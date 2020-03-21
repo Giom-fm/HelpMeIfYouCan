@@ -5,5 +5,5 @@
 
 ## Start
 
-`./mvnw spring-boot:run`
+`set -lx DATABASE_PASSWORD <PASSWORD> && ./mvnw spring-boot:run`
 
