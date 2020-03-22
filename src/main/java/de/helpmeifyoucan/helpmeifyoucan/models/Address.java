@@ -1,11 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
-import org.bson.types.ObjectId;
-
 public class Address extends AbstractEntity {
-
-    public ObjectId id;
 
     private String street;
 
@@ -60,10 +55,5 @@ public class Address extends AbstractEntity {
                 ", zipCode=" + zipCode +
                 ", country='" + country + '\'' +
                 '}';
-    }
-
-    @Override
-    public ClassName getClassName() {
-        return ClassName.Address;
     }
 }

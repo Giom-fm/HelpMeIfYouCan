@@ -1,24 +1,15 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
-import org.bson.types.ObjectId;
-
 import java.util.List;
 
-public class User extends AbstractEntity{
+public class User extends AbstractEntity {
 
-    private ObjectId id;
-
+    public static final String collectionName = "CollectionName";
     private String name;
-
     private String lastname;
-
     private List<Address> addresses;
-
     private int phoneNr;
-
     private String payPal;
-
 
     public User setName(String name) {
         this.name = name;
@@ -65,26 +56,14 @@ public class User extends AbstractEntity{
         return addresses;
     }
 
-    public User addAddress(Address address)
-    {
+    public User addAddress(Address address) {
         addresses.add(address);
         return this;
     }
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", addresses=" + addresses +
-                ", phoneNr=" + phoneNr +
-                ", payPal='" + payPal + '\'' +
-                '}';
-    }
-
-    @Override
-    public ClassName getClassName() {
-        return ClassName.User;
+        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastname + '\''
+                + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
     }
 }
