@@ -1,7 +1,6 @@
-package de.helpmeifyoucan.helpmeifyoucan.RestController;
+package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
-
-import de.helpmeifyoucan.helpmeifyoucan.controllers.UserController;
+import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
 import de.helpmeifyoucan.helpmeifyoucan.models.User;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,6 @@ public class UserRestController {
         controller.save(user);
     }
 
-
     @GetMapping("/get/{id}")
     public User get(@PathVariable String id) {
         ObjectId newId = new ObjectId(id);
@@ -26,5 +24,3 @@ public class UserRestController {
         return controller.get(newId);
     }
 }
-
-

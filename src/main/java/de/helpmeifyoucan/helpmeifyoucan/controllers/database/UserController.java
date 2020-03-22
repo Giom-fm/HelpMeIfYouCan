@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers;
+package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import org.bson.types.ObjectId;
 

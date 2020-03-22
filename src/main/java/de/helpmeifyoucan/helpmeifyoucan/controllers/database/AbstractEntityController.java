@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers;
+package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
