@@ -1,11 +1,8 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
-import org.bson.LazyBSONList;
-import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class User extends AbstractEntity{

@@ -17,7 +17,6 @@ public class EntityController {
     MongoDatabase database = Database.getDatabase();
 
     public <E extends AbstractEntity> void saveUser(E entity) {
-
         getCollection(entity.getClassName()).insertOne(entity);
     }
 
