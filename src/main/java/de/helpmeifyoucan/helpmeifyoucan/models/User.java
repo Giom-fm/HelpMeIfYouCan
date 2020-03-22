@@ -1,18 +1,44 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+
+import org.bson.types.ObjectId;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class User extends AbstractEntity {
 
-    public static final String collectionName = "CollectionName";
+    @NotNull(message = "Please fill in Name")
     private String name;
-    private String lastname;
-    private List<Address> addresses;
+
+    @NotNull(message = "Please fill in Lastname")
+    private String lastName;
+
+    @Valid
+    private List<ObjectId> addresses;
+
+    @NotNull(message = "Please fill in PhoneNumber")
     private int phoneNr;
+
     private String payPal;
+
+    @Email(message = "Please fill in Email")
+    private String email;
+
 
     public User setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public User setEmail(String email) {
+        this.email = email;
         return this;
     }
 
@@ -20,12 +46,12 @@ public class User extends AbstractEntity {
         return name;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public User setLastname(String lastname) {
-        this.lastname = lastname;
+    public User setLastName(String lastName) {
+        this.lastName = lastName;
         return this;
     }
 
@@ -47,23 +73,20 @@ public class User extends AbstractEntity {
         return this;
     }
 
-    public User setAddresses(List<Address> addresses) {
+    public User setAddresses(List<ObjectId> addresses) {
         this.addresses = addresses;
         return this;
     }
 
-    public List<Address> getAddresses() {
+    public List<ObjectId> getAddresses() {
         return addresses;
     }
 
-    public User addAddress(Address address) {
-        addresses.add(address);
-        return this;
-    }
 
     @Override
     public String toString() {
-        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastname + '\''
+        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastName + '\''
                 + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
+
     }
 }
