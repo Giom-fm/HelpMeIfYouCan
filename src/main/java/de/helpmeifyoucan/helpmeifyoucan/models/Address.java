@@ -1,6 +1,5 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
 
 import javax.validation.constraints.NotNull;
 
