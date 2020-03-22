@@ -31,7 +31,8 @@ public class Database {
             String uri = String.format("mongodb+srv://%s:%s@%s", Config.DATABASE_USER, Config.DATABASE_PASSWORD,
                     Config.DATABASE_ADDRESS);
 
-            MongoClientSettings settings = MongoClientSettings.builder().applyConnectionString(new ConnectionString(uri)).codecRegistry(codecRegistry).build();
+            MongoClientSettings settings = MongoClientSettings.builder()
+                    .applyConnectionString(new ConnectionString(uri)).codecRegistry(codecRegistry).build();
 
             Database.client = MongoClients.create(settings);
         }

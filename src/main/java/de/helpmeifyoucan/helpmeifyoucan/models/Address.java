@@ -64,8 +64,5 @@ public class Address extends AbstractEntity {
                 '}';
     }
 
-    @Override
-    public ClassName getClassName() {
-        return ClassName.Address;
-    }
+
 }

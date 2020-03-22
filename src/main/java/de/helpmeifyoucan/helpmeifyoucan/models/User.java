@@ -7,7 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class User extends AbstractEntity{
+public class User extends AbstractEntity {
 
     @NotNull(message = "Please fill in Name")
     private String name;
@@ -81,25 +81,11 @@ public class User extends AbstractEntity{
         return addresses;
     }
 
-    public User addAddress(Address address)
-    {
-        addresses.add(address);
-        return this;
-    }
 
     @Override
     public String toString() {
-        return "User{" +
-                ", name='" + name + '\'' +
-                ", lastname='" + lastname + '\'' +
-                ", addresses=" + addresses +
-                ", phoneNr=" + phoneNr +
-                ", payPal='" + payPal + '\'' +
-                '}';
-    }
+        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastname + '\''
+                + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
 
-    @Override
-    public ClassName getClassName() {
-        return ClassName.User;
     }
 }
