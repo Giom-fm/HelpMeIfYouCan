@@ -13,39 +13,37 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class EntityController {
 
-
     MongoDatabase database = Database.getDatabase();
 
-    public <E extends AbstractEntity> void saveUser(E entity) {
+
+    public <E extends AbstractEntity> void saveEntity(E entity) {
         getCollection(entity.getClassName()).insertOne(entity);
     }
 
     public <E extends AbstractEntity> E getEntityByIdAndClass(ObjectId id, ClassName className) {
-        MongoCollection collection = getCollection(className);
-        E value = (E) collection.find(eq("_id", id)).first();
-
-        return value;
+        MongoCollection<E> collection = getCollection(className);
+        return collection.find(eq("_id", id)).first();
 
     }
 
 
     //FIXME
-    private <E extends AbstractEntity> MongoCollection getCollection(ClassName entityClass) {
-        MongoCollection collection = null;
+    private <E extends AbstractEntity> MongoCollection<E> getCollection(ClassName className) {
 
-        switch (entityClass) {
+
+        MongoCollection<? extends AbstractEntity> collection = null;
+
+        switch (className) {
             case User:
                 collection = database.getCollection("users", User.class);
                 break;
-
             case Address:
                 collection = database.getCollection("addresses", Address.class);
                 break;
-
         }
+        return (MongoCollection<E>) collection;
 
-        return collection;
     }
-
-
 }
+
+

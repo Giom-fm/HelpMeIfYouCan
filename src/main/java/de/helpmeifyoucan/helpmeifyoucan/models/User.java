@@ -1,27 +1,43 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
-import org.bson.types.ObjectId;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class User extends AbstractEntity{
 
-    private ObjectId id;
-
+    @NotNull(message = "Please fill in Name")
     private String name;
 
+    @NotNull(message = "Please fill in Lastname")
     private String lastname;
 
+    @Valid
     private List<Address> addresses;
 
+    @NotNull(message = "Please fill in PhoneNumber")
     private int phoneNr;
 
     private String payPal;
 
+    @Email(message = "Please fill in Email")
+    private String email;
+
 
     public User setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public User setEmail(String email) {
+        this.email = email;
         return this;
     }
 
@@ -74,7 +90,6 @@ public class User extends AbstractEntity{
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
                 ", name='" + name + '\'' +
                 ", lastname='" + lastname + '\'' +
                 ", addresses=" + addresses +

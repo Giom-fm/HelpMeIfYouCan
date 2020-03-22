@@ -1,18 +1,20 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.ClassName;
-import org.bson.types.ObjectId;
+
+import javax.validation.constraints.NotNull;
 
 public class Address extends AbstractEntity {
 
-    public ObjectId id;
-
+    @NotNull(message = "please fill in Street")
     private String street;
-
+    @NotNull(message = "please fill in District")
     private String district;
 
+    @NotNull(message = "please fill in ZipCode")
     private int zipCode;
 
+    @NotNull(message = "please fill in Country")
     private String country;
 
 
