@@ -12,6 +12,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthenticationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
@@ -23,17 +24,21 @@ import static de.helpmeifyoucan.helpmeifyoucan.config.Config.JWT_SIGN_UP_URL;
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private UserController userController;
 
-    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
+            UserController userController) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userController = userController;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, JWT_SIGN_UP_URL).permitAll()
-                .anyRequest().authenticated().and().addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorizationFilter(authenticationManager()))
+                .anyRequest().authenticated().and()
+                .addFilter(new JWTAuthenticationFilter(this.authenticationManager(), this.userController))
+                .addFilter(new JWTAuthorizationFilter(this.authenticationManager()))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

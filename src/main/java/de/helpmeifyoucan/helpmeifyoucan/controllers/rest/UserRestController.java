@@ -21,7 +21,6 @@ public class UserRestController {
     @GetMapping("/get/{id}")
     public UserModel get(@PathVariable String id) {
         ObjectId newId = new ObjectId(id);
-
         return controller.get(newId);
     }
 
