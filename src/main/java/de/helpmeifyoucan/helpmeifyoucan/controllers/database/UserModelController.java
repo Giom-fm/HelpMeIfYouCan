@@ -1,70 +1,78 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.Address;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class UserController extends AbstractEntityController<UserModel> {
+import static com.mongodb.client.model.Filters.eq;
 
-    private final MongoCollection<UserModel> collection = database.getCollection("users", UserModel.class);
+public class UserModelController extends AbstractModelController<UserModel> {
 
-    private final AddressController addressController = new AddressController();
 
-    public UserController() {
+    private final AddressModelController addressModelController = new AddressModelController();
+
+    public UserModelController() {
+        super("users", UserModel.class);
         IndexOptions options = new IndexOptions();
         options.unique(true);
-        collection.createIndex(Indexes.ascending("email"), options);
+        super.getCollection().createIndex(Indexes.ascending("email"), options);
     }
 
     public void save(UserModel user) {
-        super.save(collection, user);
+        super.save(user);
     }
 
     public UserModel get(ObjectId id) {
-        return super.getById(collection, id);
+        return super.getById(id);
     }
 
     public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
-        return super.getByFilter(this.collection, filter);
+        return super.getByFilter(filter);
     }
 
     public void update(ObjectId id, UserModel user) {
         var filter = new Document("_id", id);
-        super.updateExisting(this.collection, filter, user);
+        super.updateExisting(filter, user);
+    }
+
+    public Optional<UserModel> exists(Bson filter) {
+        return super.exists(filter);
     }
 
     public void delete(ObjectId id) {
-        super.delete(this.collection, id);
+        super.delete(Filters.eq("_id", id));
     }
 
     private void addAddress(ObjectId userId, ObjectId addressId) {
-        var user = super.getById(this.collection, userId);
+        var user = super.getById(userId);
         var addresses = getAddresses(user);
         addresses.add(addressId);
         this.update(user.getId(), user.setAddresses(addresses));
     }
 
     public void handleUserAddressAdd(ObjectId id, Address address) {
-        var dbAddress = addressController.exists(address);
+        var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
+        var dbAddress = addressModelController.exists(addressFilter);
         if (dbAddress.isPresent()) {
             addAddress(id, dbAddress.get().getId());
         } else {
-            addressController.save(address);
+            addressModelController.save(address);
             addAddress(id, address.getId());
         }
     }
 
     public void deleteUserAddress(ObjectId userId, Address address) {
-        var user = super.getById(this.collection, userId);
+        var user = super.getById(userId);
         var addresses = getAddresses(user);
         addresses.remove(addresses);
         this.update(user.getId(), user.setAddresses(addresses));

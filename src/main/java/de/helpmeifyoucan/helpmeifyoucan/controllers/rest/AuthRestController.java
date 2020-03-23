@@ -1,25 +1,24 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
+import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
-
 @RestController
 @RequestMapping("/auth")
 public class AuthRestController {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserController userController;
+    private final UserModelController userModelController;
 
-    public AuthRestController(BCryptPasswordEncoder bCryptPasswordEncoder, UserController userController) {
+    public AuthRestController(BCryptPasswordEncoder bCryptPasswordEncoder, UserModelController userModelController) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userController = userController;
+        this.userModelController = userModelController;
     }
 
     @PostMapping("/sign-up")
@@ -30,6 +29,6 @@ public class AuthRestController {
         var user = new UserModel();
         user.setEmail(credentials.getEmail());
         user.setPassword(hashedPassword);
-        this.userController.save(user);
+        this.userModelController.save(user);
     }
 }
