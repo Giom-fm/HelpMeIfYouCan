@@ -1,6 +1,8 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
+import org.bson.types.ObjectId;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -12,10 +14,10 @@ public class User extends AbstractEntity {
     private String name;
 
     @NotNull(message = "Please fill in Lastname")
-    private String lastname;
+    private String lastName;
 
     @Valid
-    private List<Address> addresses;
+    private List<ObjectId> addresses;
 
     @NotNull(message = "Please fill in PhoneNumber")
     private int phoneNr;
@@ -44,12 +46,12 @@ public class User extends AbstractEntity {
         return name;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public User setLastname(String lastname) {
-        this.lastname = lastname;
+    public User setLastName(String lastName) {
+        this.lastName = lastName;
         return this;
     }
 
@@ -71,19 +73,19 @@ public class User extends AbstractEntity {
         return this;
     }
 
-    public User setAddresses(List<Address> addresses) {
+    public User setAddresses(List<ObjectId> addresses) {
         this.addresses = addresses;
         return this;
     }
 
-    public List<Address> getAddresses() {
+    public List<ObjectId> getAddresses() {
         return addresses;
     }
 
 
     @Override
     public String toString() {
-        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastname + '\''
+        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastName + '\''
                 + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
 
     }

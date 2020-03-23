@@ -4,26 +4,44 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractEntity;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import com.mongodb.client.model.Filters;
+
+import java.util.Optional;
 
 public abstract class AbstractEntityController<T extends AbstractEntity> {
 
-    private final MongoDatabase database = Database.getDatabase();
+    static final MongoDatabase database = Database.getDatabase();
 
-    public void save(T entity) {
-        var collection = this.getCollection(entity.getClass());
+    public void save(MongoCollection<T> collection, T entity) {
         collection.insertOne(entity);
     }
 
-    protected T get(ObjectId id, Class<T> clazz) {
-        var collection = this.getCollection(clazz);
-        return collection.find(Filters.eq("_id", id), clazz).first();
+    protected T getById(MongoCollection<T> collection, ObjectId id) {
+
+        var filter = new Document("_id", id);
+        return collection.find(filter).first();
+
     }
 
-    //FIXME 
-    private MongoCollection<T> getCollection(Class<? extends AbstractEntity> clazz) {
-        return (MongoCollection<T>) this.database.getCollection(clazz.getSimpleName(), clazz);
+    protected void delete(MongoCollection<T> collection, ObjectId id) {
+        var filter = new Document("_id", id);
+        collection.deleteOne(filter);
     }
+
+    protected T getByFilter(MongoCollection<T> collection, Bson filter) {
+        return collection.find(filter).first();
+    }
+
+    protected void updateExisting(MongoCollection<T> collection, Document filter, T entity) {
+        collection.findOneAndReplace(filter, entity);
+    }
+
+    protected Optional<T> exists(MongoCollection<T> collection, Bson filter) {
+        return Optional.ofNullable(getByFilter(collection, filter));
+
+    }
+
 
 }

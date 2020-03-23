@@ -2,6 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
 import javax.validation.constraints.NotNull;
+import java.util.Objects;
 
 public class Address extends AbstractEntity {
 
@@ -16,6 +17,8 @@ public class Address extends AbstractEntity {
     @NotNull(message = "please fill in Country")
     private String country;
 
+
+    private int hashCode;
 
     public int getZipCode() {
         return zipCode;
@@ -53,6 +56,20 @@ public class Address extends AbstractEntity {
         return this;
     }
 
+    public Address calculateHash() {
+        this.hashCode = hashCode();
+        return this;
+    }
+
+    public Address setHashCode(int hashCode) {
+        this.hashCode = hashCode;
+        return this;
+    }
+
+    public int getHashCode() {
+        return hashCode;
+    }
+
     @Override
     public String toString() {
         return "Address{" +
@@ -63,5 +80,19 @@ public class Address extends AbstractEntity {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Address address = (Address) o;
+        return getZipCode() == address.getZipCode() &&
+                getStreet().equals(address.getStreet()) &&
+                getDistrict().equals(address.getDistrict()) &&
+                getCountry().equals(address.getCountry());
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(getStreet(), getDistrict(), getZipCode(), getCountry());
+    }
 }
