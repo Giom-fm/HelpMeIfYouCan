@@ -4,7 +4,7 @@
 * Java 11
 
 ## Start
-Set an environment variable *DATABASE_PASSWORD* with your database password.
+Set environment variables *DATABASE_PASSWORD* and *DATABASE_HOST* with your credentials.
 
-`set -lx DATABASE_PASSWORD <PASSWORD> && ./mvnw spring-boot:run`
+`set -lx DATABASE_PASSWORD <PASSWORD> && set -lx DATABASE_HOST <HOST> && ./mvnw spring-boot:run`
 

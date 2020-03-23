@@ -1,7 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
+import javax.validation.constraints.Email;
+
 public class Credentials {
 
+    @Email(message = "Please fill in Email")
     private String email;
     private String password;
 

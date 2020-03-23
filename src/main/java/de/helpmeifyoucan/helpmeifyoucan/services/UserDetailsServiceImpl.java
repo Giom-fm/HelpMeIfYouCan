@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 
 import static java.util.Collections.emptyList;
 
@@ -19,11 +20,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = null;
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserModel user = this.userController.getByEmail(email);
         if (user == null) {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException(email);
         }
-        return null;
+        return new User(user.getEmail(), user.getPassword(), emptyList());
     }
 }

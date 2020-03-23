@@ -1,6 +1,5 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
@@ -8,7 +7,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-public class User extends AbstractEntity {
+public class UserModel extends AbstractEntity {
 
     @NotNull(message = "Please fill in Name")
     private String name;
@@ -26,9 +25,11 @@ public class User extends AbstractEntity {
 
     @Email(message = "Please fill in Email")
     private String email;
+    private String password;
 
 
-    public User setName(String name) {
+
+    public UserModel setName(String name) {
         this.name = name;
         return this;
     }
@@ -37,7 +38,7 @@ public class User extends AbstractEntity {
         return email;
     }
 
-    public User setEmail(String email) {
+    public UserModel setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -50,12 +51,12 @@ public class User extends AbstractEntity {
         return lastName;
     }
 
-    public User setLastName(String lastName) {
+    public UserModel setLastName(String lastName) {
         this.lastName = lastName;
         return this;
     }
 
-    public User setPhoneNr(int phoneNr) {
+    public UserModel setPhoneNr(int phoneNr) {
         this.phoneNr = phoneNr;
         return this;
     }
@@ -68,12 +69,12 @@ public class User extends AbstractEntity {
         return payPal;
     }
 
-    public User setPayPal(String payPal) {
+    public UserModel setPayPal(String payPal) {
         this.payPal = payPal;
         return this;
     }
 
-    public User setAddresses(List<ObjectId> addresses) {
+    public UserModel setAddresses(List<ObjectId> addresses) {
         this.addresses = addresses;
         return this;
     }
@@ -82,11 +83,18 @@ public class User extends AbstractEntity {
         return addresses;
     }
 
-
     @Override
     public String toString() {
         return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastName + '\''
                 + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
 
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

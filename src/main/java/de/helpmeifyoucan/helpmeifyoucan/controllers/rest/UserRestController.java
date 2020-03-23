@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
 import de.helpmeifyoucan.helpmeifyoucan.models.Address;
-import de.helpmeifyoucan.helpmeifyoucan.models.User;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import org.bson.types.ObjectId;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,19 +14,19 @@ public class UserRestController {
     UserController controller = new UserController();
 
     @PostMapping(consumes = "application/json")
-    public void createUser(@Valid @RequestBody User user) {
+    public void createUser(@Valid @RequestBody UserModel user) {
         controller.save(user);
     }
 
     @GetMapping("/get/{id}")
-    public User get(@PathVariable String id) {
+    public UserModel get(@PathVariable String id) {
         ObjectId newId = new ObjectId(id);
 
         return controller.get(newId);
     }
 
     @PostMapping(path = "/update/{id}", consumes = "application/json")
-    public void update(@Valid @RequestBody User user, @PathVariable String id) {
+    public void update(@Valid @RequestBody UserModel user, @PathVariable String id) {
         controller.update(new ObjectId(id), user);
     }
 

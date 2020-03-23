@@ -2,6 +2,8 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractEntity;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
 import org.bson.Document;
@@ -14,19 +16,18 @@ public abstract class AbstractEntityController<T extends AbstractEntity> {
 
     static final MongoDatabase database = Database.getDatabase();
 
-    public void save(MongoCollection<T> collection, T entity) {
+    protected void save(MongoCollection<T> collection, T entity) {
         collection.insertOne(entity);
     }
 
     protected T getById(MongoCollection<T> collection, ObjectId id) {
-
         var filter = new Document("_id", id);
         return collection.find(filter).first();
 
     }
 
     protected void delete(MongoCollection<T> collection, ObjectId id) {
-        var filter = new Document("_id", id);
+        var filter = Filters.eq("_id", id);
         collection.deleteOne(filter);
     }
 
@@ -40,8 +41,5 @@ public abstract class AbstractEntityController<T extends AbstractEntity> {
 
     protected Optional<T> exists(MongoCollection<T> collection, Bson filter) {
         return Optional.ofNullable(getByFilter(collection, filter));
-
     }
-
-
 }

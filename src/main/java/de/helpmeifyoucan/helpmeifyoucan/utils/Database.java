@@ -22,20 +22,16 @@ public class Database {
 
     public static MongoDatabase getDatabase() {
         if (Database.client == null) {
-
             CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-
             CodecRegistry codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                     pojoCodecRegistry);
-
-            String uri = String.format("mongodb+srv://%s:%s@%s", Config.DATABASE_USER, Config.DATABASE_PASSWORD,
-                    Config.DATABASE_ADDRESS);
-
+            String uri = String.format("%s://%s:%s@%s", Config.DATABASE_PROTOCOL, Config.DATABASE_USER,
+                    Config.DATABASE_PASSWORD, Config.DATABASE_HOST);
             MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(new ConnectionString(uri)).codecRegistry(codecRegistry).build();
-
             Database.client = MongoClients.create(settings);
         }
         return Database.client.getDatabase(Config.DATABASE_NAME);
     }
+
 }

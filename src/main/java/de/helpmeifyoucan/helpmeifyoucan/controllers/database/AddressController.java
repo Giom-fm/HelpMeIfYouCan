@@ -37,9 +37,7 @@ public class AddressController extends AbstractEntityController<Address> {
 
     public void update(ObjectId id, Address address) {
         var filter = new Document("_id", id);
-
         super.updateExisting(this.collection, filter, address);
     }
-
 
 }
