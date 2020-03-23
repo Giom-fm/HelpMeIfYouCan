@@ -23,7 +23,6 @@ public abstract class AbstractEntityController<T extends AbstractEntity> {
     protected T getById(MongoCollection<T> collection, ObjectId id) {
         var filter = new Document("_id", id);
         return collection.find(filter).first();
-
     }
 
     protected void delete(MongoCollection<T> collection, ObjectId id) {
