@@ -4,7 +4,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
-public class Address extends AbstractEntity {
+public class AddressModel extends AbstractEntity {
 
     @NotNull(message = "please fill in Street")
     private String street;
@@ -24,12 +24,12 @@ public class Address extends AbstractEntity {
         return zipCode;
     }
 
-    public Address setZipCode(int zipCode) {
+    public AddressModel setZipCode(int zipCode) {
         this.zipCode = zipCode;
         return this;
     }
 
-    public Address setCountry(String country) {
+    public AddressModel setCountry(String country) {
         this.country = country;
         return this;
     }
@@ -42,7 +42,7 @@ public class Address extends AbstractEntity {
         return district;
     }
 
-    public Address setDistrict(String district) {
+    public AddressModel setDistrict(String district) {
         this.district = district;
         return this;
     }
@@ -51,17 +51,17 @@ public class Address extends AbstractEntity {
         return street;
     }
 
-    public Address setStreet(String street) {
+    public AddressModel setStreet(String street) {
         this.street = street;
         return this;
     }
 
-    public Address calculateHash() {
+    public AddressModel calculateHash() {
         this.hashCode = hashCode();
         return this;
     }
 
-    public Address setHashCode(int hashCode) {
+    public AddressModel setHashCode(int hashCode) {
         this.hashCode = hashCode;
         return this;
     }
@@ -84,7 +84,7 @@ public class Address extends AbstractEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Address address = (Address) o;
+        AddressModel address = (AddressModel) o;
         return getZipCode() == address.getZipCode() &&
                 getStreet().equals(address.getStreet()) &&
                 getDistrict().equals(address.getDistrict()) &&

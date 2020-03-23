@@ -25,12 +25,44 @@ public class UserModel extends AbstractEntity {
 
     @Email(message = "Please fill in Email")
     private String email;
+
     private String password;
 
+    private List<String> roles;
 
+    boolean enabled;
+
+    boolean verified;
 
     public UserModel setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public UserModel setRoles(List<String> roles) {
+        this.roles = roles;
+        return this;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public UserModel setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
+    public UserModel setVerified(boolean verified) {
+        this.verified = verified;
         return this;
     }
 

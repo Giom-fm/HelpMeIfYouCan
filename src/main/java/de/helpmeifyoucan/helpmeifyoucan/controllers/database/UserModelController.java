@@ -3,7 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import de.helpmeifyoucan.helpmeifyoucan.models.Address;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -40,9 +40,9 @@ public class UserModelController extends AbstractModelController<UserModel> {
         return super.getByFilter(filter);
     }
 
-    public void update(ObjectId id, UserModel user) {
+    public UserModel update(ObjectId id, UserModel user) {
         var filter = new Document("_id", id);
-        super.updateExisting(filter, user);
+        return super.updateExisting(filter, user);
     }
 
     public Optional<UserModel> exists(Bson filter) {
@@ -60,7 +60,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
         this.update(user.getId(), user.setAddresses(addresses));
     }
 
-    public void handleUserAddressAdd(ObjectId id, Address address) {
+    public void handleUserAddressAdd(ObjectId id, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
         var dbAddress = addressModelController.exists(addressFilter);
         if (dbAddress.isPresent()) {
@@ -71,17 +71,17 @@ public class UserModelController extends AbstractModelController<UserModel> {
         }
     }
 
-    public void deleteUserAddress(ObjectId userId, Address address) {
+    public void deleteUserAddress(ObjectId userId, AddressModel address) {
         var user = super.getById(userId);
         var addresses = getAddresses(user);
-        addresses.remove(addresses);
+        addresses.remove(address.getId());
         this.update(user.getId(), user.setAddresses(addresses));
 
     }
 
     public List<ObjectId> getAddresses(UserModel user) {
-        List<ObjectId> addresses = new ArrayList<>(user.getAddresses());
-        return addresses;
+        return new ArrayList<>(user.getAddresses());
+
     }
 
 }
