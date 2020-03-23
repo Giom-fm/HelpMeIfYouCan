@@ -24,15 +24,15 @@ import java.util.Date;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import de.helpmeifyoucan.helpmeifyoucan.config.Config;
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
+import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Login;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final UserController userController;
+    private final UserModelController userController;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserController userController) {
+    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserModelController userController) {
         this.authenticationManager = authenticationManager;
         this.setFilterProcessesUrl("/auth/login");
         this.userController = userController;

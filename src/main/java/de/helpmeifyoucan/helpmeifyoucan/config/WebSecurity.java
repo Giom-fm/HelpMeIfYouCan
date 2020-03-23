@@ -12,7 +12,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserController;
+import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthenticationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
@@ -24,10 +24,10 @@ import static de.helpmeifyoucan.helpmeifyoucan.config.Config.JWT_SIGN_UP_URL;
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserController userController;
+    private UserModelController userController;
 
     public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-            UserController userController) {
+            UserModelController userController) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userController = userController;
