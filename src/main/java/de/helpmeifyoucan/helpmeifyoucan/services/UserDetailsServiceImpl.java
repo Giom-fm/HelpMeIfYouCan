@@ -2,13 +2,17 @@ package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import static java.util.Collections.emptyList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -20,10 +24,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var user = this.userModelController.exists(Filters.eq("email", email));
-        if (user.isEmpty()) {
+        var optUser = this.userModelController.exists(Filters.eq("email", email));
+        if (optUser.isEmpty()) {
             throw new UsernameNotFoundException(email);
         }
-        return new User(user.get().getEmail(), user.get().getPassword(), emptyList());
+        var user = optUser.get();
+        return new User(user.getId().toString(), user.getPassword(), this.rolesToAuthoritys(user.getRoles()));
+    }
+
+    private List<SimpleGrantedAuthority> rolesToAuthoritys(List<Roles> roles) {
+        return roles.stream().map(role -> {
+            return new SimpleGrantedAuthority(role.toString());
+        }).collect(Collectors.toList());
     }
 }

@@ -17,7 +17,6 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class UserModelController extends AbstractModelController<UserModel> {
 
-
     private final AddressModelController addressModelController = new AddressModelController();
 
     public UserModelController() {
@@ -51,6 +50,10 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     public void delete(ObjectId id) {
         super.delete(Filters.eq("_id", id));
+    }
+
+    public void deleteByEmail(String email) {
+        super.delete(Filters.eq("email", email));
     }
 
     private void addAddress(ObjectId userId, ObjectId addressId) {

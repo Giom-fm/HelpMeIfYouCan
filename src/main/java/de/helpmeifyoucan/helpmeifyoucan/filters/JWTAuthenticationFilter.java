@@ -4,8 +4,10 @@ import com.auth0.jwt.JWT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,6 +23,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import de.helpmeifyoucan.helpmeifyoucan.config.Config;
@@ -34,7 +37,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserModelController userController) {
         this.authenticationManager = authenticationManager;
-        this.setFilterProcessesUrl("/auth/login");
+        this.setFilterProcessesUrl("/auth/signin");
         this.userController = userController;
     }
 
@@ -54,19 +57,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
             Authentication auth) throws IOException, ServletException {
 
-        var email = ((User) auth.getPrincipal()).getUsername();
+        var userDetails = ((User) auth.getPrincipal());
+        var id = userDetails.getUsername();
+        var roles = userDetails.getAuthorities().stream().map(role -> role.toString()).collect(Collectors.toList());
 
-        String token = JWT.create().withSubject(email)
+        String token = JWT.create().withSubject(id).withArrayClaim("roles", roles.toArray(new String[0]))
                 .withExpiresAt(new Date(System.currentTimeMillis() + Config.JWT_EXPIRATION_TIME))
                 .sign(HMAC512(Config.JWT_SECRET.getBytes()));
 
-        // res.addHeader(Config.JWT_HEADER_STRING, Config.JWT_TOKEN_PREFIX + token);
-        var user = this.userController.getByEmail(email);
+        var user = this.userController.get(new ObjectId(id));
         var login = new Login(user.getName(), user.getLastName(), token);
-        var json = new ObjectMapper().writeValueAsString(login);
+
         res.setStatus(HttpStatus.OK.value());
-        // FIXME Use Spring Utils to write Header
-        res.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        res.getWriter().write(json);
+        res.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+        res.getWriter().write(new ObjectMapper().writeValueAsString(login));
     }
 }
