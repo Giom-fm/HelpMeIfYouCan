@@ -2,6 +2,8 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import org.bson.types.ObjectId;
 
+import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -28,7 +30,7 @@ public class UserModel extends AbstractEntity {
 
     private String password;
 
-    private List<String> roles;
+    private List<Roles> roles;
 
     boolean enabled;
 
@@ -47,12 +49,12 @@ public class UserModel extends AbstractEntity {
         return verified;
     }
 
-    public UserModel setRoles(List<String> roles) {
+    public UserModel setRoles(List<Roles> roles) {
         this.roles = roles;
         return this;
     }
 
-    public List<String> getRoles() {
+    public List<Roles> getRoles() {
         return roles;
     }
 

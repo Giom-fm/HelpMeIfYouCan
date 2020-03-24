@@ -7,6 +7,7 @@ import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import static de.helpmeifyoucan.helpmeifyoucan.config.Config.JWT_SIGN_UP_URL;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -34,7 +36,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, JWT_SIGN_UP_URL).permitAll()
-                /*.anyRequest().authenticated()*/.and()
+                .anyRequest().authenticated().and()
                 .addFilter(new JWTAuthenticationFilter(this.authenticationManager(), this.userController))
                 .addFilter(new JWTAuthorizationFilter(this.authenticationManager()))
                 // this disables session creation on Spring Security
