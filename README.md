@@ -1,6 +1,7 @@
 ### Help Me If You Can
 
 ## Dependencies
+* maven 3.6.3
 * Java 11
 
 ## Start
