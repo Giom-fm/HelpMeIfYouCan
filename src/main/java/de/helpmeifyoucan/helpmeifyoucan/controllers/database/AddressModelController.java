@@ -5,9 +5,13 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -28,17 +32,19 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public AddressModel get(ObjectId id) {
-        return super.getById(id);
+        var address = super.getById(id);
+        if (address == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+        return address;
     }
 
     public Optional<AddressModel> exists(Bson filter) {
-
         return super.exists(filter);
     }
 
     public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
-        var filter = new Document("_id", address);
-
+        var filter = Filters.eq("_id", address);
         return super.updateExistingFields(filter, updatedFields);
     }
 
@@ -49,7 +55,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public void handleUserControllerAddressDelete(ObjectId addressId, ObjectId userId) {
-        deleteUserFromAddress(this.get(addressId), userId);
+        this.deleteUserFromAddress(this.get(addressId), userId);
     }
 
     public AddressModel addUserToAddress(AddressModel address, ObjectId id) {
@@ -60,28 +66,33 @@ public class AddressModelController extends AbstractModelController<AddressModel
         return this.updateUserField(address.removeUserAddress(id));
     }
 
-    public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) throws Exception {
+    public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId)
+            throws Exception {
         var address = this.exists(Filters.eq("_id", addressId));
 
         if (address.isEmpty()) {
             throw new Exception();
         }
         var existingAddress = address.get();
-        if (existingAddress.noUserReferences() || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
+        if (existingAddress.noUserReferences()
+                || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
             var fields = addressUpdate.toDocument();
             return this.updateExistingField(fields, addressId);
         } else {
             this.deleteUserFromAddress(existingAddress, userId);
-            var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate).setUsers(Collections.singletonList(userId));
+            var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate)
+                    .setUsers(Collections.singletonList(userId));
             userModelController.exchangeAddress(userId, existingAddress.getId(), newAddress.getId());
             return this.save(newAddress);
         }
     }
 
-    //TODO check references
+    // TODO check references
     public void delete(ObjectId id) {
         var filter = Filters.eq("_id", id);
-        super.delete(filter);
+        if (!super.delete(filter)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
     }
 
 }
