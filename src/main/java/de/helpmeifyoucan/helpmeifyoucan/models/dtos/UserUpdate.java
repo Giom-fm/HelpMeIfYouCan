@@ -1,13 +1,45 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
-import org.bson.BsonDocument;
 import org.bson.Document;
 
 public class UserUpdate {
 
-    //TODO
-    public BsonDocument toDocument() {
-        return new Document().toBsonDocument(AddressUpdate.class, Database.pojoCodec);
+
+    private String password;
+
+    private String email;
+
+    public String getPassword() {
+        return password;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public UserUpdate setPassword(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public UserUpdate setEmail(String email) {
+        this.email = email;
+        return this;
+    }
+
+    public Document toDocument() {
+        var document = new Document();
+
+        if (!this.email.isEmpty()) {
+            document.put("email", this.email);
+        }
+
+        //TODO password hash
+        if (!this.password.isEmpty()) {
+            document.put("password", this.password);
+        }
+        return document;
+    }
+
+
 }

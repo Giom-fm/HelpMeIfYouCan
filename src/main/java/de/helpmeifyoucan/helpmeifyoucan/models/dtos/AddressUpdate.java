@@ -1,8 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
-import org.bson.BsonDocument;
 import org.bson.Document;
 
 public class AddressUpdate {
@@ -11,15 +9,11 @@ public class AddressUpdate {
 
     private String district;
 
-    private int zipCode;
+    private String zipCode;
 
     private String country;
 
 //TODO REGEX
-
-    public BsonDocument toDocument() {
-        return new Document().toBsonDocument(AddressUpdate.class, Database.pojoCodec);
-    }
 
     public String getStreet() {
         return street;
@@ -29,7 +23,7 @@ public class AddressUpdate {
         return district;
     }
 
-    public int getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
@@ -47,7 +41,7 @@ public class AddressUpdate {
         return this;
     }
 
-    public AddressUpdate setZipCode(int zipCode) {
+    public AddressUpdate setZipCode(String zipCode) {
         this.zipCode = zipCode;
         return this;
     }
@@ -55,5 +49,23 @@ public class AddressUpdate {
     public AddressUpdate setCountry(String country) {
         this.country = country;
         return this;
+    }
+
+    public Document toDocument() {
+        var document = new Document();
+        if (!this.street.isEmpty()) {
+            document.put("street", this.street);
+        }
+        if (!this.district.isEmpty()) {
+            document.put("district", this.district);
+        }
+        if (!this.zipCode.isEmpty()) {
+            document.put("zipCode", this.zipCode);
+        }
+        if (!this.country.isEmpty()) {
+            document.put("country", this.country);
+        }
+        return document;
+
     }
 }

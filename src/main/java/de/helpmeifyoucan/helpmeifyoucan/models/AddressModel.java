@@ -16,7 +16,7 @@ public class AddressModel extends AbstractEntity {
     private String district;
 
     @NotNull(message = "please fill in ZipCode")
-    private int zipCode;
+    private String zipCode;
 
     @NotNull(message = "please fill in Country")
     private String country;
@@ -49,11 +49,11 @@ public class AddressModel extends AbstractEntity {
         return this.users.isEmpty();
     }
 
-    public int getZipCode() {
+    public String getZipCode() {
         return zipCode;
     }
 
-    public AddressModel setZipCode(int zipCode) {
+    public AddressModel setZipCode(String zipCode) {
         this.zipCode = zipCode;
         return this;
     }
@@ -102,7 +102,7 @@ public class AddressModel extends AbstractEntity {
         if (!update.getDistrict().isBlank()) {
             this.street = update.getStreet();
         }
-        if (!(update.getZipCode() == 0)) {
+        if (!update.getZipCode().isBlank()) {
             this.zipCode = update.getZipCode();
         }
         if (!update.getCountry().isBlank()) {
@@ -137,7 +137,7 @@ public class AddressModel extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AddressModel address = (AddressModel) o;
-        return getZipCode() == address.getZipCode() &&
+        return getZipCode().equals(address.getZipCode()) &&
                 getStreet().equals(address.getStreet()) &&
                 getDistrict().equals(address.getDistrict()) &&
                 getCountry().equals(address.getCountry());

@@ -68,8 +68,9 @@ public class AddressModelController extends AbstractModelController<AddressModel
         }
         var existingAddress = address.get();
         if (existingAddress.noUserReferences() || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
-            var fields = addressUpdate.toDocument();
-            return this.updateExistingField(fields, addressId);
+
+
+            return this.updateExistingField(addressUpdate.toDocument(), addressId);
         } else {
             this.deleteUserFromAddress(existingAddress, userId);
             var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate).setUsers(Collections.singletonList(userId));
@@ -77,7 +78,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
 
             var filter = Filters.eq("hashCode", newAddress.getHashCode());
             var addressExists = this.exists(filter);
-            
+
             if (addressExists.isEmpty()) {
                 return this.save(newAddress);
             } else {
@@ -87,10 +88,13 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
 
-    //TODO check references
-    public void delete(ObjectId id) {
+    public AddressModel delete(ObjectId id) {
         var filter = Filters.eq("_id", id);
-        super.delete(filter);
+        var addressToBeDeleted = super.getById(id);
+        if (addressToBeDeleted.getUsers().isEmpty()) {
+            super.delete(filter);
+        }
+        return null;
     }
 
 }

@@ -16,7 +16,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class UserModelController extends AbstractModelController<UserModel> {
 
-    private final AddressModelController addressModelController = new AddressModelController();
+    private static AddressModelController addressModelController = new AddressModelController();
 
     public UserModelController() {
         super("users", UserModel.class);
