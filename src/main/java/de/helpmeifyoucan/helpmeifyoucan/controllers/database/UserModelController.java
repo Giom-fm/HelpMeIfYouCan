@@ -6,9 +6,13 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -16,7 +20,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class UserModelController extends AbstractModelController<UserModel> {
 
-    private static AddressModelController addressModelController = new AddressModelController();
+    private static final AddressModelController addressModelController = new AddressModelController();
 
     public UserModelController() {
         super("users", UserModel.class);
@@ -30,18 +34,29 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     public UserModel get(ObjectId id) {
-        return super.getById(id);
+        var user = super.getById(id);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return user;
     }
 
     public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
-        return super.getByFilter(filter);
+        var user = super.getByFilter(filter);
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return user;
     }
 
-    public UserModel update(UserUpdate updatedFields, ObjectId userId) {
-        var filter = new Document("_id", userId);
-
-        return super.updateExistingFields(filter, updatedFields.toDocument());
+    public UserModel update(UserUpdate updatedFields, ObjectId id) {
+        var filter = Filters.eq("_id", id);
+        var updatedUser = super.updateExistingFields(filter, updatedFields.toDocument());
+        if (updatedUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return updatedUser;
     }
 
     public Optional<UserModel> exists(Bson filter) {
@@ -49,40 +64,37 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     public void delete(ObjectId id) {
-        super.delete(Filters.eq("_id", id));
+        if (!super.delete(Filters.eq("_id", id))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
     }
-
-    public void deleteByEmail(String email) {
-        super.delete(Filters.eq("email", email));
-    }
-
 
     public void handleUserAddressAddRequest(ObjectId id, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
         var dbAddress = addressModelController.exists(addressFilter);
         var user = this.get(id);
         if (dbAddress.isPresent()) {
-            addAddressToUser(user, dbAddress.get());
+            this.addAddressToUser(user, dbAddress.get());
         } else {
-            addressModelController.save(address);
-            addAddressToUser(user, address);
+            this.addressModelController.save(address);
+            this.addAddressToUser(user, address);
         }
     }
 
     public void handleUserAddressDeleteRequest(ObjectId userId, ObjectId addressId) {
-        deleteAddressFromUser(this.get(userId), addressId);
+        this.deleteAddressFromUser(this.get(userId), addressId);
     }
 
     // user address operations
     private void addAddressToUser(UserModel user, AddressModel address) {
         user.addAddress(address.getId());
-        updateUserAddressField(user);
+        this.updateUserAddressField(user);
         addressModelController.addUserToAddress(address, user.getId());
     }
 
     public void exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
         var user = this.get(userId);
-        this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
+        updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
 
     }
 
@@ -97,6 +109,4 @@ public class UserModelController extends AbstractModelController<UserModel> {
         var filter = Filters.eq("_id", user.getId());
         return this.updateExistingFields(updatedFields, filter);
     }
-
-
 }

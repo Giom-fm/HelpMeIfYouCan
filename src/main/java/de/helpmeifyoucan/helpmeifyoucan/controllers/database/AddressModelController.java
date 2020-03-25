@@ -5,16 +5,20 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Optional;
 
 public class AddressModelController extends AbstractModelController<AddressModel> {
 
-    private final UserModelController userModelController = new UserModelController();
+    private static final UserModelController userModelController = new UserModelController();
 
     public AddressModelController() {
         super("address", AddressModel.class);
@@ -28,17 +32,19 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public AddressModel get(ObjectId id) {
-        return super.getById(id);
+        var address = super.getById(id);
+        if (address == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+        return address;
     }
 
     public Optional<AddressModel> exists(Bson filter) {
-
         return super.exists(filter);
     }
 
     public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
-        var filter = new Document("_id", address);
-
+        var filter = Filters.eq("_id", address);
         return super.updateExistingFields(filter, updatedFields);
     }
 
@@ -49,7 +55,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public void handleUserControllerAddressDelete(ObjectId addressId, ObjectId userId) {
-        deleteUserFromAddress(this.get(addressId), userId);
+        this.deleteUserFromAddress(this.get(addressId), userId);
     }
 
     public AddressModel addUserToAddress(AddressModel address, ObjectId id) {
@@ -67,10 +73,10 @@ public class AddressModelController extends AbstractModelController<AddressModel
             throw new Exception();
         }
         var existingAddress = address.get();
-        if (existingAddress.noUserReferences() || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
-
-
-            return this.updateExistingField(addressUpdate.toDocument(), addressId);
+        if (existingAddress.noUserReferences()
+                || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
+            var fields = addressUpdate.toDocument();
+            return this.updateExistingField(fields, addressId);
         } else {
             this.deleteUserFromAddress(existingAddress, userId);
             var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate).setUsers(Collections.singletonList(userId));
@@ -92,9 +98,10 @@ public class AddressModelController extends AbstractModelController<AddressModel
         var filter = Filters.eq("_id", id);
         var addressToBeDeleted = super.getById(id);
         if (addressToBeDeleted.getUsers().isEmpty()) {
-            super.delete(filter);
+             super.delete(filter);
+            return addressToBeDeleted;
         }
-        return null;
-    }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
 
 }

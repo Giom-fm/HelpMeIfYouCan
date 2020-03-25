@@ -19,12 +19,12 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
     private MongoCollection<T> collection;
 
     public AbstractModelController(String collectionName, Class<T> collectionClass) {
-        collection = database.getCollection(collectionName, collectionClass);
+        this.collection = database.getCollection(collectionName, collectionClass);
     }
 
-    //TODO INSERTMANY
+    // TODO INSERTMANY
     protected T save(T entity) {
-        collection.insertOne(entity);
+        this.collection.insertOne(entity);
         return entity;
     }
 
@@ -34,25 +34,25 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
 
     }
 
-    protected void delete(Bson filter) {
+    protected boolean delete(Bson filter) {
+        return this.collection.deleteOne(filter).getDeletedCount() != 0;
 
-        collection.deleteOne(filter);
     }
 
     protected T getByFilter(Bson filter) {
-        return collection.find(filter).first();
+        return this.collection.find(filter).first();
     }
 
     protected T replaceExisting(Bson filter, T entity) {
         var findRepOptions = new FindOneAndReplaceOptions();
         findRepOptions.returnDocument(ReturnDocument.AFTER);
-        return collection.findOneAndReplace(filter, entity, findRepOptions);
+        return this.collection.findOneAndReplace(filter, entity, findRepOptions);
     }
 
     protected T updateExistingFields(Bson filter, Bson fieldsToUpdate) {
         var updateOptions = new FindOneAndUpdateOptions();
         updateOptions.returnDocument(ReturnDocument.AFTER).upsert(false);
-        return collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
+        return this.collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
     protected Optional<T> exists(Bson filter) {

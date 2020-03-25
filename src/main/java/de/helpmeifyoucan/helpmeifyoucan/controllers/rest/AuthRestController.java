@@ -4,6 +4,7 @@ import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Register;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,7 +39,7 @@ public class AuthRestController {
     public void signUp(@Valid @RequestBody Register register) {
 
         if (this.userModelController.getByEmail(register.getEmail()) != null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_TAKEN);
         }
 
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());
