@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 public class Register extends Credentials {
 
     @NotNull
+    private String phoneNr;
+    @NotNull
     private String name;
     @NotNull
     private String lastName;
@@ -23,6 +25,14 @@ public class Register extends Credentials {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getphoneNr() {
+        return phoneNr;
+    }
+
+    public void setphoneNr(String phoneNr) {
+        this.phoneNr = phoneNr;
     }
 
 }

@@ -1,0 +1,341 @@
+{
+	"info": {
+		"_postman_id": "d39a6568-3345-44ac-8df9-1c3a653f57bd",
+		"name": "Help Me if you Can",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Regisgter",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\": \"user@mail.de\",\n\t\"password\" : \"password\",\n\t\"name\": \"Giom\",\n\t\"lastName\" : \"The Boss\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/auth/signup",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/signin",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"signin"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Me",
+					"item": [
+						{
+							"name": "Me",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhNDY0ZWEyZjI1NDdlYjgyNDVlYWMiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM5MTU1fQ._HIFQZ6741Vyf7Z-6CvlTTuN6eA8J1ddsNiL6_XIdKCefeDTcyjuA5qJB27l-6X_v6yrDIWibFqK70tZWIk6Ew",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "localhost:8080/user/me",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhMmU0N2NmOTliNzM5YWQ3ZDEyNDAiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM1NjI0fQ.X13i-egO-ECazT8VTTiOxqOwdU3I30aqnzw3idABc5Eg0ajE9KsMVRzGxz87zMGazv6By4rvYVwZiBE0evNTBg",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Baerer ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/user/me",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhMmU0N2NmOTliNzM5YWQ3ZDEyNDAiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM1NjI0fQ.X13i-egO-ECazT8VTTiOxqOwdU3I30aqnzw3idABc5Eg0ajE9KsMVRzGxz87zMGazv6By4rvYVwZiBE0evNTBg",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Baerer ",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "localhost:8080/user/me",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										"me"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "Admin",
+					"item": [
+						{
+							"name": "Get",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										":id"
+									],
+									"query": [
+										{
+											"key": "",
+											"value": "",
+											"disabled": true
+										}
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "90812309812731092387123"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhNDY0ZWEyZjI1NDdlYjgyNDVlYWMiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM5MTU1fQ._HIFQZ6741Vyf7Z-6CvlTTuN6eA8J1ddsNiL6_XIdKCefeDTcyjuA5qJB27l-6X_v6yrDIWibFqK70tZWIk6Ew",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "123098213098123"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhNDY0ZWEyZjI1NDdlYjgyNDVlYWMiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM5MTU1fQ._HIFQZ6741Vyf7Z-6CvlTTuN6eA8J1ddsNiL6_XIdKCefeDTcyjuA5qJB27l-6X_v6yrDIWibFqK70tZWIk6Ew",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "7asd0987asd0987asd98as7d"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhNDY0ZWEyZjI1NDdlYjgyNDVlYWMiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM5MTU1fQ._HIFQZ6741Vyf7Z-6CvlTTuN6eA8J1ddsNiL6_XIdKCefeDTcyjuA5qJB27l-6X_v6yrDIWibFqK70tZWIk6Ew",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "localhost:8080/user/:id",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"user",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "98as7d908as7d90a8s7d"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

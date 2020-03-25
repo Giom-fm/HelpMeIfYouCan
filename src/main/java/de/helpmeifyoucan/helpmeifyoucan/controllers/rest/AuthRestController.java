@@ -47,6 +47,7 @@ public class AuthRestController {
         var user = new UserModel();
         user.setEmail(register.getEmail()).setPassword(hashedPassword);
         user.setName(register.getName()).setLastName(register.getLastName());
+        user.setPhoneNr(Integer.parseInt(register.getphoneNr()));
         user.setRoles(roles);
 
         this.userModelController.save(user);
