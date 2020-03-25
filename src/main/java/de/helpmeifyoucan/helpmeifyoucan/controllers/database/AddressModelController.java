@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class AddressModelController extends AbstractModelController<AddressModel> {
 
-    private final UserModelController userModelController = new UserModelController();
+    private static final UserModelController userModelController = new UserModelController();
 
     public AddressModelController() {
         super("address", AddressModel.class);
