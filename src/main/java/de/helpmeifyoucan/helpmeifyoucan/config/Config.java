@@ -3,9 +3,9 @@ package de.helpmeifyoucan.helpmeifyoucan.config;
 public final class Config {
 
     public static final String DATABASE_PROTOCOL = "mongodb+srv";
-    public static final String DATABASE_HOST = System.getenv("DATABASE_HOST");
+    public static final String DATABASE_HOST = "helpme-1rsgf.mongodb.net/test?retryWrites=true&w=majority";
     public static final String DATABASE_USER = "dbUser";
-    public static final String DATABASE_PASSWORD = System.getenv("DATABASE_PASSWORD");
+    public static final String DATABASE_PASSWORD = "Wonhe9-cifqow-dadvep";
     public static final String DATABASE_NAME = "helpmeifyoucan";
 
     public static final String JWT_SECRET = "SecretKeyToGenJWTs";

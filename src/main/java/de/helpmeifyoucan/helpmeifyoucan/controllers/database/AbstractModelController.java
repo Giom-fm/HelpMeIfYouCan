@@ -2,11 +2,12 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndReplaceOptions;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractEntity;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
@@ -22,12 +23,13 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
     }
 
     //TODO INSERTMANY
-    protected void save(T entity) {
+    protected T save(T entity) {
         collection.insertOne(entity);
+        return entity;
     }
 
     protected T getById(ObjectId id) {
-        var filter = new Document("_id", id);
+        var filter = Filters.eq("_id", id);
         return collection.find(filter).first();
 
     }
@@ -41,10 +43,16 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
         return collection.find(filter).first();
     }
 
-    protected T updateExisting(Document filter, T entity) {
+    protected T replaceExisting(Bson filter, T entity) {
         var findRepOptions = new FindOneAndReplaceOptions();
         findRepOptions.returnDocument(ReturnDocument.AFTER);
         return collection.findOneAndReplace(filter, entity, findRepOptions);
+    }
+
+    protected T updateExistingFields(Bson filter, Bson fieldsToUpdate) {
+        var updateOptions = new FindOneAndUpdateOptions();
+        updateOptions.returnDocument(ReturnDocument.AFTER).upsert(false);
+        return collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
     protected Optional<T> exists(Bson filter) {

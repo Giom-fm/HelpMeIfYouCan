@@ -1,7 +1,11 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import org.bson.types.ObjectId;
+
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Objects;
 
 public class AddressModel extends AbstractEntity {
@@ -17,8 +21,33 @@ public class AddressModel extends AbstractEntity {
     @NotNull(message = "please fill in Country")
     private String country;
 
+    private List<ObjectId> users;
 
     private int hashCode;
+
+    public List<ObjectId> getUsers() {
+        return users;
+    }
+
+    public AddressModel setUsers(List<ObjectId> users) {
+        this.users = users;
+
+        return this;
+    }
+
+    public AddressModel addUserAddress(ObjectId user) {
+        this.users.add(user);
+        return this;
+    }
+
+    public AddressModel removeUserAddress(ObjectId user) {
+        this.users.remove(user);
+        return this;
+    }
+
+    public boolean noUserReferences() {
+        return this.users.isEmpty();
+    }
 
     public int getZipCode() {
         return zipCode;
@@ -66,8 +95,31 @@ public class AddressModel extends AbstractEntity {
         return this;
     }
 
+    public AddressModel mergeWithAddressUpdate(AddressUpdate update) {
+        if (!update.getStreet().isBlank()) {
+            this.street = update.getStreet();
+        }
+        if (!update.getDistrict().isBlank()) {
+            this.street = update.getStreet();
+        }
+        if (!(update.getZipCode() == 0)) {
+            this.zipCode = update.getZipCode();
+        }
+        if (!update.getCountry().isBlank()) {
+            this.country = update.getCountry();
+        }
+
+        return this.calculateHash().generateId();
+    }
+
     public int getHashCode() {
         return hashCode;
+    }
+
+    @Override
+    public AddressModel generateId() {
+        this.setId(new ObjectId());
+        return this;
     }
 
     @Override

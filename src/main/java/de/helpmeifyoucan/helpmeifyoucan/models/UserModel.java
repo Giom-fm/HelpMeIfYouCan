@@ -1,8 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import org.bson.types.ObjectId;
-
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -113,6 +112,16 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
+    public UserModel addAddress(ObjectId address) {
+        this.addresses.add(address);
+        return this;
+    }
+
+    public UserModel removeAddress(ObjectId address) {
+        this.addresses.remove(address);
+        return this;
+    }
+
     public List<ObjectId> getAddresses() {
         return addresses;
     }
@@ -130,5 +139,11 @@ public class UserModel extends AbstractEntity {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public UserModel generateId() {
+        this.setId(new ObjectId());
+        return this;
     }
 }

@@ -5,12 +5,11 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -26,8 +25,8 @@ public class UserModelController extends AbstractModelController<UserModel> {
         super.getCollection().createIndex(Indexes.ascending("email"), options);
     }
 
-    public void save(UserModel user) {
-        super.save(user);
+    public UserModel save(UserModel user) {
+        return super.save(user);
     }
 
     public UserModel get(ObjectId id) {
@@ -39,9 +38,10 @@ public class UserModelController extends AbstractModelController<UserModel> {
         return super.getByFilter(filter);
     }
 
-    public UserModel update(ObjectId id, UserModel user) {
-        var filter = new Document("_id", id);
-        return super.updateExisting(filter, user);
+    public UserModel update(UserUpdate updatedFields, ObjectId userId) {
+        var filter = new Document("_id", userId);
+
+        return super.updateExistingFields(filter, updatedFields.toDocument());
     }
 
     public Optional<UserModel> exists(Bson filter) {
@@ -56,35 +56,47 @@ public class UserModelController extends AbstractModelController<UserModel> {
         super.delete(Filters.eq("email", email));
     }
 
-    private void addAddress(ObjectId userId, ObjectId addressId) {
-        var user = super.getById(userId);
-        var addresses = getAddresses(user);
-        addresses.add(addressId);
-        this.update(user.getId(), user.setAddresses(addresses));
-    }
 
-    public void handleUserAddressAdd(ObjectId id, AddressModel address) {
+    public void handleUserAddressAddRequest(ObjectId id, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
         var dbAddress = addressModelController.exists(addressFilter);
+        var user = this.get(id);
         if (dbAddress.isPresent()) {
-            addAddress(id, dbAddress.get().getId());
+            addAddressToUser(user, dbAddress.get());
         } else {
             addressModelController.save(address);
-            addAddress(id, address.getId());
+            addAddressToUser(user, address);
         }
     }
 
-    public void deleteUserAddress(ObjectId userId, AddressModel address) {
-        var user = super.getById(userId);
-        var addresses = getAddresses(user);
-        addresses.remove(address.getId());
-        this.update(user.getId(), user.setAddresses(addresses));
+    public void handleUserAddressDeleteRequest(ObjectId userId, ObjectId addressId) {
+        deleteAddressFromUser(this.get(userId), addressId);
+    }
+
+    // user address operations
+    private void addAddressToUser(UserModel user, AddressModel address) {
+        user.addAddress(address.getId());
+        updateUserAddressField(user);
+        addressModelController.addUserToAddress(address, user.getId());
+    }
+
+    public void exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
+        var user = this.get(userId);
+        this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
 
     }
 
-    public List<ObjectId> getAddresses(UserModel user) {
-        return new ArrayList<>(user.getAddresses());
-
+    public void deleteAddressFromUser(UserModel user, ObjectId address) {
+        this.updateUserAddressField(user.removeAddress(address));
+        addressModelController.handleUserControllerAddressDelete(address, user.getId());
     }
+
+    private UserModel updateUserAddressField(UserModel user) {
+        var updatedFields = new Document();
+        updatedFields.put("addresses", user.getAddresses());
+        var filter = Filters.eq("_id", user.getId());
+        return this.updateExistingFields(updatedFields, filter);
+    }
+
 
 }

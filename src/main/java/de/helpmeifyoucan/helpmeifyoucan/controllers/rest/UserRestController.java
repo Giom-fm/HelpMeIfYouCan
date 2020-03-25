@@ -4,8 +4,8 @@ import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
-
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -43,11 +43,11 @@ public class UserRestController {
         this.userCollection.delete(id);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({Roles.ROLE_NAME_USER})
     @PatchMapping("/me")
-    public UserModel updateMe(@Valid @RequestBody UserModel user) {
+    public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
-        return userCollection.update(id, user);
+        return userCollection.update(user, id);
     }
 
     // ADMIN ENDPOINTS --------------------------------
@@ -58,10 +58,10 @@ public class UserRestController {
         userCollection.save(user);
     }
 
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({Roles.ROLE_NAME_ADMIN})
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserModel update(@Valid @RequestBody UserModel user, @PathVariable ObjectId id) {
-        return userCollection.update(id, user);
+    public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
+        return userCollection.update(user, id);
     }
 
     @Secured({ Roles.ROLE_NAME_ADMIN })
@@ -74,13 +74,13 @@ public class UserRestController {
     // FIXME
     @PostMapping(path = "/addaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void addUserAddress(@PathVariable ObjectId id, @Valid @RequestBody AddressModel address) {
-        userCollection.handleUserAddressAdd(id, address);
+        userCollection.handleUserAddressAddRequest(id, address);
     }
 
     // FIXME
     @PostMapping(path = "/deleteaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteUserAddress(@PathVariable ObjectId id, @Valid @RequestBody AddressModel address) {
-        userCollection.deleteUserAddress(id, address);
+    public void deleteUserAddress(@PathVariable ObjectId id, @Valid @RequestBody ObjectId addressId) {
+        userCollection.handleUserAddressDeleteRequest(id, addressId);
     }
 
     @ExceptionHandler(value = { MongoWriteException.class })
