@@ -3,6 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Register;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 
@@ -16,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+
+import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 
@@ -33,17 +36,21 @@ public class AuthRestController {
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void signUp(@RequestBody Credentials credentials) {
+    public void signUp(@Valid @RequestBody Register register) {
 
-        if (this.userModelController.getByEmail(credentials.getEmail()) != null) {
+        if (this.userModelController.getByEmail(register.getEmail()) != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_TAKEN);
         }
 
-        var hashedPassword = bCryptPasswordEncoder.encode(credentials.getPassword());
-        var user = new UserModel();
-        user.setEmail(credentials.getEmail()).setPassword(hashedPassword);
+        var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());
         var roles = new LinkedList<Roles>(Arrays.asList(Roles.ROLE_USER));
+
+        var user = new UserModel();
+        user.setEmail(register.getEmail()).setPassword(hashedPassword);
+        user.setName(register.getName()).setLastName(register.getLastName());
+        user.setPhoneNr(Integer.parseInt(register.getphoneNr()));
         user.setRoles(roles);
+
         this.userModelController.save(user);
     }
 }

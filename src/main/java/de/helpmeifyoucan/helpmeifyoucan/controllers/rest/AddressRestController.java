@@ -3,8 +3,10 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.AddressModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -27,15 +29,26 @@ public class AddressRestController {
     }
 
 
+    //FIXME
     @PatchMapping(path = "/update/{id}", consumes = "application/json")
-    public AddressModel update(@Valid @RequestBody AddressModel address, @PathVariable ObjectId id) {
-        return controller.update(id, address);
+    public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
+        try {
+            return controller.updateAddress(id, address, getIdFromContext());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
+
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/delete/{id}")
     public void delete(@PathVariable ObjectId id) {
         controller.delete(id);
+    }
+
+    private ObjectId getIdFromContext() {
+        return new ObjectId(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
     }
 
 }

@@ -6,12 +6,14 @@ public abstract class AbstractEntity {
 
     private ObjectId id;
 
-    public AbstractEntity setId(ObjectId id) {
+    public ObjectId setId(ObjectId id) {
         this.id = id;
-        return this;
+        return this.id;
     }
 
     public ObjectId getId() {
         return id;
     }
+
+    public abstract AbstractEntity generateId();
 }
