@@ -4,6 +4,7 @@ import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 
 import org.bson.types.ObjectId;
@@ -30,7 +31,7 @@ public class UserRestController {
         var id = this.getIdFromContext();
         var user = this.userCollection.get(id);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
         }
         return user;
     }
