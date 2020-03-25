@@ -1,50 +1,48 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
-
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.AddressModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/addresses")
+@RequestMapping("/address")
 public class AddressRestController {
 
-    AddressModelController controller = new AddressModelController();
+    AddressModelController addressCollection = new AddressModelController();
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PostMapping(consumes = "application/json")
-    public void save(@RequestBody AddressModel address) {
-        controller.save(address);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public AddressModel save(@RequestBody AddressModel address) {
+        return this.addressCollection.save(address);
     }
 
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public AddressModel find(@PathVariable ObjectId id) {
-        return controller.get(id);
+        return addressCollection.get(id);
     }
 
-
-    //FIXME
-    @PatchMapping(path = "/update/{id}", consumes = "application/json")
+    // FIXME
+    @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
         try {
-            return controller.updateAddress(id, address, getIdFromContext());
+            return addressCollection.updateAddress(id, address, getIdFromContext());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable ObjectId id) {
-        controller.delete(id);
+        this.addressCollection.delete(id);
     }
 
     private ObjectId getIdFromContext() {
