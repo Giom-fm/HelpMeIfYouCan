@@ -7,7 +7,6 @@ import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -76,7 +75,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
         if (dbAddress.isPresent()) {
             this.addAddressToUser(user, dbAddress.get());
         } else {
-            this.addressModelController.save(address);
+            addressModelController.save(address);
             this.addAddressToUser(user, address);
         }
     }

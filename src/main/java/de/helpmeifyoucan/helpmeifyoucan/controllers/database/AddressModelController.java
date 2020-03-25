@@ -6,7 +6,6 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -98,10 +97,10 @@ public class AddressModelController extends AbstractModelController<AddressModel
         var filter = Filters.eq("_id", id);
         var addressToBeDeleted = super.getById(id);
         if (addressToBeDeleted.getUsers().isEmpty()) {
-             super.delete(filter);
+            super.delete(filter);
             return addressToBeDeleted;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
+    }
 
 }
