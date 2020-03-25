@@ -1,6 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import org.bson.types.ObjectId;
 
@@ -21,8 +22,10 @@ public class AddressModel extends AbstractEntity {
     @NotNull(message = "please fill in Country")
     private String country;
 
+    @JsonIgnore
     private List<ObjectId> users;
 
+    @JsonIgnore
     private int hashCode;
 
     public List<ObjectId> getUsers() {

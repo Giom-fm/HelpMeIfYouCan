@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 
@@ -27,10 +28,11 @@ public class UserModel extends AbstractEntity {
     @Email(message = "Please fill in Email")
     private String email;
 
+    @JsonIgnore
     private String password;
 
     private List<Roles> roles;
-
+    
     boolean enabled;
 
     boolean verified;

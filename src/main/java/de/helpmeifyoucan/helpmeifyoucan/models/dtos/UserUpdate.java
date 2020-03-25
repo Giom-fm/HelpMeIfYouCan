@@ -2,6 +2,8 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
 import org.bson.Document;
 
+import javax.validation.constraints.Email;
+
 public class UserUpdate {
 
 
@@ -13,6 +15,7 @@ public class UserUpdate {
         return password;
     }
 
+    @Email
     public String getEmail() {
         return email;
     }
