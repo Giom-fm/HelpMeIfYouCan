@@ -52,7 +52,11 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
         var filter = Filters.eq("_id", id);
-        return super.updateExistingFields(filter, updatedFields.toDocument());
+        var updatedUser = super.updateExistingFields(filter, updatedFields.toDocument());
+        if (updatedUser == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return updatedUser;
     }
 
     public Optional<UserModel> exists(Bson filter) {
