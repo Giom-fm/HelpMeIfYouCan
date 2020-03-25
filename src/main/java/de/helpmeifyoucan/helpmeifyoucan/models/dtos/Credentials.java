@@ -1,11 +1,13 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 
 public class Credentials {
 
     @Email(message = "Please fill in Email")
     private String email;
+    @NotNull
     private String password;
 
     public String getEmail() {
@@ -23,5 +25,4 @@ public class Credentials {
     public void setPassword(String password) {
         this.password = password;
     }
-
 }
