@@ -2,20 +2,19 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
 import org.bson.Document;
 
-import javax.validation.constraints.Email;
-
 public class UserUpdate {
 
 
-    private String password;
+    private String password = "";
 
-    private String email;
+    private String email = "";
+
 
     public String getPassword() {
         return password;
     }
 
-    @Email
+
     public String getEmail() {
         return email;
     }
@@ -31,14 +30,16 @@ public class UserUpdate {
     }
 
     public Document toDocument() {
+
         var document = new Document();
 
-        if (!this.email.isEmpty()) {
+        if (!this.email.equals(null)) {
             document.put("email", this.email);
+
         }
 
         //TODO password hash
-        if (!this.password.isEmpty()) {
+        if (!this.password.equals(null)) {
             document.put("password", this.password);
         }
         return document;

@@ -38,8 +38,8 @@ public class AddressModelController extends AbstractModelController<AddressModel
         return address;
     }
 
-    public Optional<AddressModel> exists(Bson filter) {
-        return super.exists(filter);
+    public Optional<AddressModel> getOptional(Bson filter) {
+        return super.getOptional(filter);
     }
 
     public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
@@ -66,7 +66,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) throws Exception {
-        var address = this.exists(Filters.eq("_id", addressId));
+        var address = this.getOptional(Filters.eq("_id", addressId));
 
         if (address.isEmpty()) {
             throw new Exception();
@@ -82,7 +82,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
             userModelController.exchangeAddress(userId, existingAddress.getId(), newAddress.getId());
 
             var filter = Filters.eq("hashCode", newAddress.getHashCode());
-            var addressExists = this.exists(filter);
+            var addressExists = this.getOptional(filter);
 
             if (addressExists.isEmpty()) {
                 return this.save(newAddress);

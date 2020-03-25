@@ -1,26 +1,19 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
+import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Register;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-
 import javax.validation.Valid;
-
-import org.springframework.http.HttpStatus;
+import java.util.Collections;
+import java.util.LinkedList;
 
 @RestController
 @RequestMapping("/auth")
@@ -37,13 +30,14 @@ public class AuthRestController {
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void signUp(@Valid @RequestBody Register register) {
+        var filter = Filters.eq("email", register.getEmail());
 
-        if (this.userModelController.getByEmail(register.getEmail()) != null) {
+        if (this.userModelController.getOptional(filter).isPresent()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_TAKEN);
         }
 
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());
-        var roles = new LinkedList<Roles>(Arrays.asList(Roles.ROLE_USER));
+        var roles = new LinkedList<>(Collections.singletonList(Roles.ROLE_USER));
 
         var user = new UserModel();
         user.setEmail(register.getEmail()).setPassword(hashedPassword);

@@ -55,7 +55,7 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
         return this.collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
-    protected Optional<T> exists(Bson filter) {
+    protected Optional<T> getOptional(Bson filter) {
         return Optional.ofNullable(getByFilter(filter));
     }
 

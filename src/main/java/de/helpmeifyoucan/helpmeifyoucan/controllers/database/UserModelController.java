@@ -58,8 +58,8 @@ public class UserModelController extends AbstractModelController<UserModel> {
         return updatedUser;
     }
 
-    public Optional<UserModel> exists(Bson filter) {
-        return super.exists(filter);
+    public Optional<UserModel> getOptional(Bson filter) {
+        return super.getOptional(filter);
     }
 
     public void delete(ObjectId id) {
@@ -70,7 +70,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     public void handleUserAddressAddRequest(ObjectId id, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
-        var dbAddress = addressModelController.exists(addressFilter);
+        var dbAddress = addressModelController.getOptional(addressFilter);
         var user = this.get(id);
         if (dbAddress.isPresent()) {
             this.addAddressToUser(user, dbAddress.get());
