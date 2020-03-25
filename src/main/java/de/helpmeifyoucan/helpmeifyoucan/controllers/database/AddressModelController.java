@@ -74,9 +74,18 @@ public class AddressModelController extends AbstractModelController<AddressModel
             this.deleteUserFromAddress(existingAddress, userId);
             var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate).setUsers(Collections.singletonList(userId));
             userModelController.exchangeAddress(userId, existingAddress.getId(), newAddress.getId());
-            return this.save(newAddress);
+
+            var filter = Filters.eq("hashCode", newAddress.getHashCode());
+            var addressExists = this.exists(filter);
+            
+            if (addressExists.isEmpty()) {
+                return this.save(newAddress);
+            } else {
+                return addUserToAddress(addressExists.get(), userId);
+            }
         }
     }
+
 
     //TODO check references
     public void delete(ObjectId id) {
