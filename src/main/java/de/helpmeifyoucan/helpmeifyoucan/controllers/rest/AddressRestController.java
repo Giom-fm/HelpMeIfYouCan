@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.AddressModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

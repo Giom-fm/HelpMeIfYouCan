@@ -1,13 +1,15 @@
-package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
+package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
+
+import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Password;
 
 public class Credentials {
 
     @Email(message = "Please fill in Email")
     private String email;
-    @NotNull
+    
+    @Password
     private String password;
 
     public String getEmail() {

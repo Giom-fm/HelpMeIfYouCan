@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
