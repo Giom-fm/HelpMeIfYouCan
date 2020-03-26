@@ -7,6 +7,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,66 +21,71 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/user")
 public class UserRestController {
-    UserModelController userCollection = new UserModelController();
+    UserModelController userModelController;
+
+    @Autowired
+    public UserRestController(UserModelController userModelController) {
+        this.userModelController = userModelController;
+    }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({Roles.ROLE_NAME_USER})
     @GetMapping("/me")
     public UserModel getMe() {
         var id = this.getIdFromContext();
-        return this.userCollection.get(id);
+        return this.userModelController.get(id);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({Roles.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
         var id = this.getIdFromContext();
-        this.userCollection.delete(id);
+        this.userModelController.delete(id);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({Roles.ROLE_NAME_USER})
     @PatchMapping("/me")
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
-        return this.userCollection.update(user, id);
+        return this.userModelController.update(user, id);
     }
 
     // ADMIN ENDPOINTS --------------------------------
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({Roles.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@Valid @RequestBody UserModel user) {
-        this.userCollection.save(user);
+        this.userModelController.save(user);
     }
 
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({Roles.ROLE_NAME_ADMIN})
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
-        return this.userCollection.update(user, getIdFromContext());
+        return this.userModelController.update(user, getIdFromContext());
     }
 
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({Roles.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable ObjectId id) {
-        this.userCollection.delete(id);
+        this.userModelController.delete(id);
     }
 
     // FIXME
     @PostMapping(path = "/addaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void addUserAddress(@PathVariable ObjectId id, @Valid @RequestBody AddressModel address) {
-        this.userCollection.handleUserAddressAddRequest(id, address);
+        this.userModelController.handleUserAddressAddRequest(id, address);
     }
 
     // FIXME
     @PostMapping(path = "/deleteaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteUserAddress(@PathVariable ObjectId id, @Valid @RequestBody ObjectId addressId) {
-        this.userCollection.handleUserAddressDeleteRequest(id, addressId);
+        this.userModelController.handleUserAddressDeleteRequest(id, addressId);
     }
 
     // REVIEW
-    @ExceptionHandler(value = { MongoWriteException.class })
+    @ExceptionHandler(value = {MongoWriteException.class})
     protected ResponseEntity<String> handleConflict(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "Email already taken!";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);

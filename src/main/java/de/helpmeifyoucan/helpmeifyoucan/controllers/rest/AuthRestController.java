@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Register;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,7 @@ public class AuthRestController {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserModelController userModelController;
 
+    @Autowired
     public AuthRestController(BCryptPasswordEncoder bCryptPasswordEncoder, UserModelController userModelController) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userModelController = userModelController;

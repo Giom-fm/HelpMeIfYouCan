@@ -15,24 +15,28 @@ import javax.validation.Valid;
 @RequestMapping("/address")
 public class AddressRestController {
 
-    AddressModelController addressCollection = new AddressModelController();
+    AddressModelController addressModelController;
+
+    public AddressRestController(AddressModelController addressModelController) {
+        this.addressModelController = addressModelController;
+    }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel save(@RequestBody AddressModel address) {
-        return this.addressCollection.save(address);
+        return this.addressModelController.save(address);
     }
 
     @GetMapping("/{id}")
     public AddressModel find(@PathVariable ObjectId id) {
-        return addressCollection.get(id);
+        return addressModelController.get(id);
     }
 
     // FIXME
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
         try {
-            return addressCollection.updateAddress(id, address, getIdFromContext());
+            return addressModelController.updateAddress(id, address, getIdFromContext());
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -42,7 +46,7 @@ public class AddressRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable ObjectId id) {
-        this.addressCollection.delete(id);
+        this.addressModelController.delete(id);
     }
 
     private ObjectId getIdFromContext() {

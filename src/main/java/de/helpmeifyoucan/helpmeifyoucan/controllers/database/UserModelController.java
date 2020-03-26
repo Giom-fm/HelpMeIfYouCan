@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -10,22 +11,33 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 
+@Service
 public class UserModelController extends AbstractModelController<UserModel> {
 
-    private static final AddressModelController addressModelController = new AddressModelController();
+    private AddressModelController addressModelController;
 
-    public UserModelController() {
-        super("users", UserModel.class);
+
+    @Autowired
+    public UserModelController(MongoDatabase database) {
+        super(database);
+        super.createCollection("users", UserModel.class);
+        createIndex();
+    }
+
+    private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
-        super.getCollection().createIndex(Indexes.ascending("email"), options);
+
+        super.createIndex(Indexes.ascending("email"), options);
     }
 
     public UserModel save(UserModel user) {
@@ -107,5 +119,10 @@ public class UserModelController extends AbstractModelController<UserModel> {
         updatedFields.put("addresses", user.getAddresses());
         var filter = Filters.eq("_id", user.getId());
         return this.updateExistingFields(updatedFields, filter);
+    }
+
+    @Autowired
+    public void setAddressModelController(AddressModelController addressModelController) {
+        this.addressModelController = addressModelController;
     }
 }

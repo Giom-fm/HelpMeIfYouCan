@@ -4,6 +4,7 @@ import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthenticationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,11 +27,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     private UserModelController userController;
 
-    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-            UserModelController userController) {
+    @Autowired
+    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, UserModelController userController) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userController = userController;
+
     }
 
     @Override
@@ -54,4 +56,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
     }
+
+
 }

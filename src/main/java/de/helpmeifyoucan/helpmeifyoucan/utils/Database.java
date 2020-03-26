@@ -14,26 +14,34 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class Database {
 
-    private static MongoClient client = null;
+    private MongoClient client;
 
     public static CodecRegistry pojoCodec;
 
-    private Database() {
+    public MongoDatabase database;
+
+
+    public Database() {
+        setDatabase();
     }
 
 
-    public static MongoDatabase getDatabase() {
-        if (Database.client == null) {
-            CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-            pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                    pojoCodecRegistry);
-            String uri = String.format("%s://%s:%s@%s", Config.DATABASE_PROTOCOL, Config.DATABASE_USER,
-                    Config.DATABASE_PASSWORD, Config.DATABASE_HOST);
-            MongoClientSettings settings = MongoClientSettings.builder()
-                    .applyConnectionString(new ConnectionString(uri)).codecRegistry(pojoCodec).build();
-            Database.client = MongoClients.create(settings);
-        }
-        return Database.client.getDatabase(Config.DATABASE_NAME);
+    private void setDatabase() {
+
+        CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+                pojoCodecRegistry);
+        String uri = String.format("%s://%s:%s@%s", Config.DATABASE_PROTOCOL, Config.DATABASE_USER,
+                Config.DATABASE_PASSWORD, Config.DATABASE_HOST);
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(new ConnectionString(uri)).codecRegistry(pojoCodec).build();
+        this.client = MongoClients.create(settings);
+
+        this.database = client.getDatabase(Config.DATABASE_NAME);
+    }
+
+    public MongoDatabase getDatabase() {
+        return this.database;
     }
 
 }

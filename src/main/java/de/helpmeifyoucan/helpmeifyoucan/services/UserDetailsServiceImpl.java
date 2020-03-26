@@ -3,6 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.services;
 import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +16,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
+
     private UserModelController userModelController;
 
+    @Autowired
     public UserDetailsServiceImpl(UserModelController userModelController) {
+
         this.userModelController = userModelController;
     }
 
@@ -34,4 +38,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private List<SimpleGrantedAuthority> rolesToAuthoritys(List<Roles> roles) {
         return roles.stream().map(role -> new SimpleGrantedAuthority(role.toString())).collect(Collectors.toList());
     }
+
 }

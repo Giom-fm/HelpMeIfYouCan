@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
@@ -9,21 +10,31 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Optional;
 
+@Service
 public class AddressModelController extends AbstractModelController<AddressModel> {
 
-    private static final UserModelController userModelController = new UserModelController();
+    private UserModelController userModelController;
 
-    public AddressModelController() {
-        super("address", AddressModel.class);
+    @Autowired
+    public AddressModelController(MongoDatabase dataBase) {
+        super(dataBase);
+        super.createCollection("address", AddressModel.class);
+        this.createIndex();
+    }
+
+    private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
-        super.getCollection().createIndex(Indexes.ascending("street", "zipCode", "country", "district"), options);
+
+        super.createIndex(Indexes.ascending("street", "zipCode", "country", "district"), options);
     }
 
     public AddressModel save(AddressModel address) {
@@ -101,6 +112,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
             return addressToBeDeleted;
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+    }
+
+    @Autowired
+    public void setUserModelController(UserModelController userModelController) {
+        this.userModelController = userModelController;
     }
 
 }

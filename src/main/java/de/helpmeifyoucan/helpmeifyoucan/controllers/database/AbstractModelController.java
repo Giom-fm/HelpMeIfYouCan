@@ -2,24 +2,25 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.FindOneAndReplaceOptions;
-import com.mongodb.client.model.FindOneAndUpdateOptions;
-import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractEntity;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Database;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public abstract class AbstractModelController<T extends AbstractEntity> {
 
-    private final MongoDatabase database = Database.getDatabase();
+    private MongoDatabase database;
     private MongoCollection<T> collection;
 
-    public AbstractModelController(String collectionName, Class<T> collectionClass) {
-        this.collection = database.getCollection(collectionName, collectionClass);
+
+    @Autowired
+    public AbstractModelController(MongoDatabase database) {
+        this.database = database;
     }
 
     // TODO INSERTMANY
@@ -28,6 +29,7 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
         return entity;
     }
 
+    //TODO GETALL
     protected T getById(ObjectId id) {
         var filter = Filters.eq("_id", id);
         return collection.find(filter).first();
@@ -59,7 +61,12 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
         return Optional.ofNullable(getByFilter(filter));
     }
 
-    protected MongoCollection<T> getCollection() {
-        return this.collection;
+    protected void createCollection(String collectionName, Class<T> collectionClass) {
+        this.collection = database.getCollection(collectionName, collectionClass);
     }
+
+    protected void createIndex(Bson indexes, IndexOptions options) {
+        this.collection.createIndex(indexes, options);
+    }
+
 }
