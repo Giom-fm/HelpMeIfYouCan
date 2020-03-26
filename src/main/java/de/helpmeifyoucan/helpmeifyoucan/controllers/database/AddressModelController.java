@@ -74,7 +74,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
         var existingAddress = address.get();
         if (existingAddress.noUserReferences()
                 || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
-            var fields = addressUpdate.toDocument();
+            var fields = addressUpdate.toFilter();
             return this.updateExistingField(fields, addressId);
         } else {
             this.deleteUserFromAddress(existingAddress, userId);

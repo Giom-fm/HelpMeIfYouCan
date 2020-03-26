@@ -1,9 +1,16 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
 
-import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 public class AddressUpdate {
+
 
     private String street;
 
@@ -14,6 +21,13 @@ public class AddressUpdate {
     private String country;
 
 //TODO REGEX
+
+    public AddressUpdate() {
+        this.street = "";
+        this.district = "";
+        this.zipCode = "";
+        this.country = "";
+    }
 
     public String getStreet() {
         return street;
@@ -51,21 +65,21 @@ public class AddressUpdate {
         return this;
     }
 
-    public Document toDocument() {
-        var document = new Document();
+    public Bson toFilter() {
+        List<Bson> filter = new ArrayList<>();
         if (!this.street.isEmpty()) {
-            document.put("street", this.street);
+            filter.add(set("street", this.street));
         }
         if (!this.district.isEmpty()) {
-            document.put("district", this.district);
+            filter.add(set("district", this.district));
         }
         if (!this.zipCode.isEmpty()) {
-            document.put("zipCode", this.zipCode);
+            filter.add(set("zipCode", this.zipCode));
         }
         if (!this.country.isEmpty()) {
-            document.put("country", this.country);
+            filter.add(set("country", this.country));
         }
-        return document;
+        return combine(filter);
 
     }
 }

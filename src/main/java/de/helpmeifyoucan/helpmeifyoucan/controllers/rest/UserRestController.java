@@ -5,7 +5,6 @@ import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
-
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -57,7 +56,7 @@ public class UserRestController {
     @Secured({ Roles.ROLE_NAME_ADMIN })
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
-        return this.userCollection.update(user, id);
+        return this.userCollection.update(user, getIdFromContext());
     }
 
     @Secured({ Roles.ROLE_NAME_ADMIN })

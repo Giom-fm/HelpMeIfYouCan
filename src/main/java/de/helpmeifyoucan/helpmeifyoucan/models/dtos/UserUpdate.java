@@ -1,23 +1,35 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
 
-import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import javax.validation.constraints.Email;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mongodb.client.model.Updates.combine;
+import static com.mongodb.client.model.Updates.set;
 
 public class UserUpdate {
 
 
-    private String password = "";
+    private String password;
 
-    private String email = "";
+    @Email
+    private String email;
 
+    public UserUpdate() {
+        this.password = "";
+        this.email = "";
+    }
 
     public String getPassword() {
         return password;
     }
 
-
     public String getEmail() {
         return email;
     }
+
 
     public UserUpdate setPassword(String password) {
         this.password = password;
@@ -29,20 +41,18 @@ public class UserUpdate {
         return this;
     }
 
-    public Document toDocument() {
+    public Bson toFilter() {
 
-        var document = new Document();
-
-        if (!this.email.equals(null)) {
-            document.put("email", this.email);
-
+        List<Bson> filter = new ArrayList<>();
+        if (!this.email.isEmpty()) {
+            filter.add(set("email", this.email));
         }
 
         //TODO password hash
-        if (!this.password.equals(null)) {
-            document.put("password", this.password);
+        if (!this.password.isEmpty()) {
+            filter.add(set("password", this.password));
         }
-        return document;
+        return combine(filter);
     }
 
 
