@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import de.helpmeifyoucan.helpmeifyoucan.config.Config;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Credentials;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Login;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.Login;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;

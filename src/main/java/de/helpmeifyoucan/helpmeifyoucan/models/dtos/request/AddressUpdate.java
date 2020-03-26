@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
+package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 
 import org.bson.conversions.Bson;
@@ -19,8 +19,6 @@ public class AddressUpdate {
     private String zipCode;
 
     private String country;
-
-//TODO REGEX
 
     public AddressUpdate() {
         this.street = "";
