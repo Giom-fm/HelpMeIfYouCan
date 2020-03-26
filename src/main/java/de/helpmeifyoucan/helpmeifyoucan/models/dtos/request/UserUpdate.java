@@ -1,4 +1,5 @@
-package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
+package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
+
 
 import org.bson.conversions.Bson;
 
@@ -11,11 +12,10 @@ import static com.mongodb.client.model.Updates.set;
 
 public class UserUpdate {
 
-
-    private String password;
-
     @Email
     private String email;
+    
+    private String password;
 
     public UserUpdate() {
         this.password = "";
@@ -29,7 +29,6 @@ public class UserUpdate {
     public String getEmail() {
         return email;
     }
-
 
     public UserUpdate setPassword(String password) {
         this.password = password;
@@ -48,12 +47,11 @@ public class UserUpdate {
             filter.add(set("email", this.email));
         }
 
-        //TODO password hash
+        // TODO password hash
         if (!this.password.isEmpty()) {
             filter.add(set("password", this.password));
         }
         return combine(filter);
     }
-
 
 }

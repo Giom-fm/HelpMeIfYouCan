@@ -1,9 +1,12 @@
-package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
+package de.helpmeifyoucan.helpmeifyoucan.models.dtos.response;
+
 
 public class Login {
 
     private String name;
+    
     private String lastName;
+    
     private String token;
 
     public Login(String name, String lastName, String token) {

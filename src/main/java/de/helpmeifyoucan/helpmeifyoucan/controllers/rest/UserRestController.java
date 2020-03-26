@@ -4,7 +4,7 @@ import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;

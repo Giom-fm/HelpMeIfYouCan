@@ -4,7 +4,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.Document;
 import org.bson.conversions.Bson;

@@ -3,7 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.Register;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Register;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.springframework.http.HttpStatus;
@@ -42,7 +42,6 @@ public class AuthRestController {
         var user = new UserModel();
         user.setEmail(register.getEmail()).setPassword(hashedPassword);
         user.setName(register.getName()).setLastName(register.getLastName());
-        user.setPhoneNr(Integer.parseInt(register.getphoneNr()));
         user.setRoles(roles);
 
         this.userModelController.save(user);
