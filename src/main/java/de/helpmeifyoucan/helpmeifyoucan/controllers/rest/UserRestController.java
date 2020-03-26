@@ -73,12 +73,14 @@ public class UserRestController {
     }
 
     // FIXME
-    @PostMapping(path = "/addaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void addUserAddress(@PathVariable ObjectId id, @Valid @RequestBody AddressModel address) {
-        this.userModelController.handleUserAddressAddRequest(id, address);
+    @Secured({Roles.ROLE_NAME_USER})
+    @PostMapping(path = "/addaddress", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void addUserAddress(@Valid @RequestBody AddressModel address) {
+        this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address);
     }
 
     // FIXME
+
     @PostMapping(path = "/deleteaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void deleteUserAddress(@PathVariable ObjectId id, @Valid @RequestBody ObjectId addressId) {
         this.userModelController.handleUserAddressDeleteRequest(id, addressId);

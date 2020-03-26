@@ -8,7 +8,6 @@ import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
 
 @Service
 public class UserModelController extends AbstractModelController<UserModel> {
@@ -115,10 +115,10 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     private UserModel updateUserAddressField(UserModel user) {
-        var updatedFields = new Document();
-        updatedFields.put("addresses", user.getAddresses());
+        Bson updatedFields = set("address", user.getAddresses());
+
         var filter = Filters.eq("_id", user.getId());
-        return this.updateExistingFields(updatedFields, filter);
+        return this.updateExistingFields(filter, updatedFields);
     }
 
     @Autowired

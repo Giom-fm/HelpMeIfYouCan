@@ -7,7 +7,6 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Collections;
 import java.util.Optional;
+
+import static com.mongodb.client.model.Updates.set;
 
 @Service
 public class AddressModelController extends AbstractModelController<AddressModel> {
@@ -59,8 +60,8 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public AddressModel updateUserField(AddressModel address) {
-        var updatedFields = new Document();
-        updatedFields.put("users", address.getUsers());
+        Bson updatedFields = set("users", address.getUsers());
+
         return this.updateExistingField(updatedFields, address.getId());
     }
 

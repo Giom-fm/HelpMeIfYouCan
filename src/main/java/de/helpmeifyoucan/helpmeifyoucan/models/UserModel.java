@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 public class UserModel extends AbstractEntity {
@@ -115,8 +116,12 @@ public class UserModel extends AbstractEntity {
     }
 
     public UserModel addAddress(ObjectId address) {
-        this.addresses.add(address);
-        return this;
+        if (this.addresses != null) {
+            this.addresses.add(address);
+            return this;
+        }
+
+        return this.setAddresses(Collections.singletonList(address));
     }
 
     public UserModel removeAddress(ObjectId address) {

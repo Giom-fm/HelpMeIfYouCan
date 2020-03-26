@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressUpdate;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -39,8 +40,12 @@ public class AddressModel extends AbstractEntity {
     }
 
     public AddressModel addUserAddress(ObjectId user) {
-        this.users.add(user);
-        return this;
+        if (this.users != null) {
+            this.users.add(user);
+            return this;
+        }
+
+        return this.setUsers(Collections.singletonList(user));
     }
 
     public AddressModel removeUserAddress(ObjectId user) {
