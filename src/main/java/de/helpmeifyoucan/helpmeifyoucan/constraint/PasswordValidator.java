@@ -1,15 +1,13 @@
 package de.helpmeifyoucan.helpmeifyoucan.constraint;
 
-import java.util.regex.Pattern;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
+import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Password;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Password;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.regex.Pattern;
 
 public class PasswordValidator implements ConstraintValidator<Password, String> {
 
@@ -45,7 +43,7 @@ public class PasswordValidator implements ConstraintValidator<Password, String> 
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
         }
 
-        return valid;
+        return true;
 
     }
 }

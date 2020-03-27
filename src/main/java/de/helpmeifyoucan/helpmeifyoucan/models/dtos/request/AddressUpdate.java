@@ -77,6 +77,7 @@ public class AddressUpdate {
         if (!this.country.isEmpty()) {
             filter.add(set("country", this.country));
         }
+
         return combine(filter);
 
     }

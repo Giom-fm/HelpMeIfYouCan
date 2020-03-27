@@ -36,8 +36,8 @@ public abstract class AbstractModelController<T extends AbstractEntity> {
 
     }
 
-    protected boolean delete(Bson filter) {
-        return this.collection.deleteOne(filter).getDeletedCount() != 0;
+    protected void delete(Bson filter) {
+        this.collection.deleteOne(filter);
 
     }
 

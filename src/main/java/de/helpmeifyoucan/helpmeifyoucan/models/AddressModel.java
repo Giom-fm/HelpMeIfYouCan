@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import org.bson.types.ObjectId;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
@@ -23,19 +25,21 @@ public class AddressModel extends AbstractEntity {
     @NotNull(message = "please fill in Country")
     private String country;
 
-    @JsonIgnore
+    @Min(value = 0, message = "please fill in House Number between 0 and 999")
+    @Max(value = 999, message = "please fill in House Number between 0 and 999")
+    private int houseNumber;
+
     private List<ObjectId> users;
 
     @JsonIgnore
     private int hashCode;
 
     public List<ObjectId> getUsers() {
-        return users;
+        return this.users;
     }
 
     public AddressModel setUsers(List<ObjectId> users) {
         this.users = users;
-
         return this;
     }
 
@@ -51,6 +55,15 @@ public class AddressModel extends AbstractEntity {
     public AddressModel removeUserAddress(ObjectId user) {
         this.users.remove(user);
         return this;
+    }
+
+    public AddressModel setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
+        return this;
+    }
+
+    public int getHouseNumber() {
+        return this.houseNumber;
     }
 
     public boolean noUserReferences() {
@@ -132,11 +145,13 @@ public class AddressModel extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Address{" +
+        return "AddressModel{" +
                 "street='" + street + '\'' +
                 ", district='" + district + '\'' +
-                ", zipCode=" + zipCode +
+                ", zipCode='" + zipCode + '\'' +
                 ", country='" + country + '\'' +
+                ", houseNumber=" + houseNumber +
+                ", hashCode=" + hashCode +
                 '}';
     }
 
@@ -144,15 +159,17 @@ public class AddressModel extends AbstractEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AddressModel address = (AddressModel) o;
-        return getZipCode().equals(address.getZipCode()) &&
-                getStreet().equals(address.getStreet()) &&
-                getDistrict().equals(address.getDistrict()) &&
-                getCountry().equals(address.getCountry());
+        AddressModel that = (AddressModel) o;
+        return getHouseNumber() == that.getHouseNumber() &&
+                getStreet().equals(that.getStreet()) &&
+                getDistrict().equals(that.getDistrict()) &&
+                getZipCode().equals(that.getZipCode()) &&
+                getCountry().equals(that.getCountry()) &&
+                getUsers().equals(that.getUsers());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getStreet(), getDistrict(), getZipCode(), getCountry());
+        return Objects.hash(getStreet(), getDistrict(), getZipCode(), getCountry(), getHouseNumber(), getUsers());
     }
 }

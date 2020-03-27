@@ -34,6 +34,7 @@ public class UserRestController {
     public UserModel getMe() {
         var id = this.getIdFromContext();
         return this.userModelController.get(id);
+
     }
 
     @Secured({Roles.ROLE_NAME_USER})
@@ -49,6 +50,19 @@ public class UserRestController {
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
         return this.userModelController.update(user, id);
+    }
+
+    @Secured({Roles.ROLE_NAME_USER})
+    @PostMapping(path = "/addaddress", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel addUserAddress(@Valid @RequestBody AddressModel address) {
+        return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address);
+    }
+
+    @Secured({Roles.ROLE_NAME_USER})
+    @ResponseStatus(HttpStatus.OK)
+    @PostMapping(path = "/deleteaddress/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
+        return this.userModelController.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
     }
 
     // ADMIN ENDPOINTS --------------------------------
@@ -72,19 +86,6 @@ public class UserRestController {
         this.userModelController.delete(id);
     }
 
-    // FIXME
-    @Secured({Roles.ROLE_NAME_USER})
-    @PostMapping(path = "/addaddress", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void addUserAddress(@Valid @RequestBody AddressModel address) {
-        this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address);
-    }
-
-    // FIXME
-
-    @PostMapping(path = "/deleteaddress/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void deleteUserAddress(@PathVariable ObjectId id, @Valid @RequestBody ObjectId addressId) {
-        this.userModelController.handleUserAddressDeleteRequest(id, addressId);
-    }
 
     // REVIEW
     @ExceptionHandler(value = {MongoWriteException.class})

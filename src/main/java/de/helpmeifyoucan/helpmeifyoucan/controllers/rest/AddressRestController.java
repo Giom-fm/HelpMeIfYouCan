@@ -28,7 +28,7 @@ public class AddressRestController {
     }
 
     @GetMapping("/{id}")
-    public AddressModel find(@PathVariable ObjectId id) {
+    public AddressModel get(@PathVariable ObjectId id) {
         return addressModelController.get(id);
     }
 

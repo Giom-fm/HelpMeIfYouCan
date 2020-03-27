@@ -1,6 +1,8 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 
@@ -18,6 +20,7 @@ public class UserModel extends AbstractEntity {
     @NotNull(message = "Please fill in Lastname")
     private String lastName;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     @Valid
     private List<ObjectId> addresses;
 
@@ -37,6 +40,7 @@ public class UserModel extends AbstractEntity {
     boolean enabled;
 
     boolean verified;
+
 
     public UserModel setName(String name) {
         this.name = name;
@@ -130,7 +134,7 @@ public class UserModel extends AbstractEntity {
     }
 
     public List<ObjectId> getAddresses() {
-        return addresses;
+        return this.addresses;
     }
 
     @Override
