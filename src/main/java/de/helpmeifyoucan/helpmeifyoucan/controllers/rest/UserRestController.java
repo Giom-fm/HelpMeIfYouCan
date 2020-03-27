@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
+import com.mongodb.MongoCommandException;
 import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
@@ -93,6 +94,13 @@ public class UserRestController {
         String bodyOfResponse = "Email already taken!";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(value = {MongoCommandException.class})
+    protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
+        String bodyOfResponse = ex.getLocalizedMessage();
+        return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
     private ObjectId getIdFromContext() {
         return new ObjectId(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());

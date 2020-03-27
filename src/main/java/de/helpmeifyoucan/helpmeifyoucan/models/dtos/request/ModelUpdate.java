@@ -1,12 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.conversions.Bson;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,23 +14,23 @@ import static com.mongodb.client.model.Updates.set;
 public abstract class ModelUpdate {
 
     protected Bson toFilter(Object obj) {
+        Field[] runtimeFields = obj.getClass().getDeclaredFields();
+        List<Bson> filter = new ArrayList<>();
 
-        try {
-            List<Bson> filter = new ArrayList<>();
-
-            Field[] runtimeFields = obj.getClass().getDeclaredFields();
-
-            for (Field f : runtimeFields) {
-                Optional<Object> notNull = Optional.ofNullable(f.get(obj));
-                if (notNull.isPresent()) {
-                    filter.add(set(f.getName(), notNull.get()));
-                }
-
+        Arrays.stream(runtimeFields).filter(x -> {
+            try {
+                return Optional.ofNullable(x.get(obj)).isPresent();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return false;
             }
-            return combine(filter);
-        } catch (IllegalAccessException e) {
-
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.UPDATE_FAILED);
-        }
+        }).forEach(x -> {
+            try {
+                filter.add(set(x.getName(), x.get(obj)));
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+        });
+        return combine(filter);
     }
 }

@@ -1,13 +1,16 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
 
+import com.mongodb.MongoCommandException;
 import de.helpmeifyoucan.helpmeifyoucan.controllers.database.AddressModelController;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 
@@ -43,6 +46,12 @@ public class AddressRestController {
     @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable ObjectId id) {
         this.addressModelController.delete(id);
+    }
+
+    @ExceptionHandler(value = {MongoCommandException.class})
+    protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
+        String bodyOfResponse = "hier";
+        return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
 
     private ObjectId getIdFromContext() {

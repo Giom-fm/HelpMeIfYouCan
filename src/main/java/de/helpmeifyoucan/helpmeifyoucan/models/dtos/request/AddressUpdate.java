@@ -11,41 +11,18 @@ import javax.validation.constraints.Min;
 public class AddressUpdate extends ModelUpdate {
 
 
-    protected String street;
+    public String street;
 
-    protected String district;
+    public String district;
 
     @Min(value = 0, message = "please fill in House Number between 0 and 999")
     @Max(value = 999, message = "please fill in House Number between 0 and 999")
-    protected int houseNumber;
+    public int houseNumber;
 
-    protected String zipCode;
+    public String zipCode;
 
-    protected String country;
+    public String country;
 
-    public AddressUpdate() {
-
-    }
-
-    public String getStreet() {
-        return street;
-    }
-
-    public String getDistrict() {
-        return district;
-    }
-
-    public String getZipCode() {
-        return zipCode;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public int getHouseNumber() {
-        return houseNumber;
-    }
 
     public void setHouseNumber(int houseNumber) {
         this.houseNumber = houseNumber;

@@ -12,17 +12,6 @@ public class UserUpdate extends ModelUpdate {
 
     protected String password;
 
-    public UserUpdate() {
-
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public String getEmail() {
-        return email;
-    }
 
     public UserUpdate setPassword(String password) {
         this.password = password;

@@ -1,7 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
 
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
@@ -17,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 @Service
@@ -35,11 +35,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
-        super.createIndex(Indexes.ascending("street", "zipCode", "country", "district"), options);
+        super.createIndex(Indexes.ascending("street", "zipCode", "country", "district", "houseNumber"), options);
     }
 
     public AddressModel save(AddressModel address) {
-        return super.save(address.calculateHash().generateId());
+        return super.save(address.calculateHash());
     }
 
     public AddressModel get(ObjectId id) {
@@ -55,7 +55,7 @@ public class AddressModelController extends AbstractModelController<AddressModel
     }
 
     public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
-        var filter = Filters.eq("_id", address);
+        var filter = eq("_id", address);
         return super.updateExistingFields(filter, updatedFields);
     }
 
@@ -92,11 +92,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
      * We want to add a user to addresses user references and do so by updating the addresses users field
      *
      * @param address the address to update
-     * @param id      Users id to add
+     * @param userId  Users userId to add
      * @return the updated address
      */
-    public AddressModel addUserToAddress(AddressModel address, ObjectId id) {
-        return this.updateUserField(address.addUserAddress(id));
+    public AddressModel addUserToAddress(AddressModel address, ObjectId userId) {
+        return this.updateUserField(address.addUserAddress(userId));
     }
 
     /**
@@ -130,39 +130,76 @@ public class AddressModelController extends AbstractModelController<AddressModel
      * @param addressUpdate the update changes
      * @param userId        the user who requested the update
      * @return the new or updated address
-     * @throws Exception address not found
      */
     public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) {
-        var address = this.getOptional(Filters.eq("_id", addressId));
+        var address = this.getOptional(eq("_id", addressId));
 
         if (address.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
         var existingAddress = address.get();
-        if (existingAddress.noUserReferences()
-                || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
-            var fields = addressUpdate.toFilter();
-            return this.updateExistingField(fields, addressId);
+        var mergeWithAddressUpdate = existingAddress.mergeWithAddressUpdate(addressUpdate);
+        var filter = eq("hashCode", mergeWithAddressUpdate.getHashCode());
+        var optionalAddressModel = this.getOptional(filter);
+
+        if (existingAddress.noUserReferences() || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
+
+            return this.updateAddressWithNoOtherReferences(addressUpdate, existingAddress, optionalAddressModel, userId);
+
         } else {
+
+            return this.updateAddressWithOtherReferences(mergeWithAddressUpdate, existingAddress, optionalAddressModel, userId);
+        }
+    }
+
+    /**
+     * We want to update an address with other users referring to it. We do so by first eleting the requesting user from the old address and then check if the updated address already exits in the db
+     * If yes, we will add the user to this addresses user references
+     * if no we will create a new address
+     *
+     * @param mergedAddress            the updated Address
+     * @param addressToUpdate          the old address to update
+     * @param potentialExistingAddress the if existing address amtching the merged address
+     * @param userId                   the user
+     * @return the Updated /saved address
+     */
+    private AddressModel updateAddressWithOtherReferences(AddressModel mergedAddress, AddressModel addressToUpdate, Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
+
+        this.deleteUserFromAddress(addressToUpdate, userId);
+
+        if (potentialExistingAddress.isEmpty()) {
+            userModelController.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
+            return this.save(mergedAddress);
+        } else {
+            var existingAddressModel = potentialExistingAddress.get();
+            userModelController.exchangeAddress(userId, addressToUpdate.getId(), existingAddressModel.getId());
+            return addUserToAddress(existingAddressModel, userId);
+        }
+    }
+
+    /**
+     * We want to update an address with no users referring to it. So we query the db for an address matching our updated address, if we find one, we will add the user to this addresses user references and safe it
+     * otherwise we will just update the existing address
+     *
+     * @param existingAddress          the existing address to be updated
+     * @param potentialExistingAddress the if existing address matching the updated address
+     * @param userId                   the updating user
+     * @return the updated address
+     */
+
+    private AddressModel updateAddressWithNoOtherReferences(AddressUpdate addressUpdate, AddressModel existingAddress, Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
+
+        if (potentialExistingAddress.isPresent()) {
             this.deleteUserFromAddress(existingAddress, userId);
-            var newAddress = existingAddress.mergeWithAddressUpdate(addressUpdate);
-
-            var filter = Filters.eq("hashCode", newAddress.getHashCode());
-            var addressExists = this.getOptional(filter);
-
-            if (addressExists.isEmpty()) {
-                userModelController.exchangeAddress(userId, existingAddress.getId(), newAddress.setUsers(Collections.singletonList(userId)).getId());
-                return this.save(newAddress);
-            } else {
-                userModelController.exchangeAddress(userId, existingAddress.getId(), addressExists.get().getId());
-                return addUserToAddress(addressExists.get(), userId);
-            }
+            return this.addUserToAddress(potentialExistingAddress.get(), userId);
+        } else {
+            return this.updateExistingField(addressUpdate.toFilter(), existingAddress.getId());
         }
     }
 
 
     public void delete(ObjectId id) {
-        var filter = Filters.eq("_id", id);
+        var filter = eq("_id", id);
 
         super.delete(filter);
     }
