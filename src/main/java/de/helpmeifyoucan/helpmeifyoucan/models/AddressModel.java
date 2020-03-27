@@ -2,15 +2,19 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public class AddressModel extends AbstractEntity {
 
@@ -29,6 +33,7 @@ public class AddressModel extends AbstractEntity {
     @Max(value = 999, message = "please fill in House Number between 0 and 999")
     private int houseNumber;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     private List<ObjectId> users;
 
     @JsonIgnore
@@ -116,7 +121,17 @@ public class AddressModel extends AbstractEntity {
         return this;
     }
 
-    public AddressModel mergeWithAddressUpdate(AddressUpdate update) {
+    public AddressModel mergeWithAddressUpdate(AddressUpdate update) throws IllegalAccessException {
+
+        Field[] runtimeFields = update.getClass().getDeclaredFields();
+
+        for (Field f : runtimeFields) {
+            Optional<Object> notNull = Optional.ofNullable(f.get(update));
+            if (notNull.isPresent()) {
+                
+            }
+
+        }
         if (!update.getStreet().isBlank()) {
             this.street = update.getStreet();
         }
@@ -170,6 +185,6 @@ public class AddressModel extends AbstractEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getStreet(), getDistrict(), getZipCode(), getCountry(), getHouseNumber(), getUsers());
+        return Objects.hash(getStreet(), getDistrict(), getZipCode(), getCountry(), getHouseNumber());
     }
 }

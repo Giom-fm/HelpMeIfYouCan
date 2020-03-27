@@ -60,7 +60,7 @@ public class UserRestController {
 
     @Secured({Roles.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(path = "/deleteaddress/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/deleteaddress/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
         return this.userModelController.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
     }

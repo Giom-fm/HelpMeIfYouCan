@@ -80,7 +80,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
      * @param userId    the User who held the address
      */
     public void handleUserControllerAddressDelete(ObjectId addressId, ObjectId userId) {
-        this.deleteUserFromAddress(this.get(addressId), userId);
+        try {
+            this.deleteUserFromAddress(this.get(addressId), userId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
     }
 
 
@@ -128,11 +132,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
      * @return the new or updated address
      * @throws Exception address not found
      */
-    public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) throws Exception {
+    public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) {
         var address = this.getOptional(Filters.eq("_id", addressId));
 
         if (address.isEmpty()) {
-            throw new Exception();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
         var existingAddress = address.get();
         if (existingAddress.noUserReferences()

@@ -10,5 +10,6 @@ public final class ErrorMessages {
     public static final String PASSWORD_LENGTH = "Password must contain 8-128 characters";
     public static final String PASSWORD_NUMERIC = "Password must contain at least one numeric character";
     public static final String PASSWORD_ALPHABETIC = "Password must contain at least one alphabetic character";
+    public static final String UPDATE_FAILED = "Please check your updated fields to be correct";
 
 }

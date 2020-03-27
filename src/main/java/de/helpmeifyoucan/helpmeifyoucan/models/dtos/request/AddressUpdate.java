@@ -1,30 +1,30 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 
+
 import org.bson.conversions.Bson;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.mongodb.client.model.Updates.combine;
-import static com.mongodb.client.model.Updates.set;
-
-public class AddressUpdate {
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 
-    private String street;
+public class AddressUpdate extends ModelUpdate {
 
-    private String district;
 
-    private String zipCode;
+    protected String street;
 
-    private String country;
+    protected String district;
+
+    @Min(value = 0, message = "please fill in House Number between 0 and 999")
+    @Max(value = 999, message = "please fill in House Number between 0 and 999")
+    protected int houseNumber;
+
+    protected String zipCode;
+
+    protected String country;
 
     public AddressUpdate() {
-        this.street = "";
-        this.district = "";
-        this.zipCode = "";
-        this.country = "";
+
     }
 
     public String getStreet() {
@@ -43,42 +43,34 @@ public class AddressUpdate {
         return country;
     }
 
-    public AddressUpdate setStreet(String street) {
+    public int getHouseNumber() {
+        return houseNumber;
+    }
+
+    public void setHouseNumber(int houseNumber) {
+        this.houseNumber = houseNumber;
+    }
+
+    public void setStreet(String street) {
         this.street = street;
-        return this;
+
     }
 
-    public AddressUpdate setDistrict(String district) {
+    public void setDistrict(String district) {
         this.district = district;
-        return this;
     }
 
-    public AddressUpdate setZipCode(String zipCode) {
+    public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
-        return this;
     }
 
-    public AddressUpdate setCountry(String country) {
+    public void setCountry(String country) {
         this.country = country;
-        return this;
     }
 
     public Bson toFilter() {
-        List<Bson> filter = new ArrayList<>();
-        if (!this.street.isEmpty()) {
-            filter.add(set("street", this.street));
-        }
-        if (!this.district.isEmpty()) {
-            filter.add(set("district", this.district));
-        }
-        if (!this.zipCode.isEmpty()) {
-            filter.add(set("zipCode", this.zipCode));
-        }
-        if (!this.country.isEmpty()) {
-            filter.add(set("country", this.country));
-        }
-
-        return combine(filter);
-
+        return super.toFilter(this);
     }
+
+
 }

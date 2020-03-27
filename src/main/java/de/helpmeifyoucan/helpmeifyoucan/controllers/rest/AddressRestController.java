@@ -32,15 +32,11 @@ public class AddressRestController {
         return addressModelController.get(id);
     }
 
-    // FIXME
-    @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
-        try {
-            return addressModelController.updateAddress(id, address, getIdFromContext());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+
+    @PatchMapping(path = "/{addressId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId addressId) {
+        return addressModelController.updateAddress(addressId, address, getIdFromContext());
+
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

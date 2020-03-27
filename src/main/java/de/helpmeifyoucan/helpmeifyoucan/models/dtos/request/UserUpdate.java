@@ -4,22 +4,16 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 import org.bson.conversions.Bson;
 
 import javax.validation.constraints.Email;
-import java.util.ArrayList;
-import java.util.List;
 
-import static com.mongodb.client.model.Updates.combine;
-import static com.mongodb.client.model.Updates.set;
-
-public class UserUpdate {
+public class UserUpdate extends ModelUpdate {
 
     @Email
-    private String email;
-    
-    private String password;
+    protected String email;
+
+    protected String password;
 
     public UserUpdate() {
-        this.password = "";
-        this.email = "";
+
     }
 
     public String getPassword() {
@@ -40,18 +34,9 @@ public class UserUpdate {
         return this;
     }
 
+
     public Bson toFilter() {
-
-        List<Bson> filter = new ArrayList<>();
-        if (!this.email.isEmpty()) {
-            filter.add(set("email", this.email));
-        }
-
-        // TODO password hash
-        if (!this.password.isEmpty()) {
-            filter.add(set("password", this.password));
-        }
-        return combine(filter);
+        return super.toFilter(this);
     }
 
 }
