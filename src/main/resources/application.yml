@@ -1,13 +1,3 @@
-server:
-  port: 8080
-
-logging:
-  level:
-    .: error
-    org.springframework: ERROR
-    org.zalando.logbook: TRACE
-    org.mongodb.driver:
-      .: INFO
-      cluster: OFF
-
-
+spring:
+  profiles:
+    active: development

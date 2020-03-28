@@ -1,7 +1,7 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
+package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import com.mongodb.MongoCommandException;
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.AddressModelController;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import org.bson.types.ObjectId;
@@ -16,11 +16,11 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/address")
-public class AddressRestController {
+public class AddressController {
 
-    AddressModelController addressModelController;
+    AddressService addressModelController;
 
-    public AddressRestController(AddressModelController addressModelController) {
+    public AddressController(AddressService addressModelController) {
         this.addressModelController = addressModelController;
     }
 

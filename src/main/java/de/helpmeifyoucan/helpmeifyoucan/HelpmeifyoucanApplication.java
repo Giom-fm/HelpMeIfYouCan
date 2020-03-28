@@ -28,7 +28,6 @@ public class HelpmeifyoucanApplication extends SpringBootServletInitializer {
     }
 
     public static void main(String[] args) {
-
         SpringApplication.run(HelpmeifyoucanApplication.class, args);
     }
 

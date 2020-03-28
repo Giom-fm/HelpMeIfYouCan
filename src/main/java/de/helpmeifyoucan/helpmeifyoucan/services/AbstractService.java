@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
+package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -12,14 +12,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public abstract class AbstractModelController<T extends AbstractEntity> {
+public abstract class AbstractService<T extends AbstractEntity> {
 
     private MongoDatabase database;
     private MongoCollection<T> collection;
 
 
     @Autowired
-    public AbstractModelController(MongoDatabase database) {
+    public AbstractService(MongoDatabase database) {
         this.database = database;
     }
 

@@ -1,9 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.config;
 
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
-import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthenticationFilter;
-import de.helpmeifyoucan.helpmeifyoucan.filters.JWTAuthorizationFilter;
+import de.helpmeifyoucan.helpmeifyoucan.filters.AuthenticationFilter;
+import de.helpmeifyoucan.helpmeifyoucan.filters.AuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -18,29 +19,31 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import static de.helpmeifyoucan.helpmeifyoucan.config.Config.JWT_SIGN_UP_URL;
-
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private UserDetailsServiceImpl userDetailsService;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserModelController userController;
+    private UserService userController;
+    private JwtConfig jwtConfig;
 
     @Autowired
-    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, UserModelController userController) {
+    public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
+            UserService userController, JwtConfig jwtConfig) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userController = userController;
+        this.jwtConfig = jwtConfig;
 
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, JWT_SIGN_UP_URL).permitAll()
+        http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, "/auth/signup").permitAll()
                 .anyRequest().authenticated().and()
-                .addFilter(new JWTAuthenticationFilter(this.authenticationManager(), this.userController))
-                .addFilter(new JWTAuthorizationFilter(this.authenticationManager()))
+                .addFilter(
+                        new AuthenticationFilter(this.authenticationManager(), this.userController, this.jwtConfig))
+                .addFilter(new AuthorizationFilter(this.authenticationManager(), this.jwtConfig))
                 // this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
@@ -56,6 +59,5 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
     }
-
 
 }

@@ -5,9 +5,11 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
-import de.helpmeifyoucan.helpmeifyoucan.config.Config;
+import de.helpmeifyoucan.helpmeifyoucan.config.DatabaseConfig;
+
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -15,29 +17,27 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 public class Database {
 
     private MongoClient client;
-
     public static CodecRegistry pojoCodec;
-
     public MongoDatabase database;
 
-
-    public Database() {
-        setDatabase();
-    }
-
-
-    private void setDatabase() {
-
+    @Autowired
+    public Database(DatabaseConfig config) {
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
-                pojoCodecRegistry);
-        String uri = String.format("%s://%s:%s@%s", Config.DATABASE_PROTOCOL, Config.DATABASE_USER,
-                Config.DATABASE_PASSWORD, Config.DATABASE_HOST);
-        MongoClientSettings settings = MongoClientSettings.builder()
-                .applyConnectionString(new ConnectionString(uri)).codecRegistry(pojoCodec).build();
+        pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
+
+        var stringBuilder = new StringBuilder();
+        stringBuilder.append(config.getProtocol()).append("//");
+
+        if (config.getName() != null && config.getPassword() != null) {
+            stringBuilder.append(config.getUser()).append(":").append(config.getPassword()).append("@");
+        }
+        stringBuilder.append(config.getHost());
+
+        var uri = new ConnectionString(stringBuilder.toString());
+        var settings = MongoClientSettings.builder().applyConnectionString(uri).codecRegistry(pojoCodec).build();
         this.client = MongoClients.create(settings);
 
-        this.database = client.getDatabase(Config.DATABASE_NAME);
+        this.database = this.client.getDatabase(config.getName());
     }
 
     public MongoDatabase getDatabase() {

@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
+package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -21,13 +21,13 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 @Service
-public class UserModelController extends AbstractModelController<UserModel> {
+public class UserService extends AbstractService<UserModel> {
 
-    private AddressModelController addressModelController;
+    private AddressService addressService;
 
 
     @Autowired
-    public UserModelController(MongoDatabase database) {
+    public UserService(MongoDatabase database) {
         super(database);
         super.createCollection("users", UserModel.class);
         createIndex();
@@ -92,14 +92,14 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
-        var dbAddress = addressModelController.getOptional(addressFilter);
+        var dbAddress = addressService.getOptional(addressFilter);
         var user = this.get(userId);
         if (dbAddress.isPresent()) {
-            addressModelController.addUserToAddress(dbAddress.get(), user.getId());
+            addressService.addUserToAddress(dbAddress.get(), user.getId());
             return this.addAddressToUser(user, dbAddress.get());
 
         } else {
-            addressModelController.save(address.addUserAddress(userId));
+            addressService.save(address.addUserAddress(userId));
             return this.addAddressToUser(user, address);
         }
     }
@@ -156,7 +156,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
      * @return the edited User
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
-        addressModelController.handleUserControllerAddressDelete(addressId, user.getId());
+        addressService.handleUserControllerAddressDelete(addressId, user.getId());
         return this.updateUserAddressField(user.removeAddress(addressId));
     }
 
@@ -175,7 +175,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     @Autowired
-    public void setAddressModelController(AddressModelController addressModelController) {
-        this.addressModelController = addressModelController;
+    public void setAddressModelController(AddressService addressModelController) {
+        this.addressService = addressModelController;
     }
 }

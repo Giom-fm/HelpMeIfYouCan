@@ -5,6 +5,7 @@ import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,19 +27,22 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import de.helpmeifyoucan.helpmeifyoucan.config.Config;
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
+import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.Login;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
-    private final UserModelController userController;
+    private final UserService userService;
+    private final JwtConfig config;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, UserModelController userController) {
+    public AuthenticationFilter(AuthenticationManager authenticationManager, UserService userService,
+            JwtConfig config) {
         this.authenticationManager = authenticationManager;
         this.setFilterProcessesUrl("/auth/signin");
-        this.userController = userController;
+        this.userService = userService;
+        this.config = config;
     }
 
     @Override
@@ -62,10 +66,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         var roles = userDetails.getAuthorities().stream().map(role -> role.toString()).collect(Collectors.toList());
 
         String token = JWT.create().withSubject(id).withArrayClaim("roles", roles.toArray(new String[0]))
-                .withExpiresAt(new Date(System.currentTimeMillis() + Config.JWT_EXPIRATION_TIME))
-                .sign(HMAC512(Config.JWT_SECRET.getBytes()));
+                .withExpiresAt(new Date(System.currentTimeMillis() + config.getExpiration()))
+                .sign(HMAC512(this.config.getSecret().getBytes()));
 
-        var user = this.userController.get(new ObjectId(id));
+        var user = this.userService.get(new ObjectId(id));
         var login = new Login(user.getName(), user.getLastName(), token);
 
         res.setStatus(HttpStatus.OK.value());
