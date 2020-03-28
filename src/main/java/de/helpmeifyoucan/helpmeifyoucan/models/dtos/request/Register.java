@@ -1,13 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.Name;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
 
 public class Register extends Credentials {
 
-    @Name
+    @ValidName
     private String name;
-    @Name
+    @ValidName
     private String lastName;
 
     public String getName() {

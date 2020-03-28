@@ -1,22 +1,22 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
+import javax.validation.constraints.NotNull;
 
 import org.bson.conversions.Bson;
 
-import javax.validation.constraints.Email;
-
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 
 public class UserUpdate extends ModelUpdate {
 
-
-    @Email
+    @ValidEmail(canBeNull = true)
     protected String email;
 
-
+    @ValidPassword(canBeNull = true)
     protected String password;
 
+    @NotNull
     private String currentPassword;
-
 
     public UserUpdate() {
 
@@ -30,7 +30,6 @@ public class UserUpdate extends ModelUpdate {
         this.currentPassword = currentPassword;
     }
 
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -39,10 +38,8 @@ public class UserUpdate extends ModelUpdate {
         this.email = email;
     }
 
-
     public Bson toFilter() {
         return super.toFilter(this);
     }
-
 
 }
