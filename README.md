@@ -9,4 +9,3 @@ Select the profile that you want to use in *application.yml*.
 Set environment variables *DATABASE_PASSWORD* with your credentials.
 
 `set -lx DATABASE_PASSWORD <PASSWORD> && ./mvnw spring-boot:run`
-
