@@ -12,6 +12,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,12 +25,13 @@ import static com.mongodb.client.model.Updates.set;
 public class UserService extends AbstractService<UserModel> {
 
     private AddressService addressService;
-
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(MongoDatabase database) {
+    public UserService(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
         super(database);
         super.createCollection("users", UserModel.class);
+        this.passwordEncoder = passwordEncoder;
         createIndex();
     }
 
@@ -63,8 +65,15 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
-        var filter = Filters.eq("_id", id);
-        var updatedUser = super.updateExistingFields(filter, updatedFields.toFilter());
+
+        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
+        if (!hashedPassword) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_WRONG);
+        }
+
+        var updateFilter = eq(id);
+
+        var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
         if (updatedUser == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
         }
@@ -80,10 +89,11 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * The user requests to add a new address to his addresses, as we dont want to have redundant addresses in our db, we first
-     * calculate the new addresses hash, and query the db for it. If we find a matching address,
-     * we want to add the user to the addresses userreferneces and vice versa
-     * If no address is found, we will create a new entity and update references accordingly
+     * The user requests to add a new address to his addresses, as we dont want to
+     * have redundant addresses in our db, we first calculate the new addresses
+     * hash, and query the db for it. If we find a matching address, we want to add
+     * the user to the addresses userreferneces and vice versa If no address is
+     * found, we will create a new entity and update references accordingly
      *
      * @param userId  User to add the address to
      * @param address the from the request mapped new address
@@ -105,8 +115,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to get the User Model of the calling user, so we fetch it from db and delegate deleting to
-     * another method
+     * We want to get the User Model of the calling user, so we fetch it from db and
+     * delegate deleting to another method
      *
      * @param userId    User to delete address from
      * @param addressId Address to delete
@@ -119,8 +129,8 @@ public class UserService extends AbstractService<UserModel> {
     // user address operations
 
     /**
-     * We want to add a User to the Addresses user References and vice versa,
-     * we to this by adding address reference to user
+     * We want to add a User to the Addresses user References and vice versa, we to
+     * this by adding address reference to user
      *
      * @param user    User to add address to
      * @param address Address to add
@@ -131,7 +141,6 @@ public class UserService extends AbstractService<UserModel> {
         return this.updateUserAddressField(user.addAddress(address.getId()));
 
     }
-
 
     /**
      * We want to delete one and add the other address reference to a user
@@ -148,8 +157,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to delete the given Address from Users Address List and let the AddressmodelController handle
-     * the Addressmodel
+     * We want to delete the given Address from Users Address List and let the
+     * AddressmodelController handle the Addressmodel
      *
      * @param user      User to delete address from
      * @param addressId Address to delete
@@ -161,8 +170,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to submit the changed address references to the db, we do so by quering the db
-     * for the userid and change the address field to actual value
+     * We want to submit the changed address references to the db, we do so by
+     * quering the db for the userid and change the address field to actual value
      *
      * @param user the user to update
      * @return the updated user
