@@ -1,7 +1,4 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
-
-import javax.validation.constraints.Email;
-
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 
 public class Credentials {
