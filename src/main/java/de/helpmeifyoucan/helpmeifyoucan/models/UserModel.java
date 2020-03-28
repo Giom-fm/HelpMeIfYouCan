@@ -12,6 +12,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class UserModel extends AbstractEntity {
 
@@ -154,12 +155,28 @@ public class UserModel extends AbstractEntity {
         return password;
     }
 
-    public void setPassword(String password) {
+    public UserModel setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     public ObjectId generateId() {
         this.setId(new ObjectId());
         return this.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserModel userModel = (UserModel) o;
+        return getName().equals(userModel.getName()) &&
+                getLastName().equals(userModel.getLastName()) &&
+                getEmail().equals(userModel.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getLastName(), getEmail());
     }
 }
