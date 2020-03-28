@@ -1,8 +1,8 @@
 spring:
-  profiles: development
+  profiles: local
   main:
     banner-mode: off
-    lazy-initialization: true
+    lazy-initialization: false
 server:
   port: 8080
 logging:
@@ -14,11 +14,9 @@ logging:
       .: INFO
       cluster: OFF
 database:
-  protocol: mongodb+srv
-  host: "helpme-1rsgf.mongodb.net/test?retryWrites=true&w=majority"
+  protocol: mongodb
+  host: "localhost"
   name: helpmeifyoucan
-  user: dbUser
-  password: ${DATABASE_PASSWORD}
 jwt:
   secret: yeipu7koo6ceez5quieDeenooxeep9wu
   expiration: 864000000

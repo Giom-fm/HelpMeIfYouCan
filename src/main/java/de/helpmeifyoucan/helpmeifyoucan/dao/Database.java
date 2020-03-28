@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.utils;
+package de.helpmeifyoucan.helpmeifyoucan.dao;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -26,13 +26,12 @@ public class Database {
         pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
 
         var stringBuilder = new StringBuilder();
-        stringBuilder.append(config.getProtocol()).append("//");
+        stringBuilder.append(config.getProtocol()).append("://");
 
-        if (config.getName() != null && config.getPassword() != null) {
+        if (config.getUser() != null && config.getPassword() != null) {
             stringBuilder.append(config.getUser()).append(":").append(config.getPassword()).append("@");
         }
         stringBuilder.append(config.getHost());
-
         var uri = new ConnectionString(stringBuilder.toString());
         var settings = MongoClientSettings.builder().applyConnectionString(uri).codecRegistry(pojoCodec).build();
         this.client = MongoClients.create(settings);
