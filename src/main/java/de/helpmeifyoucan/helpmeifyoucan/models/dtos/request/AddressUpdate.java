@@ -1,30 +1,27 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-
-
 import org.bson.conversions.Bson;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidCountry;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidDistrict;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidHouseNumber;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidStreet;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidZipCode;
 
 public class AddressUpdate extends ModelUpdate {
 
-
+    @ValidStreet(canBeNull = true)
     public String street;
-
+    @ValidDistrict(canBeNull = true)
     public String district;
-
-    @Min(value = 0, message = "please fill in House Number between 0 and 999")
-    @Max(value = 999, message = "please fill in House Number between 0 and 999")
-    public int houseNumber;
-
+    @ValidHouseNumber(canBeNull = true)
+    public String houseNumber;
+    @ValidZipCode(canBeNull = true)
     public String zipCode;
-
+    @ValidCountry(canBeNull = true)
     public String country;
 
-
-    public void setHouseNumber(int houseNumber) {
+    public void setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
     }
 
@@ -48,6 +45,5 @@ public class AddressUpdate extends ModelUpdate {
     public Bson toFilter() {
         return super.toFilter(this);
     }
-
 
 }
