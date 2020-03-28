@@ -41,6 +41,10 @@ public abstract class AbstractService<T extends AbstractEntity> {
 
     }
 
+    protected boolean exists(Bson filter) {
+        return this.getOptional(filter).isPresent();
+    }
+
     protected T getByFilter(Bson filter) {
         return this.collection.find(filter).first();
     }
@@ -69,4 +73,7 @@ public abstract class AbstractService<T extends AbstractEntity> {
         this.collection.createIndex(indexes, options);
     }
 
+    public MongoCollection<T> getCollection() {
+        return this.collection;
+    }
 }
