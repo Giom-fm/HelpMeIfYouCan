@@ -12,6 +12,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,11 +26,15 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     private AddressModelController addressModelController;
 
+    private BCryptPasswordEncoder passwordEncoder;
+
 
     @Autowired
-    public UserModelController(MongoDatabase database) {
+    public UserModelController(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
+
         super(database);
         super.createCollection("users", UserModel.class);
+        this.passwordEncoder = passwordEncoder;
         createIndex();
     }
 
@@ -63,8 +68,15 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
-        var filter = Filters.eq("_id", id);
-        var updatedUser = super.updateExistingFields(filter, updatedFields.toFilter());
+
+        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
+        if (!hashedPassword) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_WRONG);
+        }
+
+        var updateFilter = eq(id);
+
+        var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
         if (updatedUser == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
         }

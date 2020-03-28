@@ -16,9 +16,7 @@ public class Database {
 
     private MongoClient client;
 
-    public static CodecRegistry pojoCodec;
-
-    public MongoDatabase database;
+    private MongoDatabase database;
 
 
     public Database() {
@@ -29,7 +27,7 @@ public class Database {
     private void setDatabase() {
 
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
+        CodecRegistry pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
                 pojoCodecRegistry);
         String uri = String.format("%s://%s:%s@%s", Config.DATABASE_PROTOCOL, Config.DATABASE_USER,
                 Config.DATABASE_PASSWORD, Config.DATABASE_HOST);

@@ -77,7 +77,7 @@ public class UserRestController {
     @Secured({Roles.ROLE_NAME_ADMIN})
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
-        return this.userModelController.update(user, getIdFromContext());
+        return this.userModelController.update(user, id);
     }
 
     @Secured({Roles.ROLE_NAME_ADMIN})
