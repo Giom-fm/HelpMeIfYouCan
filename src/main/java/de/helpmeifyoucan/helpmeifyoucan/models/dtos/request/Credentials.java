@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 import javax.validation.constraints.Email;
 
-import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Password;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.Password;
 
 public class Credentials {
 

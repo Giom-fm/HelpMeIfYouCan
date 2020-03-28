@@ -1,7 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.model.Filters;
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,10 +16,10 @@ import java.util.stream.Collectors;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private UserModelController userModelController;
+    private UserService userModelController;
 
     @Autowired
-    public UserDetailsServiceImpl(UserModelController userModelController) {
+    public UserDetailsServiceImpl(UserService userModelController) {
 
         this.userModelController = userModelController;
     }

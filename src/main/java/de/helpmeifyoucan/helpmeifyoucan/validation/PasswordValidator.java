@@ -1,6 +1,6 @@
-package de.helpmeifyoucan.helpmeifyoucan.constraint;
+package de.helpmeifyoucan.helpmeifyoucan.validation;
 
-import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Password;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.Password;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;

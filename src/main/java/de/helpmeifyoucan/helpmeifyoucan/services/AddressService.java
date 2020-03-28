@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
+package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
@@ -20,12 +20,12 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 @Service
-public class AddressModelController extends AbstractModelController<AddressModel> {
+public class AddressService extends AbstractService<AddressModel> {
 
-    private UserModelController userModelController;
+    private UserService userService;
 
     @Autowired
-    public AddressModelController(MongoDatabase dataBase) {
+    public AddressService(MongoDatabase dataBase) {
         super(dataBase);
         super.createCollection("address", AddressModel.class);
         this.createIndex();
@@ -168,11 +168,11 @@ public class AddressModelController extends AbstractModelController<AddressModel
         this.deleteUserFromAddress(addressToUpdate, userId);
 
         if (potentialExistingAddress.isEmpty()) {
-            userModelController.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
+            userService.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
             return this.save(mergedAddress);
         } else {
             var existingAddressModel = potentialExistingAddress.get();
-            userModelController.exchangeAddress(userId, addressToUpdate.getId(), existingAddressModel.getId());
+            userService.exchangeAddress(userId, addressToUpdate.getId(), existingAddressModel.getId());
             return addUserToAddress(existingAddressModel, userId);
         }
     }
@@ -206,8 +206,8 @@ public class AddressModelController extends AbstractModelController<AddressModel
 
 
     @Autowired
-    public void setUserModelController(UserModelController userModelController) {
-        this.userModelController = userModelController;
+    public void setUserModelController(UserService userModelController) {
+        this.userService = userModelController;
     }
 
 }

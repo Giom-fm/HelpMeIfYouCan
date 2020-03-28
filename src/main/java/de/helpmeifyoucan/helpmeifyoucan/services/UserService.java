@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.database;
+package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -22,16 +22,13 @@ import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
 @Service
-public class UserModelController extends AbstractModelController<UserModel> {
+public class UserService extends AbstractService<UserModel> {
 
-    private AddressModelController addressModelController;
-
+    private AddressService addressService;
     private BCryptPasswordEncoder passwordEncoder;
 
-
     @Autowired
-    public UserModelController(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
-
+    public UserService(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
         super(database);
         super.createCollection("users", UserModel.class);
         this.passwordEncoder = passwordEncoder;
@@ -92,10 +89,11 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     /**
-     * The user requests to add a new address to his addresses, as we dont want to have redundant addresses in our db, we first
-     * calculate the new addresses hash, and query the db for it. If we find a matching address,
-     * we want to add the user to the addresses userreferneces and vice versa
-     * If no address is found, we will create a new entity and update references accordingly
+     * The user requests to add a new address to his addresses, as we dont want to
+     * have redundant addresses in our db, we first calculate the new addresses
+     * hash, and query the db for it. If we find a matching address, we want to add
+     * the user to the addresses userreferneces and vice versa If no address is
+     * found, we will create a new entity and update references accordingly
      *
      * @param userId  User to add the address to
      * @param address the from the request mapped new address
@@ -104,21 +102,21 @@ public class UserModelController extends AbstractModelController<UserModel> {
 
     public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
-        var dbAddress = addressModelController.getOptional(addressFilter);
+        var dbAddress = addressService.getOptional(addressFilter);
         var user = this.get(userId);
         if (dbAddress.isPresent()) {
-            addressModelController.addUserToAddress(dbAddress.get(), user.getId());
+            addressService.addUserToAddress(dbAddress.get(), user.getId());
             return this.addAddressToUser(user, dbAddress.get());
 
         } else {
-            addressModelController.save(address.addUserAddress(userId));
+            addressService.save(address.addUserAddress(userId));
             return this.addAddressToUser(user, address);
         }
     }
 
     /**
-     * We want to get the User Model of the calling user, so we fetch it from db and delegate deleting to
-     * another method
+     * We want to get the User Model of the calling user, so we fetch it from db and
+     * delegate deleting to another method
      *
      * @param userId    User to delete address from
      * @param addressId Address to delete
@@ -131,8 +129,8 @@ public class UserModelController extends AbstractModelController<UserModel> {
     // user address operations
 
     /**
-     * We want to add a User to the Addresses user References and vice versa,
-     * we to this by adding address reference to user
+     * We want to add a User to the Addresses user References and vice versa, we to
+     * this by adding address reference to user
      *
      * @param user    User to add address to
      * @param address Address to add
@@ -143,7 +141,6 @@ public class UserModelController extends AbstractModelController<UserModel> {
         return this.updateUserAddressField(user.addAddress(address.getId()));
 
     }
-
 
     /**
      * We want to delete one and add the other address reference to a user
@@ -160,21 +157,21 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     /**
-     * We want to delete the given Address from Users Address List and let the AddressmodelController handle
-     * the Addressmodel
+     * We want to delete the given Address from Users Address List and let the
+     * AddressmodelController handle the Addressmodel
      *
      * @param user      User to delete address from
      * @param addressId Address to delete
      * @return the edited User
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
-        addressModelController.handleUserControllerAddressDelete(addressId, user.getId());
+        addressService.handleUserControllerAddressDelete(addressId, user.getId());
         return this.updateUserAddressField(user.removeAddress(addressId));
     }
 
     /**
-     * We want to submit the changed address references to the db, we do so by quering the db
-     * for the userid and change the address field to actual value
+     * We want to submit the changed address references to the db, we do so by
+     * quering the db for the userid and change the address field to actual value
      *
      * @param user the user to update
      * @return the updated user
@@ -187,7 +184,7 @@ public class UserModelController extends AbstractModelController<UserModel> {
     }
 
     @Autowired
-    public void setAddressModelController(AddressModelController addressModelController) {
-        this.addressModelController = addressModelController;
+    public void setAddressModelController(AddressService addressModelController) {
+        this.addressService = addressModelController;
     }
 }

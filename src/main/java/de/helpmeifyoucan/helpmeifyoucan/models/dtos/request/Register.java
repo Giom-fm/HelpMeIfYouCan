@@ -1,7 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 
-import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Name;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.Name;
 
 public class Register extends Credentials {
 
