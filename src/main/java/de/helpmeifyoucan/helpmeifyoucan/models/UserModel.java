@@ -1,41 +1,47 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
 
 public class UserModel extends AbstractEntity {
 
     @NotNull(message = "Please fill in Name")
-    private String name;
+    protected String name;
 
     @NotNull(message = "Please fill in Lastname")
-    private String lastName;
+    protected String lastName;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     @Valid
-    private List<ObjectId> addresses;
+    protected List<ObjectId> addresses;
 
     @NotNull(message = "Please fill in PhoneNumber")
-    private int phoneNr;
+    protected int phoneNr;
 
-    private String payPal;
+    protected String payPal;
 
     @Email(message = "Please fill in Email")
-    private String email;
+    protected String email;
 
     @JsonIgnore
-    private String password;
+    protected String password;
 
-    private List<Roles> roles;
-    
-    boolean enabled;
+    protected List<Roles> roles;
 
-    boolean verified;
+    protected boolean enabled;
+
+    protected boolean verified;
+
 
     public UserModel setName(String name) {
         this.name = name;
@@ -109,14 +115,23 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
+    public UserModel mergeWithUserUpdate(UserUpdate update) {
+        super.mergeWithUpdate(update, this);
+        return this;
+    }
+
     public UserModel setAddresses(List<ObjectId> addresses) {
         this.addresses = addresses;
         return this;
     }
 
     public UserModel addAddress(ObjectId address) {
-        this.addresses.add(address);
-        return this;
+        if (this.addresses != null) {
+            this.addresses.add(address);
+            return this;
+        }
+
+        return this.setAddresses(Collections.singletonList(address));
     }
 
     public UserModel removeAddress(ObjectId address) {
@@ -125,7 +140,7 @@ public class UserModel extends AbstractEntity {
     }
 
     public List<ObjectId> getAddresses() {
-        return addresses;
+        return this.addresses;
     }
 
     @Override
@@ -143,9 +158,8 @@ public class UserModel extends AbstractEntity {
         this.password = password;
     }
 
-    @Override
-    public UserModel generateId() {
+    public ObjectId generateId() {
         this.setId(new ObjectId());
-        return this;
+        return this.getId();
     }
 }

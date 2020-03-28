@@ -1,0 +1,22 @@
+spring:
+  profiles: production
+  main:
+    banner-mode: off
+    lazy-initialization: false
+server:
+  port: 80
+logging:
+  level:
+    .: error
+    org.springframework: INFO
+    org.zalando.logbook: TRACE
+    org.mongodb.driver:
+      .: INFO
+      cluster: OFF
+database:
+  host: ""
+  user: dbUser
+  password: ${DATABASE_PASSWORD}
+jwt:
+  secret: ${random.value}
+  expiration: 864000000

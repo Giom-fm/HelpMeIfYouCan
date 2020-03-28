@@ -15,7 +15,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\": \"user@mail.de\",\n\t\"password\" : \"password\",\n\t\"name\": \"Giom\",\n\t\"lastName\" : \"The Boss\"\n}",
+							"raw": "{\n\t\"email\": \"user@mail.de\",\n\t\"password\" : \"password1\",\n\t\"name\": \"Giom\",\n\t\"lastName\" : \"The Boss\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -43,7 +43,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password\"\n  }",
+							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password1\"\n  }",
 							"options": {
 								"raw": {
 									"language": "json"

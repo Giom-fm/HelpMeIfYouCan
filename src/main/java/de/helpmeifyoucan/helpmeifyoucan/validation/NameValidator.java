@@ -1,10 +1,10 @@
-package de.helpmeifyoucan.helpmeifyoucan.constraint;
+package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import de.helpmeifyoucan.helpmeifyoucan.constraint.Annotations.Name;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.Name;
 
 public class NameValidator implements ConstraintValidator<Name, String> {
 

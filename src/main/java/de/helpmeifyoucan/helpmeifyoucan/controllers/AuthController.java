@@ -1,11 +1,12 @@
-package de.helpmeifyoucan.helpmeifyoucan.controllers.rest;
+package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import com.mongodb.client.model.Filters;
-import de.helpmeifyoucan.helpmeifyoucan.controllers.database.UserModelController;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Register;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +18,13 @@ import java.util.LinkedList;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthRestController {
+public class AuthController {
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserModelController userModelController;
+    private final UserService userModelController;
 
-    public AuthRestController(BCryptPasswordEncoder bCryptPasswordEncoder, UserModelController userModelController) {
+    @Autowired
+    public AuthController(BCryptPasswordEncoder bCryptPasswordEncoder, UserService userModelController) {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.userModelController = userModelController;
     }

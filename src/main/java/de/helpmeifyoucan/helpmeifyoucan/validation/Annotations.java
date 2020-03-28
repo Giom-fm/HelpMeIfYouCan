@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.constraint;
+package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
