@@ -36,9 +36,9 @@ public class AddressController {
     }
 
 
-    @PatchMapping(path = "/{addressId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId addressId) {
-        return addressModelController.updateAddress(addressId, address, getIdFromContext());
+    @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
+        return addressModelController.updateAddress(id, address, getIdFromContext());
 
     }
 
