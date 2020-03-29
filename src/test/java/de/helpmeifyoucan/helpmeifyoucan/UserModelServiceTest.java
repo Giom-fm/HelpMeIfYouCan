@@ -155,7 +155,7 @@ public class UserModelServiceTest {
 
     @Test
     public void afterAddingAddressToUser_ItShouldBeRemovedSuccessfully() {
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
         this.userService.save(testUser);
 
         this.userService.handleUserAddressAddRequest(testUser.getId(), address);
@@ -167,7 +167,7 @@ public class UserModelServiceTest {
     @Test
     public void afterGivenCorrectAddressId_AddressShouldBeAddedToUser() {
         this.userService.save(testUser);
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
         UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
 
@@ -177,7 +177,7 @@ public class UserModelServiceTest {
 
     public void whenGivenIncorrectUserId_AddAddressShouldThrowException() {
         testUser.setId(new ObjectId());
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
         UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
 
@@ -212,7 +212,7 @@ public class UserModelServiceTest {
     @Test
     public void givenCorrectAddressIdAndUserId_AddressShouldBeDeletedFromUser() {
         testUser.setId(new ObjectId());
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.addressService.save(address.addUserAddress(testUser.getId()));
 
         testUser.addAddress(address.getId());
@@ -228,7 +228,7 @@ public class UserModelServiceTest {
     @Test(expected = ResponseStatusException.class)
     public void givenWrongUserIdAddressIdCombination_MethodShouldThrowException() {
         testUser.setId(new ObjectId());
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.addressService.save(address.addUserAddress(testUser.getId()));
 
         testUser.addAddress(address.getId());
@@ -245,7 +245,7 @@ public class UserModelServiceTest {
 
     @Test
     public void givenRightUser_AddressFieldShouldBeUpdatedAccordingly() {
-        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.userService.save(testUser);
         UserModel updatedUser = this.userService.updateUserAddressField(testUser.addAddress(address.getId()));
 
