@@ -177,9 +177,9 @@ public class UserService extends AbstractService<UserModel> {
      * @param addressToAdd    address to add
      */
 
-    public void exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
+    public UserModel exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
         var user = this.get(userId);
-        this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
+        return this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
 
     }
 
@@ -193,7 +193,14 @@ public class UserService extends AbstractService<UserModel> {
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserControllerAddressDelete(addressId, user.getId());
-        return this.updateUserAddressField(user.removeAddress(addressId));
+        try{
+            return this.updateUserAddressField(user.removeAddress(addressId));
+        }
+        catch (UnsupportedOperationException e)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+
     }
 
     /**
@@ -203,16 +210,21 @@ public class UserService extends AbstractService<UserModel> {
      * @param user the user to update
      * @return the updated user
      */
-    private UserModel updateUserAddressField(UserModel user) {
+    public UserModel updateUserAddressField(UserModel user) {
         Bson updatedFields = set("addresses", user.getAddresses());
 
         var filter = Filters.eq("_id", user.getId());
-        return super.updateExistingFields(filter, updatedFields);
+
+        var updatedUser = super.updateExistingFields(filter, updatedFields);
+        if(updatedUser == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return updatedUser;
     }
 
     @Autowired
-    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder)
-    {
+    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
     }
 

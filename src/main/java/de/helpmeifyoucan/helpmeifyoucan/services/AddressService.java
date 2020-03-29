@@ -83,7 +83,6 @@ public class AddressService extends AbstractService<AddressModel> {
         try {
             this.deleteUserFromAddress(this.get(addressId), userId);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
     }

@@ -48,9 +48,10 @@ public class AddressController {
         this.addressModelController.delete(id);
     }
 
+    //REVIEW
     @ExceptionHandler(value = {MongoCommandException.class})
     protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "hier";
+        String bodyOfResponse = "Address already exists";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
 

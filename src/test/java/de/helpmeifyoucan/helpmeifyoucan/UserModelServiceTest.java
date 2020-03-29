@@ -174,15 +174,85 @@ public class UserModelServiceTest {
         assertTrue(updatedUser.getAddresses().contains(address.getId()));
     }
 
-    @Test
+
     public void whenGivenIncorrectUserId_AddAddressShouldThrowException() {
         testUser.setId(new ObjectId());
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
 
         UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
 
-        System.out.println(updatedUser);
     }
+
+    @Test
+    public void givenUserWithAddedAddressAndAddressToDelete_ItShouldExchangeAddressesAccordingly() {
+        AddressModel addressToDelete = new AddressModel().generateId();
+
+        testUser.addAddress(addressToDelete.getId());
+        this.userService.save(testUser);
+
+        AddressModel addressToAdd = new AddressModel().generateId();
+
+        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
+        assertTrue(updatedUser.getAddresses().size() == 1 && updatedUser.getAddresses().contains(addressToAdd.getId()));
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenNotExistingUserId_ExchangeAddressesShouldThrowException() {
+        AddressModel addressToDelete = new AddressModel().generateId();
+
+        testUser.addAddress(addressToDelete.getId());
+
+        testUser.setId(new ObjectId());
+
+        AddressModel addressToAdd = new AddressModel().generateId();
+
+        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
+    }
+
+    @Test
+    public void givenCorrectAddressIdAndUserId_AddressShouldBeDeletedFromUser() {
+        testUser.setId(new ObjectId());
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        this.addressService.save(address.addUserAddress(testUser.getId()));
+
+        testUser.addAddress(address.getId());
+
+        this.userService.save(testUser);
+
+        UserModel updatedUser = this.userService.deleteAddressFromUser(this.userService.get(testUser.getId()), address.getId());
+
+        assertTrue(updatedUser.noAddressReferences());
+
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenWrongUserIdAddressIdCombination_MethodShouldThrowException() {
+        testUser.setId(new ObjectId());
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        this.addressService.save(address.addUserAddress(testUser.getId()));
+
+        testUser.addAddress(address.getId());
+
+        this.userService.save(testUser);
+
+        UserModel updatedUser = this.userService.deleteAddressFromUser(testUser, address.getId());
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenWrongUserId_FieldsShouldNotBeUpdatedAndExceptionShouldBeThrown() {
+        this.userService.updateUserAddressField(testUser.addAddress(new ObjectId()));
+    }
+
+    @Test
+    public void givenRightUser_AddressFieldShouldBeUpdatedAccordingly() {
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13).generateId();
+        this.userService.save(testUser);
+        UserModel updatedUser = this.userService.updateUserAddressField(testUser.addAddress(address.getId()));
+
+        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+
+    }
+
 
     @Before
     public void clearCollection() {

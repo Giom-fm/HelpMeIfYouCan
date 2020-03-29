@@ -136,7 +136,8 @@ public class AddressModel extends AbstractEntity {
     @Override
     public String toString() {
         return "AddressModel{" +
-                "street='" + street + '\'' +
+                "id='" + super.getId() +
+                ", street='" + street + '\'' +
                 ", district='" + district + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 ", country='" + country + '\'' +

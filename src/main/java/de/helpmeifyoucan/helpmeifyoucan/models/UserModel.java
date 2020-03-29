@@ -144,6 +144,10 @@ public class UserModel extends AbstractEntity {
     }
 
     public UserModel removeAddress(ObjectId address) {
+        if(this.addresses == null)
+        {
+            return this;
+        }
         this.addresses.remove(address);
         return this;
     }
