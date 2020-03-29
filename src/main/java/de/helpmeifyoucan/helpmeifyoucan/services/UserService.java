@@ -211,6 +211,12 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     @Autowired
+    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder)
+    {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Autowired
     public void setAddressModelController(AddressService addressModelController) {
         this.addressService = addressModelController;
     }
