@@ -1,8 +1,8 @@
 spring:
   profiles: development
   main:
-    banner-mode: off
-    lazy-initialization: true
+    banner-mode: console
+    lazy-initialization: false
 server:
   port: 8080
 logging:
@@ -10,6 +10,7 @@ logging:
     .: error
     org.springframework: INFO
     org.zalando.logbook: TRACE
+    org.apache.tomcat: INFO
     org.mongodb.driver:
       .: INFO
       cluster: OFF
@@ -22,3 +23,14 @@ database:
 jwt:
   secret: yeipu7koo6ceez5quieDeenooxeep9wu
   expiration: 864000000
+logbook:
+  format.style: http
+  filter.enabled: true
+  secure-filter.enabled: false
+  strategy: default
+  obfuscate:
+    headers:
+      - Authorization
+    parameters:
+      - password
+      - currentPassword

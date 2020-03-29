@@ -27,7 +27,7 @@ public class UserModel extends AbstractEntity {
     protected List<ObjectId> addresses;
 
     @NotNull(message = "Please fill in PhoneNumber")
-    protected int phoneNr;
+    protected String phoneNr;
 
     protected String payPal;
 
@@ -98,12 +98,12 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
-    public UserModel setPhoneNr(int phoneNr) {
+    public UserModel setPhoneNr(String phoneNr) {
         this.phoneNr = phoneNr;
         return this;
     }
 
-    public int getPhoneNr() {
+    public String getPhoneNr() {
         return phoneNr;
     }
 

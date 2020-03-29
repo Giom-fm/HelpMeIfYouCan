@@ -20,3 +20,14 @@ database:
 jwt:
   secret: ${random.value}
   expiration: 864000000
+logbook:
+  format.style: http
+  filter.enabled: true
+  secure-filter.enabled: false
+  strategy: without-body
+  obfuscate:
+    headers:
+      - Authorization
+    parameters:
+      - password
+      - currentPassword
