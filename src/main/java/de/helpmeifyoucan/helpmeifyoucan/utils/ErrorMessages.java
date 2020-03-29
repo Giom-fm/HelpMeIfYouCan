@@ -47,7 +47,7 @@ public final class ErrorMessages {
     public static final String ZIPCODE_PATTERN_ERROR = "Zipcode is in invalid format";
 
     // Country
-    public static final String COUNRTY_NOT_SET = "Country is needed";
-    public static final String COUNRTY_PATTERN_ERROR = "Country is in invalid format";
+    public static final String COUNTRY_NOT_SET = "Country is needed";
+    public static final String COUNTRY_PATTERN_ERROR = "Country is in invalid format";
 
 }
