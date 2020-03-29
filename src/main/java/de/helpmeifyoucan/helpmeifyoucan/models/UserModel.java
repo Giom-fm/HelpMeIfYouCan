@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -81,7 +81,7 @@ public class UserModel extends AbstractEntity {
     }
 
     public UserModel setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
         return this;
     }
 
@@ -132,10 +132,25 @@ public class UserModel extends AbstractEntity {
             return this;
         }
 
-        return this.setAddresses(Collections.singletonList(address));
+        List<ObjectId> users = new ArrayList<>();
+        users.add(address);
+        return this.setAddresses(users);
+
+    }
+
+    public boolean noAddressReferences() {
+        if (this.addresses == null) {
+            return true;
+        }
+        return this.addresses.isEmpty();
+
     }
 
     public UserModel removeAddress(ObjectId address) {
+        if(this.addresses == null)
+        {
+            return this;
+        }
         this.addresses.remove(address);
         return this;
     }
@@ -146,9 +161,18 @@ public class UserModel extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + this.getId() + ", name='" + name + '\'' + ", lastname='" + lastName + '\''
-                + ", addresses=" + addresses + ", phoneNr=" + phoneNr + ", payPal='" + payPal + '\'' + '}';
-
+        return "UserModel{" +
+                "name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", addresses=" + addresses +
+                ", phoneNr=" + phoneNr +
+                ", payPal='" + payPal + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
+                ", enabled=" + enabled +
+                ", verified=" + verified +
+                '}';
     }
 
     public String getPassword() {

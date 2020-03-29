@@ -1,12 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.conversions.Bson;
-
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidCountry;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidDistrict;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidHouseNumber;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidStreet;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidZipCode;
 
 public class AddressUpdate extends ModelUpdate {
 
@@ -21,25 +16,29 @@ public class AddressUpdate extends ModelUpdate {
     @ValidCountry(canBeNull = true)
     public String country;
 
-    public void setHouseNumber(String houseNumber) {
-        this.houseNumber = houseNumber;
-    }
-
-    public void setStreet(String street) {
+    public AddressUpdate setStreet(String street) {
         this.street = street;
-
+        return this;
     }
 
-    public void setDistrict(String district) {
+    public AddressUpdate setDistrict(String district) {
         this.district = district;
+        return this;
     }
 
-    public void setZipCode(String zipCode) {
+    public AddressUpdate setHouseNumber(String houseNumber) {
+        this.houseNumber = houseNumber;
+        return this;
+    }
+
+    public AddressUpdate setZipCode(String zipCode) {
         this.zipCode = zipCode;
+        return this;
     }
 
-    public void setCountry(String country) {
+    public AddressUpdate setCountry(String country) {
         this.country = country;
+        return this;
     }
 
     public Bson toFilter() {

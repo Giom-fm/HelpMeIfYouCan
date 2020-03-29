@@ -7,10 +7,8 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import org.bson.types.ObjectId;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,9 +25,7 @@ public class AddressModel extends AbstractEntity {
     @NotNull(message = "please fill in Country")
     protected String country;
 
-    @Min(value = 0, message = "please fill in House Number between 0 and 999")
-    @Max(value = 999, message = "please fill in House Number between 0 and 999")
-    protected int houseNumber;
+    protected String houseNumber;
 
     @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> users;
@@ -52,7 +48,9 @@ public class AddressModel extends AbstractEntity {
             return this;
         }
 
-        return this.setUsers(Collections.singletonList(user));
+        List<ObjectId> users = new ArrayList<>();
+        users.add(user);
+        return this.setUsers(users);
     }
 
     public AddressModel removeUserAddress(ObjectId user) {
@@ -60,12 +58,12 @@ public class AddressModel extends AbstractEntity {
         return this;
     }
 
-    public AddressModel setHouseNumber(int houseNumber) {
+    public AddressModel setHouseNumber(String houseNumber) {
         this.houseNumber = houseNumber;
         return this;
     }
 
-    public int getHouseNumber() {
+    public String getHouseNumber() {
         return this.houseNumber;
     }
 
@@ -124,24 +122,32 @@ public class AddressModel extends AbstractEntity {
         return this.calculateHash();
     }
 
+    public boolean containsUser(ObjectId user) {
+        if (this.users == null) {
+            return false;
+        }
+        return this.users.contains(user);
+    }
+
     public int getHashCode() {
         return hashCode;
     }
 
-
-    public ObjectId generateId() {
+    public AddressModel generateId() {
         this.setId(new ObjectId());
-        return this.getId();
+        return this;
     }
 
     @Override
     public String toString() {
         return "AddressModel{" +
-                "street='" + street + '\'' +
+                "id='" + super.getId() +
+                ", street='" + street + '\'' +
                 ", district='" + district + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 ", country='" + country + '\'' +
                 ", houseNumber=" + houseNumber +
+                ", users=" + users +
                 ", hashCode=" + hashCode +
                 '}';
     }
@@ -151,12 +157,11 @@ public class AddressModel extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AddressModel that = (AddressModel) o;
-        return getHouseNumber() == that.getHouseNumber() &&
+        return getHouseNumber().equals(that.getHouseNumber()) &&
                 getStreet().equals(that.getStreet()) &&
                 getDistrict().equals(that.getDistrict()) &&
                 getZipCode().equals(that.getZipCode()) &&
-                getCountry().equals(that.getCountry()) &&
-                getUsers().equals(that.getUsers());
+                getCountry().equals(that.getCountry());
     }
 
     @Override
