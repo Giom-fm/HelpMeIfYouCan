@@ -2,28 +2,30 @@ package de.helpmeifyoucan.helpmeifyoucan.dao;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import de.helpmeifyoucan.helpmeifyoucan.config.DatabaseConfig;
-
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
+@Component
 public class Database {
 
     private MongoClient client;
-    public static CodecRegistry pojoCodec;
+
     public MongoDatabase database;
 
     @Autowired
     public Database(DatabaseConfig config) {
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
+        CodecRegistry pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
 
         var stringBuilder = new StringBuilder();
         stringBuilder.append(config.getProtocol()).append("://");
@@ -36,7 +38,7 @@ public class Database {
         var settings = MongoClientSettings.builder().applyConnectionString(uri).codecRegistry(pojoCodec).build();
         this.client = MongoClients.create(settings);
 
-        this.database = this.client.getDatabase(config.getName());
+        this.database = this.client.getDatabase(config.getName()).withWriteConcern(WriteConcern.ACKNOWLEDGED);
     }
 
     public MongoDatabase getDatabase() {

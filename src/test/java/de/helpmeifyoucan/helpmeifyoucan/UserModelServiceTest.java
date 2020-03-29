@@ -1,21 +1,30 @@
 package de.helpmeifyoucan.helpmeifyoucan;
 
+import com.mongodb.MongoWriteException;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Test;
+import org.bson.types.ObjectId;
+import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.server.ResponseStatusException;
 
+import static com.mongodb.client.model.Filters.eq;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class UserModelServiceTest {
+public class UserModelServiceTest {
 
 
     @Autowired
@@ -24,10 +33,20 @@ class UserModelServiceTest {
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AddressService addressService;
+
+    private UserModel testUser;
+
+
+    @Before
+    public void setUpTest() {
+        testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+
+    }
 
     @Test
-    void saveTest() {
-        UserModel testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+    public void givenValidUserToSave_RetrievedUserShouldBeEqualToSavedUser() {
 
         this.userService.save(testUser);
 
@@ -35,20 +54,141 @@ class UserModelServiceTest {
         assertEquals(savedUser, testUser);
     }
 
+    @Test(expected = ResponseStatusException.class)
+    public void givenNotExistingObjectId_NotFoundShouldBeThrown() {
+        this.userService.get(new ObjectId());
+    }
+
     @Test
-    void deleteTest() {
-        UserModel testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+    public void afterSavingUser_ExistsShouldBeTrue() {
+        this.userService.save(testUser);
+        assertTrue(this.userService.exits(eq(testUser.getId())));
+    }
+
+
+    @Test
+    public void afterSavingUserAndDeletingUser_UserShouldNotExistAnymore() {
         this.userService.save(testUser);
 
         this.userService.delete(testUser.getId());
 
-        //this.userService.getOptional()
+        assertFalse(this.userService.exits(eq(testUser.getId())));
+    }
+
+    @Test(expected = MongoWriteException.class)
+    public void afterSavingUserWithIndex_SavingUserWithSameIndexIsNotPossible() {
+
+        this.userService.save(testUser);
+
+        UserModel duplicateEmailUser = new UserModel().setName("Marc").setEmail("test@Mail.de");
+
+        this.userService.save(duplicateEmailUser);
+    }
+
+    @Test
+    public void afterSavingUserWithEmail_ItShouldBeFoundByEmail() {
+
+        this.userService.save(testUser);
+        UserModel retrievedUser = this.userService.getByEmail(testUser.getEmail());
+        assertEquals(testUser, retrievedUser);
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenNotExistingEmail_NotFoundShouldThrowNotFound() {
+        this.userService.getByEmail("notExisting");
 
     }
 
-    @AfterAll
-    void dropCollection() {
+    @Test
+    public void existsOnNotExistingUser_ShouldBeFalse() {
+        assertFalse(this.userService.exits(eq(new ObjectId())));
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenWrongPasswordForUpdate_WrongPasswordShouldBeThrown() {
+        this.userService.save(testUser);
+
+        UserUpdate wrongUpdate = new UserUpdate();
+
+        wrongUpdate.setCurrentPassword("wrongPassword");
+
+        this.userService.update(wrongUpdate, testUser.getId());
+
+    }
+
+    @Test
+    public void givenCorrectPasswordForUpdate_UpdatedFieldShouldBeUpdatedCorrectly() {
+        this.userService.save(testUser);
+
+        UserUpdate nameUpdate = new UserUpdate();
+
+        nameUpdate.setCurrentPassword("password1");
+
+        nameUpdate.setLastName("West");
+
+        nameUpdate.setName("Kanye");
+
+        UserModel updatedUser = this.userService.update(nameUpdate, testUser.getId());
+
+        assertEquals(updatedUser.getLastName(), "West");
+        assertEquals(updatedUser.getName(), "Kanye");
+    }
+
+    @Test(expected = ResponseStatusException.class)
+    public void givenIncorrectUserId_AddressAddShouldThrowError() {
+        AddressModel address = new AddressModel().setCountry("germany");
+
+        this.userService.handleUserAddressAddRequest(new ObjectId(), address);
+    }
+
+    @Test
+    public void givenCorrectUserIdAndAddress_CorrectAddressIdShouldBeAddedToUser() {
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg");
+
+        this.userService.save(testUser);
+
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address);
+
+        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+    }
+
+
+    @Test
+    public void afterAddingAddressToUser_ItShouldBeRemovedSuccessfully() {
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+        this.userService.save(testUser);
+
+        this.userService.handleUserAddressAddRequest(testUser.getId(), address);
+        userService.handleUserAddressDeleteRequest(testUser.getId(), address.getId());
+
+        assertTrue(testUser.noAddressReferences());
+    }
+
+    @Test
+    public void afterGivenCorrectAddressId_AddressShouldBeAddedToUser() {
+        this.userService.save(testUser);
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+
+        UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
+
+        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+    }
+
+    @Test
+    public void whenGivenIncorrectUserId_AddAddressShouldThrowException() {
+        testUser.setId(new ObjectId());
+        AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber(13);
+
+        UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
+
+        System.out.println(updatedUser);
+    }
+
+    @Before
+    public void clearCollection() {
         userService.getCollection().drop();
+        this.userService.createIndex();
+
     }
 
 

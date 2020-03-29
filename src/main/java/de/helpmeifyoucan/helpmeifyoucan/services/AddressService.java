@@ -83,6 +83,7 @@ public class AddressService extends AbstractService<AddressModel> {
         try {
             this.deleteUserFromAddress(this.get(addressId), userId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
     }
@@ -168,7 +169,7 @@ public class AddressService extends AbstractService<AddressModel> {
         this.deleteUserFromAddress(addressToUpdate, userId);
 
         if (potentialExistingAddress.isEmpty()) {
-            userService.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
+            userService.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId().getId());
             return this.save(mergedAddress);
         } else {
             var existingAddressModel = potentialExistingAddress.get();

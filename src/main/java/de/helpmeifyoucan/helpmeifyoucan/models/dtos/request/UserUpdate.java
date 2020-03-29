@@ -55,7 +55,7 @@ public class UserUpdate extends ModelUpdate {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
 

@@ -128,10 +128,9 @@ public class AddressModel extends AbstractEntity {
         return hashCode;
     }
 
-
-    public ObjectId generateId() {
+    public AddressModel generateId() {
         this.setId(new ObjectId());
-        return this.getId();
+        return this;
     }
 
     @Override
