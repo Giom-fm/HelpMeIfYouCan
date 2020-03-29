@@ -1,39 +1,48 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class UserModel extends AbstractEntity {
 
     @NotNull(message = "Please fill in Name")
-    private String name;
+    protected String name;
 
     @NotNull(message = "Please fill in Lastname")
-    private String lastName;
+    protected String lastName;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     @Valid
-    private List<ObjectId> addresses;
+    protected List<ObjectId> addresses;
 
     @NotNull(message = "Please fill in PhoneNumber")
-    private int phoneNr;
+    protected int phoneNr;
 
-    private String payPal;
+    protected String payPal;
 
     @Email(message = "Please fill in Email")
-    private String email;
+    protected String email;
 
-    private String password;
+    @JsonIgnore
+    protected String password;
 
-    private List<Roles> roles;
+    protected List<Roles> roles;
 
-    boolean enabled;
+    protected boolean enabled;
 
-    boolean verified;
+    protected boolean verified;
+
 
     public UserModel setName(String name) {
         this.name = name;
@@ -107,14 +116,23 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
+    public UserModel mergeWithUserUpdate(UserUpdate update) {
+        super.mergeWithUpdate(update, this);
+        return this;
+    }
+
     public UserModel setAddresses(List<ObjectId> addresses) {
         this.addresses = addresses;
         return this;
     }
 
     public UserModel addAddress(ObjectId address) {
-        this.addresses.add(address);
-        return this;
+        if (this.addresses != null) {
+            this.addresses.add(address);
+            return this;
+        }
+
+        return this.setAddresses(Collections.singletonList(address));
     }
 
     public UserModel removeAddress(ObjectId address) {
@@ -123,7 +141,7 @@ public class UserModel extends AbstractEntity {
     }
 
     public List<ObjectId> getAddresses() {
-        return addresses;
+        return this.addresses;
     }
 
     @Override
@@ -137,13 +155,28 @@ public class UserModel extends AbstractEntity {
         return password;
     }
 
-    public void setPassword(String password) {
+    public UserModel setPassword(String password) {
         this.password = password;
+        return this;
+    }
+
+    public ObjectId generateId() {
+        this.setId(new ObjectId());
+        return this.getId();
     }
 
     @Override
-    public UserModel generateId() {
-        this.setId(new ObjectId());
-        return this;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserModel userModel = (UserModel) o;
+        return getName().equals(userModel.getName()) &&
+                getLastName().equals(userModel.getLastName()) &&
+                getEmail().equals(userModel.getEmail());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getLastName(), getEmail());
     }
 }

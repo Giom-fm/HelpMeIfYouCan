@@ -1,14 +1,12 @@
-package de.helpmeifyoucan.helpmeifyoucan.models.dtos;
+package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-import javax.validation.constraints.NotNull;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
 
 public class Register extends Credentials {
 
-    @NotNull
-    private String phoneNr;
-    @NotNull
+    @ValidName
     private String name;
-    @NotNull
+    @ValidName
     private String lastName;
 
     public String getName() {
@@ -26,13 +24,4 @@ public class Register extends Credentials {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
-
-    public String getphoneNr() {
-        return phoneNr;
-    }
-
-    public void setphoneNr(String phoneNr) {
-        this.phoneNr = phoneNr;
-    }
-
 }

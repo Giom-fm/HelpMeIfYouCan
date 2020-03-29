@@ -9,13 +9,13 @@
 			"name": "Auth",
 			"item": [
 				{
-					"name": "Regisgter",
+					"name": "Register",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"email\": \"user@mail.de\",\n\t\"password\" : \"password\",\n\t\"name\": \"Giom\",\n\t\"lastName\" : \"The Boss\"\n}",
+							"raw": "{\n\t\"email\": \"user1@mail.de\",\n\t\"password\" : \"password1\",\n\t\"name\": \"Giom\",\n\t\"lastName\" : \"The Boss\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -43,7 +43,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password\"\n  }",
+							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password1\"\n  }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -123,7 +123,7 @@
 									"bearer": [
 										{
 											"key": "token",
-											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdhMmU0N2NmOTliNzM5YWQ3ZDEyNDAiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg1OTM1NjI0fQ.X13i-egO-ECazT8VTTiOxqOwdU3I30aqnzw3idABc5Eg0ajE9KsMVRzGxz87zMGazv6By4rvYVwZiBE0evNTBg",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdlNzFjNDM5MjUyYzY3Y2JhNDJkOWUiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg2MjkxMTg1fQ.0O-ZjVOGSwA7yBmFDzZX1IUof82ChH0zoH6jra_cJ7Ucw9AXTQjg4gM-4ZG_2P58JBrKkSHNUMbXhDYu2Dn7WA",
 											"type": "string"
 										}
 									]
@@ -136,6 +136,15 @@
 										"type": "text"
 									}
 								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"email\" : \"user@mail.de\",\n\t\"password\": \"newPassword1\",\n\t\"name\" : \"newName\",\n\t\"lastName\" : \"newLastName\",\n\t\"phoneNr\" : \"017666666\"\n\t\"currentPassword\" : \"password1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "localhost:8080/user/me",
 									"host": [
@@ -332,6 +341,106 @@
 					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Address",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/address/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"address",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123213213213213"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTdlNzFjNDM5MjUyYzY3Y2JhNDJkOWUiLCJyb2xlcyI6WyJST0xFX1VTRVIiXSwiZXhwIjoxNTg2MjkxMTg1fQ.0O-ZjVOGSwA7yBmFDzZX1IUof82ChH0zoH6jra_cJ7Ucw9AXTQjg4gM-4ZG_2P58JBrKkSHNUMbXhDYu2Dn7WA",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66666,\n    \"country\": \"newCountry\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/address/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"address",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123124234123213"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/address/:id",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"address",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "123123213213"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"protocolProfileBehavior": {}

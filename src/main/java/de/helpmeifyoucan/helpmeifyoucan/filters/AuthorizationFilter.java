@@ -10,29 +10,31 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import de.helpmeifyoucan.helpmeifyoucan.config.Config;
+public class AuthorizationFilter extends BasicAuthenticationFilter {
 
-public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
+    private JWTVerifier verifier;
+    private JwtConfig config;
 
-    private final JWTVerifier verifier;
-
-    public JWTAuthorizationFilter(AuthenticationManager authManager) {
+    public AuthorizationFilter(AuthenticationManager authManager, JwtConfig config) {
         super(authManager);
-        this.verifier = JWT.require(Algorithm.HMAC512(Config.JWT_SECRET.getBytes())).build();
+        this.config = config;
+        this.verifier = JWT.require(Algorithm.HMAC512(this.config.getSecret().getBytes())).build();
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws IOException, ServletException {
 
-        String header = req.getHeader(Config.JWT_HEADER_STRING);
-        if (header != null && header.startsWith(Config.JWT_TOKEN_PREFIX)) {
+        String header = req.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer")) {
             var authentication = this.getAuthentication(header);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
@@ -43,7 +45,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     private UsernamePasswordAuthenticationToken getAuthentication(String header) {
         if (header != null) {
-            var token = header.replace(Config.JWT_TOKEN_PREFIX, "");
+            var token = header.replace("Bearer ", "");
             var decodedJWT = this.verifier.verify(token);
             var user = decodedJWT.getSubject();
             var roles = decodedJWT.getClaim("roles").asList(SimpleGrantedAuthority.class);

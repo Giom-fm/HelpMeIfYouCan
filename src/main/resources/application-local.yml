@@ -1,0 +1,22 @@
+spring:
+  profiles: local
+  main:
+    banner-mode: off
+    lazy-initialization: false
+server:
+  port: 8080
+logging:
+  level:
+    .: error
+    org.springframework: INFO
+    org.zalando.logbook: TRACE
+    org.mongodb.driver:
+      .: INFO
+      cluster: OFF
+database:
+  protocol: mongodb
+  host: "localhost"
+  name: helpmeifyoucan
+jwt:
+  secret: yeipu7koo6ceez5quieDeenooxeep9wu
+  expiration: 864000000
