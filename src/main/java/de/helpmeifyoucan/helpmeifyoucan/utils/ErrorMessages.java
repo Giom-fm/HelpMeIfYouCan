@@ -11,6 +11,9 @@ public final class ErrorMessages {
     // Address
     public static final String ADDRESS_NOT_FOUND = "Address not found";
 
+
+    //DBERRORS
+    public static final String DELETE_NOT_ACKNOWLEDGED = "Internal Database error";
     // Password
     public static final String PASSWORD_NOT_SET = "Password is needed";
     public static final String PASSWORD_WRONG = "Password is incorrect";

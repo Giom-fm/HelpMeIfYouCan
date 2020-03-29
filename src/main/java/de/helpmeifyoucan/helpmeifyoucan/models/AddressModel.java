@@ -7,10 +7,8 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
 import org.bson.types.ObjectId;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +48,9 @@ public class AddressModel extends AbstractEntity {
             return this;
         }
 
-        return this.setUsers(Collections.singletonList(user));
+        List<ObjectId> users = new ArrayList<>();
+        users.add(user);
+        return this.setUsers(users);
     }
 
     public AddressModel removeUserAddress(ObjectId user) {
@@ -122,6 +122,13 @@ public class AddressModel extends AbstractEntity {
         return this.calculateHash();
     }
 
+    public boolean containsUser(ObjectId user) {
+        if (this.users == null) {
+            return false;
+        }
+        return this.users.contains(user);
+    }
+
     public int getHashCode() {
         return hashCode;
     }
@@ -140,6 +147,7 @@ public class AddressModel extends AbstractEntity {
                 ", zipCode='" + zipCode + '\'' +
                 ", country='" + country + '\'' +
                 ", houseNumber=" + houseNumber +
+                ", users=" + users +
                 ", hashCode=" + hashCode +
                 '}';
     }
@@ -153,8 +161,7 @@ public class AddressModel extends AbstractEntity {
                 getStreet().equals(that.getStreet()) &&
                 getDistrict().equals(that.getDistrict()) &&
                 getZipCode().equals(that.getZipCode()) &&
-                getCountry().equals(that.getCountry()) &&
-                getUsers().equals(that.getUsers());
+                getCountry().equals(that.getCountry());
     }
 
     @Override

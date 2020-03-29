@@ -37,9 +37,9 @@ public abstract class AbstractService<T extends AbstractEntity> {
 
     }
 
-    protected void delete(Bson filter) {
-        this.collection.deleteOne(filter);
+    protected boolean delete(Bson filter) {
 
+        return this.collection.deleteOne(filter).wasAcknowledged();
     }
 
     protected boolean exists(Bson filter) {

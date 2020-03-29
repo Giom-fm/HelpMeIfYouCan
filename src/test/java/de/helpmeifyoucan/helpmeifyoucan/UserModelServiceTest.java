@@ -41,6 +41,7 @@ public class UserModelServiceTest {
 
     @Before
     public void setUpTest() {
+        clearCollection();
         testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
 
     }
@@ -63,6 +64,11 @@ public class UserModelServiceTest {
     public void afterSavingUser_ExistsShouldBeTrue() {
         this.userService.save(testUser);
         assertTrue(this.userService.exits(eq(testUser.getId())));
+    }
+
+    @Test
+    public void givenNotExistingId_ExistsShouldBeFalse() {
+        assertFalse(this.userService.exits(eq(new ObjectId())));
     }
 
 
@@ -235,7 +241,22 @@ public class UserModelServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.deleteAddressFromUser(testUser, address.getId());
+        UserModel updatedUser = this.userService.deleteAddressFromUser(testUser, new ObjectId());
+    }
+
+    @Test
+    public void givenTwoAddresses_TheyShouldBeAddedCorrectly() {
+        AddressModel address1 = new AddressModel().generateId();
+        AddressModel address2 = new AddressModel().generateId();
+
+        testUser.addAddress(address1.getId());
+        testUser.addAddress(address2.getId());
+
+        this.userService.save(testUser);
+
+        UserModel updatedUser = this.userService.get(testUser.getId());
+
+        assertTrue(updatedUser.getAddresses().contains(address1.getId()) && updatedUser.getAddresses().contains(address2.getId()));
     }
 
     @Test(expected = ResponseStatusException.class)
@@ -256,10 +277,12 @@ public class UserModelServiceTest {
 
     @Before
     public void clearCollection() {
-        userService.getCollection().drop();
+        this.userService.getCollection().drop();
         this.userService.createIndex();
 
-    }
+        this.addressService.getCollection().drop();
+        this.addressService.createIndex();
 
+    }
 
 }
