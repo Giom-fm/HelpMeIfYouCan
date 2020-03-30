@@ -5,18 +5,17 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.AlgorithmMismatchException;
 import com.auth0.jwt.exceptions.InvalidClaimException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.server.ResponseStatusException;
 
 import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
 
@@ -63,11 +62,13 @@ public class AuthorizationFilter extends BasicAuthenticationFilter {
         } catch (TokenExpiredException exception) {
             log.warn("Token Expired");
         } catch (AlgorithmMismatchException exception) {
-            log.warn("Wrong Algo");
+            log.warn("Wrong Token Algorithm");
         } catch (SignatureVerificationException exception) {
-            log.warn("Signature");
+            log.warn("Wrong Token Signature");
         } catch (InvalidClaimException exception) {
-            log.warn("Claim");
+            log.warn("Claim does nit exists");
+        } catch (JWTVerificationException exception) {
+            log.warn("Error while parsing Token");
         }
         return null;
     }
