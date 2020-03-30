@@ -6,6 +6,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.conversions.Bson;
@@ -129,7 +130,7 @@ public class UserService extends AbstractService<UserModel> {
      * @return the Updated User
      */
 
-    public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address) {
+    public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address, boolean lazy) {
         var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
         var dbAddress = addressService.getOptional(addressFilter);
         var user = this.get(userId);
@@ -142,6 +143,19 @@ public class UserService extends AbstractService<UserModel> {
             return this.addAddressToUser(user, address);
         }
     }
+
+    public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
+        var updatingUser = this.get(userId);
+
+        var updatedAddress = this.addressService.handleUserControllerAddressUpdate(updatingUser.getUserAddress(), update, userId);
+
+        if (lazy) {
+            return updatingUser.setUserAddress(updatedAddress.getId());
+        }
+
+        return updatingUser.setFullAddress(updatedAddress);
+    }
+
 
     /**
      * We want to get the User Model of the calling user, so we fetch it from db and
@@ -167,7 +181,7 @@ public class UserService extends AbstractService<UserModel> {
      */
     public UserModel addAddressToUser(UserModel user, AddressModel address) {
 
-        return this.updateUserAddressField(user.addAddress(address.getId()));
+        return this.updateUserAddressField(user.setUserAddress(address.getId()));
 
     }
 
@@ -181,7 +195,7 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
         var user = this.get(userId);
-        return this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
+        return this.updateUserAddressField(user.setUserAddress(addressToAdd));
 
     }
 
@@ -196,7 +210,7 @@ public class UserService extends AbstractService<UserModel> {
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserControllerAddressDelete(addressId, user.getId());
         try{
-            return this.updateUserAddressField(user.removeAddress(addressId));
+            return this.updateUserAddressField(user.setUserAddress(null));
         }
         catch (UnsupportedOperationException e)
         {
@@ -213,7 +227,7 @@ public class UserService extends AbstractService<UserModel> {
      * @return the updated user
      */
     public UserModel updateUserAddressField(UserModel user) {
-        Bson updatedFields = set("addresses", user.getAddresses());
+        Bson updatedFields = set("userAddress", user.getUserAddress());
 
         var filter = Filters.eq("_id", user.getId());
 

@@ -190,7 +190,7 @@ public class AddressServiceTest {
 
     @Test
     public void givenAddressWithTwoReferencesAndUpdatedAddressNotExisting_UpdatedAddressShouldBeSavedAndUserRefsUpdatedAccordingly() {
-        this.userService.save(testUser.addAddress(testAddress.generateId().getId()));
+        this.userService.save(testUser.setUserAddress(testAddress.generateId().getId()));
         UserModel secondUser = new UserModel().setName("Guillaume");
         this.userService.save(secondUser);
 
@@ -216,7 +216,7 @@ public class AddressServiceTest {
 
     @Test
     public void givenAddressWithTwoReferencesAndUpdatedAddressExisting_UpdatedReferencesShouldBeChangedAccordingly() {
-        this.userService.save(testUser.addAddress(testAddress.generateId().getId()));
+        this.userService.save(testUser.setUserAddress(testAddress.generateId().getId()));
         UserModel secondUser = new UserModel().setName("Guillaume");
         this.userService.save(secondUser);
 

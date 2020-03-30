@@ -116,6 +116,24 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateUserField(address.addUserAddress(userId));
     }
 
+
+    /**
+     * User want to update his userAddress, so give him this entrypoint into the controller to manage the workflow
+     *
+     * @param update the update to perform
+     * @param userId this updating user
+     * @return the id of the new or updated Address
+     */
+
+    public AddressModel handleUserControllerAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
+
+
+        if (addressToUpdate == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+        return this.updateAddress(addressToUpdate, update, userId);
+    }
+
     /**
      * We want to delete a User from a Addresses references and insert it back into the db. We do not want
      * to insert Address with no referneces back into the db, so we check for it

@@ -2,10 +2,11 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import com.mongodb.MongoCommandException;
 import com.mongodb.MongoWriteException;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,28 +47,36 @@ public class UserController {
         this.userModelController.delete(id);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({Roles.ROLE_NAME_USER})
     @PatchMapping("/me")
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
         return this.userModelController.update(user, id);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
-    @PostMapping(path = "/addaddress", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserModel addUserAddress(@Valid @RequestBody AddressModel address) {
-        return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address);
+    @Secured({Roles.ROLE_NAME_USER})
+    @PostMapping(path = "/addaddress/{lazy}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel addUserAddress(@Valid @RequestBody AddressModel address, @PathVariable boolean lazy) {
+        return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address, lazy);
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+
+    @Secured({Roles.ROLE_NAME_USER})
+    @PostMapping(path = "/updateaddress/{lazy}")
+    public UserModel updateUserAdress(@Valid @RequestBody AddressUpdate update, @PathVariable boolean lazy) {
+        return this.userModelController.handleUserAddressUpdateRequest(getIdFromContext(), update, lazy);
+    }
+
+
+    @Secured({Roles.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(path = "/deleteaddress/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/deleteaddress/", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
         return this.userModelController.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
     }
 
     // ADMIN ENDPOINTS --------------------------------
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({Roles.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@Valid @RequestBody UserModel user) {
