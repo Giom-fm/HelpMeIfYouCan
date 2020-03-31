@@ -26,7 +26,7 @@ public enum ErrorCode {
                 message = "User \"%s\" not found";
                 break;
             case USER_TAKEN:
-                message = "User \"%s\" already Taken";
+                message = "User \"%s\" already taken";
                 break;
             case ADDRESS_NOT_FOUND:
                 message = "Address \"%s\" not found";
