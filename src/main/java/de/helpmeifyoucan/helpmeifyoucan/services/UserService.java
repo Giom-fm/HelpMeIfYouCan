@@ -35,7 +35,7 @@ public class UserService extends AbstractService<UserModel> {
         createIndex();
     }
 
-    private void createIndex() {
+    public void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
@@ -64,6 +64,15 @@ public class UserService extends AbstractService<UserModel> {
         return user;
     }
 
+    /**
+     * We want to update the Uses given fields, so we first check if the password is correct, we then create a filter for these fields, to update them in the db
+     * we then update the user and return the updated user
+     *
+     * @param updatedFields the fields to update
+     * @param id            the user id to update
+     * @return the updated User
+     */
+
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
         // FIXME wird in Zukunft vom Authmanager übernommen -> Endpunkt update wird dann nur aufgerufen wenn es kein Auth exception gab.
@@ -75,18 +84,38 @@ public class UserService extends AbstractService<UserModel> {
         var updateFilter = eq(id);
 
         var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
+
         if (updatedUser == null) {
-            throw new UserNotFoundError(id.toString());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.UPDATE_FAILED);
         }
         return updatedUser;
     }
+
+    public boolean exits(Bson filter) {
+        return super.exists(filter);
+    }
+
+    /**
+     * We want to know if an object matching our filter exists, so we query the db for it. if it exists it will be inside the optional otherwise its not
+     *
+     * @param filter the filter to search by
+     * @return the Optional containing the object
+     */
 
     public Optional<UserModel> getOptional(Bson filter) {
         return super.getOptional(filter);
     }
 
+    /**
+     * We want to delete a user by its id
+     *
+     * @param id the user id to delete
+     */
+
     public void delete(ObjectId id) {
-        super.delete(Filters.eq("_id", id));
+        if (!super.delete(Filters.eq("_id", id))) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
+        }
     }
 
     /**
@@ -137,7 +166,7 @@ public class UserService extends AbstractService<UserModel> {
      * @param address Address to add
      * @return the updated user
      */
-    private UserModel addAddressToUser(UserModel user, AddressModel address) {
+    public UserModel addAddressToUser(UserModel user, AddressModel address) {
 
         return this.updateUserAddressField(user.addAddress(address.getId()));
 
@@ -151,9 +180,9 @@ public class UserService extends AbstractService<UserModel> {
      * @param addressToAdd    address to add
      */
 
-    public void exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
+    public UserModel exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
         var user = this.get(userId);
-        updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
+        return this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
 
     }
 
@@ -167,7 +196,14 @@ public class UserService extends AbstractService<UserModel> {
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserControllerAddressDelete(addressId, user.getId());
-        return this.updateUserAddressField(user.removeAddress(addressId));
+        try{
+            return this.updateUserAddressField(user.removeAddress(addressId));
+        }
+        catch (UnsupportedOperationException e)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+
     }
 
     /**
@@ -177,12 +213,19 @@ public class UserService extends AbstractService<UserModel> {
      * @param user the user to update
      * @return the updated user
      */
-    private UserModel updateUserAddressField(UserModel user) {
+    public UserModel updateUserAddressField(UserModel user) {
         Bson updatedFields = set("addresses", user.getAddresses());
 
         var filter = Filters.eq("_id", user.getId());
-        return this.updateExistingFields(filter, updatedFields);
+
+        var updatedUser = super.updateExistingFields(filter, updatedFields);
+        if(updatedUser == null)
+        {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+        return updatedUser;
     }
+
 
     @Autowired
     public void setAddressModelController(AddressService addressModelController) {

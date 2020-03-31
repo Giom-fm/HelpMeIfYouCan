@@ -29,7 +29,7 @@ public class AddressService extends AbstractService<AddressModel> {
         this.createIndex();
     }
 
-    private void createIndex() {
+    public void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
@@ -48,13 +48,30 @@ public class AddressService extends AbstractService<AddressModel> {
         return address;
     }
 
+    public boolean exists(Bson filter) {
+        return this.getOptional(filter).isPresent();
+    }
+
+
+    public boolean delete(ObjectId id) {
+        var filter = eq("_id", id);
+
+        return super.delete(filter);
+    }
+
     public Optional<AddressModel> getOptional(Bson filter) {
         return super.getOptional(filter);
     }
 
     public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
-        var filter = eq("_id", address);
-        return super.updateExistingFields(filter, updatedFields);
+        var filter = eq(address);
+        var updatedAddress = super.updateExistingFields(filter, updatedFields);
+
+        if (updatedAddress == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
+
+        return updatedAddress;
     }
 
     /**
@@ -107,14 +124,21 @@ public class AddressService extends AbstractService<AddressModel> {
      * @param userId  user To delete from Address
      */
 
-    // FIXME THIS WILL NOT BE VALID WITH ADDED REFERENCES
-    public void deleteUserFromAddress(AddressModel address, ObjectId userId) {
-
+    //FIXME THIS WILL NOT BE VALID WITH ADDED REFERENCES
+    public AddressModel deleteUserFromAddress(AddressModel address, ObjectId userId) {
+        if (!address.containsUser(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
         var addressWithUserRemoved = address.removeUserAddress(userId);
+
         if (addressWithUserRemoved.noUserReferences()) {
-            this.delete(addressWithUserRemoved.getId());
+            if (this.delete(addressWithUserRemoved.getId())) {
+                return address;
+            }
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
+
         } else {
-            this.updateUserField(addressWithUserRemoved);
+            return this.updateUserField(addressWithUserRemoved);
         }
     }
 
@@ -169,14 +193,16 @@ public class AddressService extends AbstractService<AddressModel> {
      * @param userId                   the user
      * @return the Updated /saved address
      */
-    private AddressModel updateAddressWithOtherReferences(AddressModel mergedAddress, AddressModel addressToUpdate,
-            Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
+    public AddressModel updateAddressWithOtherReferences(AddressModel mergedAddress, AddressModel addressToUpdate, Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
+
+        if (!addressToUpdate.containsUser(userId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        }
 
         this.deleteUserFromAddress(addressToUpdate, userId);
 
         if (potentialExistingAddress.isEmpty()) {
-            userService.exchangeAddress(userId, addressToUpdate.getId(),
-                    mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
+            userService.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId().getId());
             return this.save(mergedAddress);
         } else {
             var existingAddressModel = potentialExistingAddress.get();
@@ -209,11 +235,6 @@ public class AddressService extends AbstractService<AddressModel> {
         }
     }
 
-    public void delete(ObjectId id) {
-        var filter = eq("_id", id);
-
-        super.delete(filter);
-    }
 
     @Autowired
     public void setUserModelController(UserService userModelController) {

@@ -11,6 +11,9 @@ public final class ErrorMessages {
     // Address
     public static final String ADDRESS_NOT_FOUND = "Address not found";
 
+
+    //DBERRORS
+    public static final String DELETE_NOT_ACKNOWLEDGED = "Internal Database error";
     // Password
     public static final String PASSWORD_NOT_SET = "Password is needed";
     public static final String PASSWORD_WRONG = "Password is incorrect";
@@ -18,7 +21,7 @@ public final class ErrorMessages {
     public static final String PASSWORD_NUMERIC = "Password must contain at least one numeric character";
     public static final String PASSWORD_ALPHABETIC = "Password must contain at least one alphabetic character";
     // Update
-    public static final String UPDATE_FAILED = "Please check your updated fields to be correct";
+    public static final String UPDATE_FAILED = "Please check your updated fields to be correct and try again";
 
     // Name
     public static final String NAME_NOT_SET = "Name is needed";
@@ -44,7 +47,7 @@ public final class ErrorMessages {
     public static final String ZIPCODE_PATTERN_ERROR = "Zipcode is in invalid format";
 
     // Country
-    public static final String COUNRTY_NOT_SET = "Country is needed";
-    public static final String COUNRTY_PATTERN_ERROR = "Country is in invalid format";
+    public static final String COUNTRY_NOT_SET = "Country is needed";
+    public static final String COUNTRY_PATTERN_ERROR = "Country is in invalid format";
 
 }

@@ -23,7 +23,6 @@ public abstract class AbstractEntity {
         return id;
     }
 
-    public abstract ObjectId generateId();
 
     protected <T extends AbstractEntity> void mergeWithUpdate(ModelUpdate update, T subClass) {
         Field[] updateRuntimeFields = update.getClass().getDeclaredFields();

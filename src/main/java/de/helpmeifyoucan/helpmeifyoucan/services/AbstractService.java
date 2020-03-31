@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
+import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
@@ -36,9 +37,9 @@ public abstract class AbstractService<T extends AbstractEntity> {
 
     }
 
-    protected void delete(Bson filter) {
-        this.collection.deleteOne(filter);
+    protected boolean delete(Bson filter) {
 
+        return this.collection.deleteOne(filter).wasAcknowledged();
     }
 
     protected boolean exists(Bson filter) {
@@ -66,7 +67,8 @@ public abstract class AbstractService<T extends AbstractEntity> {
     }
 
     protected void createCollection(String collectionName, Class<T> collectionClass) {
-        this.collection = database.getCollection(collectionName, collectionClass);
+        this.collection = database.getCollection(collectionName, collectionClass).withWriteConcern(WriteConcern.W1);
+        System.out.println(collection.getWriteConcern());
     }
 
     protected void createIndex(Bson indexes, IndexOptions options) {
