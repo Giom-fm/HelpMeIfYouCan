@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -63,6 +64,10 @@ public class UserService extends AbstractService<UserModel> {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
         }
         return user;
+    }
+
+    public List<UserModel> getAllByFilter(Bson filter) {
+        return super.getAllByFilter(filter);
     }
 
     /**
@@ -131,29 +136,23 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address, boolean lazy) {
-        var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
-        var dbAddress = addressService.getOptional(addressFilter);
-        var user = this.get(userId);
-        if (dbAddress.isPresent()) {
-            addressService.addUserToAddress(dbAddress.get(), user.getId());
-            return this.addAddressToUser(user, dbAddress.get());
 
-        } else {
-            addressService.save(address.addUserAddress(userId));
-            return this.addAddressToUser(user, address);
-        }
+        var user = this.get(userId);
+
+        var addedAddress = this.addressService.handleUserServiceAddressAdd(address, userId);
+
+        this.addAddressToUser(user, addedAddress);
+
+        return lazy ? user.setUserAddress(addedAddress.getId()) : user.setFullAddress(addedAddress);
+
     }
 
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
         var updatingUser = this.get(userId);
 
-        var updatedAddress = this.addressService.handleUserControllerAddressUpdate(updatingUser.getUserAddress(), update, userId);
+        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update, userId);
 
-        if (lazy) {
-            return updatingUser.setUserAddress(updatedAddress.getId());
-        }
-
-        return updatingUser.setFullAddress(updatedAddress);
+        return lazy ? updatingUser.setUserAddress(updatedAddress.getId()) : updatingUser.setFullAddress(updatedAddress);
     }
 
 
@@ -208,12 +207,10 @@ public class UserService extends AbstractService<UserModel> {
      * @return the edited User
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
-        addressService.handleUserControllerAddressDelete(addressId, user.getId());
-        try{
+        addressService.handleUserServiceAddressDelete(addressId, user.getId());
+        try {
             return this.updateUserAddressField(user.setUserAddress(null));
-        }
-        catch (UnsupportedOperationException e)
-        {
+        } catch (UnsupportedOperationException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
 
@@ -232,8 +229,7 @@ public class UserService extends AbstractService<UserModel> {
         var filter = Filters.eq("_id", user.getId());
 
         var updatedUser = super.updateExistingFields(filter, updatedFields);
-        if(updatedUser == null)
-        {
+        if (updatedUser == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
         }
         return updatedUser;

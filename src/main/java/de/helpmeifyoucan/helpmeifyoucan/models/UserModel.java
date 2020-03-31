@@ -136,6 +136,7 @@ public class UserModel extends AbstractEntity {
 
     public UserModel setFullAddress(AddressModel address) {
         this.fullAddress = address;
+        this.userAddress = address.getId();
         return this;
     }
 

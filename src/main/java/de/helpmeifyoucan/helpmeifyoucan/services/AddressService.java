@@ -90,19 +90,7 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateExistingField(updatedFields, address.getId());
     }
 
-    /**
-     * UserController calls this Method to process AddressModel after it deleted a User from its references
-     *
-     * @param addressId the edited Address
-     * @param userId    the User who held the address
-     */
-    public void handleUserControllerAddressDelete(ObjectId addressId, ObjectId userId) {
-        try {
-            this.deleteUserFromAddress(this.get(addressId), userId);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
-    }
+
 
 
     /**
@@ -116,7 +104,6 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateUserField(address.addUserAddress(userId));
     }
 
-
     /**
      * User want to update his userAddress, so give him this entrypoint into the controller to manage the workflow
      *
@@ -125,7 +112,7 @@ public class AddressService extends AbstractService<AddressModel> {
      * @return the id of the new or updated Address
      */
 
-    public AddressModel handleUserControllerAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
+    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
 
 
         if (addressToUpdate == null) {
@@ -133,6 +120,34 @@ public class AddressService extends AbstractService<AddressModel> {
         }
         return this.updateAddress(addressToUpdate, update, userId);
     }
+
+
+    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
+        var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
+        var dbAddress = this.getOptional(addressFilter);
+
+        if (dbAddress.isPresent()) {
+            return this.addUserToAddress(dbAddress.get(), userId);
+        } else {
+            return this.save(addressToAdd.addUserAddress(userId));
+        }
+
+    }
+
+    /**
+     * UserController calls this Method to process AddressModel after it deleted a User from its references
+     *
+     * @param addressId the edited Address
+     * @param userId    the User who held the address
+     */
+    public void handleUserServiceAddressDelete(ObjectId addressId, ObjectId userId) {
+        try {
+            this.deleteUserFromAddress(this.get(addressId), userId);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+    }
+
 
     /**
      * We want to delete a User from a Addresses references and insert it back into the db. We do not want
