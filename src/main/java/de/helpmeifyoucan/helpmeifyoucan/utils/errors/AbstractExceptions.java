@@ -1,6 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-public class AbstractErrors {
+public class AbstractExceptions {
 
     public static abstract class CustomException extends RuntimeException {
 
@@ -27,11 +27,11 @@ public class AbstractErrors {
         }
     }
 
-    public static abstract class NotFoundError extends CustomException {
+    public static abstract class NotFoundException extends CustomException {
 
         private static final long serialVersionUID = 2761795526522376099L;
 
-        public NotFoundError(String message, int code) {
+        public NotFoundException(String message, int code) {
             super(message, code);
         }
     }

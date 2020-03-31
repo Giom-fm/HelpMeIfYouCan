@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos.response;
 
 import java.util.Date;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractErrors.CustomException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.CustomException;
 
 public class ErrorResponse {
     private final String message;

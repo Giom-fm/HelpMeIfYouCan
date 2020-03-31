@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserErrors.UserAlreadyTakenError;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserAlreadyTakenException;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -34,7 +34,7 @@ public class AuthController {
         var filter = Filters.eq("email", register.getEmail());
 
         if (this.userModelController.getOptional(filter).isPresent()) {
-            throw new UserAlreadyTakenError(register.getEmail());
+            throw new UserAlreadyTakenException(register.getEmail());
         }
 
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());

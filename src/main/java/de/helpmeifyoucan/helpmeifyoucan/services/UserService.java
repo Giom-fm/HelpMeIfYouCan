@@ -7,14 +7,18 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserErrors.UserNotFoundError;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthErrors.PasswordMismatchError;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -50,7 +54,7 @@ public class UserService extends AbstractService<UserModel> {
         var user = super.getById(id);
 
         if (user == null) {
-            throw new UserNotFoundError(id.toString());
+            throw new UserNotFoundException(id.toString());
         }
         return user;
     }
@@ -59,13 +63,14 @@ public class UserService extends AbstractService<UserModel> {
         var filter = Filters.eq("email", email);
         var user = super.getByFilter(filter);
         if (user == null) {
-            throw new UserNotFoundError(email);
+            throw new UserNotFoundException(email);
         }
         return user;
     }
 
     /**
-     * We want to update the Uses given fields, so we first check if the password is correct, we then create a filter for these fields, to update them in the db
+     * We want to update the Uses given fields, so we first check if the password is
+     * correct, we then create a filter for these fields, to update them in the db
      * we then update the user and return the updated user
      *
      * @param updatedFields the fields to update
@@ -75,10 +80,11 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
-        // FIXME wird in Zukunft vom Authmanager übernommen -> Endpunkt update wird dann nur aufgerufen wenn es kein Auth exception gab.
+        // FIXME wird in Zukunft vom Authmanager übernommen -> Endpunkt update wird dann
+        // nur aufgerufen wenn es kein Auth exception gab.
         var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
         if (!hashedPassword) {
-            throw new PasswordMismatchError();
+            throw new PasswordMismatchException();
         }
 
         var updateFilter = eq(id);
@@ -96,7 +102,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to know if an object matching our filter exists, so we query the db for it. if it exists it will be inside the optional otherwise its not
+     * We want to know if an object matching our filter exists, so we query the db
+     * for it. if it exists it will be inside the optional otherwise its not
      *
      * @param filter the filter to search by
      * @return the Optional containing the object
@@ -196,12 +203,10 @@ public class UserService extends AbstractService<UserModel> {
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserControllerAddressDelete(addressId, user.getId());
-        try{
+        try {
             return this.updateUserAddressField(user.removeAddress(addressId));
-        }
-        catch (UnsupportedOperationException e)
-        {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        } catch (UnsupportedOperationException e) {
+            throw new AddressNotFoundException(addressId.toString());
         }
 
     }
@@ -219,13 +224,11 @@ public class UserService extends AbstractService<UserModel> {
         var filter = Filters.eq("_id", user.getId());
 
         var updatedUser = super.updateExistingFields(filter, updatedFields);
-        if(updatedUser == null)
-        {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+        if (updatedUser == null) {
+            throw new UserNotFoundException(user.getEmail());
         }
         return updatedUser;
     }
-
 
     @Autowired
     public void setAddressModelController(AddressService addressModelController) {
