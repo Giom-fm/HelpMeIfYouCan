@@ -4,13 +4,12 @@ import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Register;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserErrors.UserAlreadyTakenError;
 
 import javax.validation.Valid;
 import java.util.Collections;
@@ -35,7 +34,7 @@ public class AuthController {
         var filter = Filters.eq("email", register.getEmail());
 
         if (this.userModelController.getOptional(filter).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_TAKEN);
+            throw new UserAlreadyTakenError(register.getEmail());
         }
 
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());

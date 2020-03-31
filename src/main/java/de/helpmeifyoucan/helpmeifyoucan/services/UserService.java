@@ -7,14 +7,14 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserErrors.UserNotFoundError;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthErrors.PasswordMismatchError;
+
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public class UserService extends AbstractService<UserModel> {
         var user = super.getById(id);
 
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundError(id.toString());
         }
         return user;
     }
@@ -59,23 +59,24 @@ public class UserService extends AbstractService<UserModel> {
         var filter = Filters.eq("email", email);
         var user = super.getByFilter(filter);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundError(email);
         }
         return user;
     }
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
+        // FIXME wird in Zukunft vom Authmanager übernommen -> Endpunkt update wird dann nur aufgerufen wenn es kein Auth exception gab.
         var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
         if (!hashedPassword) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_WRONG);
+            throw new PasswordMismatchError();
         }
 
         var updateFilter = eq(id);
 
         var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
         if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundError(id.toString());
         }
         return updatedUser;
     }

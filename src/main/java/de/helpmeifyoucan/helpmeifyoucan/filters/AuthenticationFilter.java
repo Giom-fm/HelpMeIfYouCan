@@ -28,7 +28,7 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.Login;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.LoginResponse;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -68,7 +68,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .sign(HMAC512(this.config.getSecret().getBytes()));
 
         var user = this.userService.get(new ObjectId(id));
-        var login = new Login(user.getName(), user.getLastName(), token);
+        var login = new LoginResponse(user.getName(), user.getLastName(), token);
 
         res.setStatus(HttpStatus.OK.value());
         res.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
