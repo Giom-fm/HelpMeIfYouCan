@@ -1,7 +1,7 @@
 
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-public enum ErrorCodes {
+public enum ErrorCode {
     // User
     USER_NOT_FOUND(104), USER_TAKEN(109),
     // Address
@@ -11,7 +11,7 @@ public enum ErrorCodes {
 
     private int code;
 
-    private ErrorCodes(int code) {
+    private ErrorCode(int code) {
         this.code = code;
     }
 

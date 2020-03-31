@@ -7,7 +7,7 @@ public class AuthExceptions {
     public static class PasswordMismatchException extends CustomException {
 
         private static final long serialVersionUID = 7415040101907590277L;
-        private static ErrorCodes error = ErrorCodes.PASSWORD_MISMATCH;
+        private static ErrorCode error = ErrorCode.PASSWORD_MISMATCH;
 
         public PasswordMismatchException() {
             super(error.getMessage(), error.getCode());
