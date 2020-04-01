@@ -22,7 +22,7 @@ database:
   user: dbUser
   password: ${DATABASE_PASSWORD}
 jwt:
-  secret: yeipu7koo6ceez5quieDeenooxeep9wu
+  secret: pooliesh4eeb0pei6edieFah9aizui8mee2ahxae1ohr6xaixuu3tuaghaidaghi
   expiration: 864000000
 logbook:
   format.style: http

@@ -1,42 +1,37 @@
 package de.helpmeifyoucan.helpmeifyoucan.config;
 
-import de.helpmeifyoucan.helpmeifyoucan.filters.AuthenticationFilter;
-import de.helpmeifyoucan.helpmeifyoucan.filters.AuthorizationFilter;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserDetailsServiceImpl;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import de.helpmeifyoucan.helpmeifyoucan.security.AuthenticationProcessingFilter;
+import de.helpmeifyoucan.helpmeifyoucan.security.EmailPasswordAuthenticationProvider;
+import de.helpmeifyoucan.helpmeifyoucan.security.JwtAuthenticationProvider;
+import de.helpmeifyoucan.helpmeifyoucan.security.JwtAuthorizationFilter;
+
 @EnableWebSecurity(debug = false)
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private UserDetailsServiceImpl userDetailsService;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    private UserService userController;
-    private JwtConfig jwtConfig;
+
+    private JwtAuthenticationProvider jwtAuthenticationProvider;
+    private EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-            UserService userController, JwtConfig jwtConfig) {
-        this.userDetailsService = userDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-        this.userController = userController;
-        this.jwtConfig = jwtConfig;
-
+    public SecurityConfig(JwtAuthenticationProvider jwtAuthenticationProvider,
+            EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider) {
+        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+        this.emailPasswordAuthenticationProvider = emailPasswordAuthenticationProvider;
     }
 
     @Override
@@ -44,17 +39,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable().authorizeRequests().antMatchers(HttpMethod.POST, "/auth/signup").permitAll()
                 .anyRequest().authenticated().and()
                 // Auth
-                .addFilter(new AuthenticationFilter(this.authenticationManager(), this.userController, this.jwtConfig))
-                .addFilter(new AuthorizationFilter(this.authenticationManager(), this.jwtConfig))
+                .addFilterAt(new AuthenticationProcessingFilter(this.authenticationManager(),
+                        this.jwtAuthenticationProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new JwtAuthorizationFilter(this.authenticationManager()), BasicAuthenticationFilter.class)
                 // Auth Error Handling
-                .exceptionHandling().authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                // .exceptionHandling().authenticationEntryPoint(new
+                // HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 // Session
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        auth.authenticationProvider(this.jwtAuthenticationProvider)
+                .authenticationProvider(this.emailPasswordAuthenticationProvider);
     }
 
     @Bean
@@ -64,5 +62,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-   
 }

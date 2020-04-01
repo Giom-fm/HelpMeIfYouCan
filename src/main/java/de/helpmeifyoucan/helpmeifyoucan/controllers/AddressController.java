@@ -35,7 +35,6 @@ public class AddressController {
         return addressModelController.get(id);
     }
 
-
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
         return addressModelController.updateAddress(id, address, getIdFromContext());
@@ -48,15 +47,15 @@ public class AddressController {
         this.addressModelController.delete(id);
     }
 
-    //REVIEW
-    @ExceptionHandler(value = {MongoCommandException.class})
+    // REVIEW
+    @ExceptionHandler(value = { MongoCommandException.class })
     protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "Address already exists";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
 
     private ObjectId getIdFromContext() {
-        return new ObjectId(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

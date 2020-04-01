@@ -4,7 +4,7 @@ import com.mongodb.client.model.Filters;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Register;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,7 +38,7 @@ public class AuthController {
         }
 
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());
-        var roles = new LinkedList<>(Collections.singletonList(Roles.ROLE_USER));
+        var roles = new LinkedList<>(Collections.singletonList(Role.ROLE_USER));
 
         var user = new UserModel();
         user.setEmail(register.getEmail()).setPassword(hashedPassword);

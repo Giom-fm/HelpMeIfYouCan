@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 import org.bson.types.ObjectId;
 
 import javax.validation.Valid;
@@ -37,7 +37,7 @@ public class UserModel extends AbstractEntity {
     @JsonIgnore
     protected String password;
 
-    protected List<Roles> roles;
+    protected List<Role> roles;
 
     protected boolean enabled;
 
@@ -57,12 +57,12 @@ public class UserModel extends AbstractEntity {
         return verified;
     }
 
-    public UserModel setRoles(List<Roles> roles) {
+    public UserModel setRoles(List<Role> roles) {
         this.roles = roles;
         return this;
     }
 
-    public List<Roles> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 

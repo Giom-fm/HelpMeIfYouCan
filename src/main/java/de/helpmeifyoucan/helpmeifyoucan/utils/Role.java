@@ -1,6 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils;
 
-public enum Roles {
+public enum Role {
 
     ROLE_ADMIN, ROLE_USER;
 
