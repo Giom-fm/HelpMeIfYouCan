@@ -228,7 +228,7 @@ public class UserModelServiceTest {
 
         AddressModel addressToAdd = new AddressModel().generateId();
 
-        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
+        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToAdd.getId());
         assertEquals(updatedUser.getUserAddress(), (addressToAdd.getId()));
     }
 
@@ -242,7 +242,7 @@ public class UserModelServiceTest {
 
         AddressModel addressToAdd = new AddressModel().generateId();
 
-        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
+        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToAdd.getId());
     }
 
     @Test

@@ -1,20 +1,24 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import org.bson.types.ObjectId;
 
 import java.util.List;
 import java.util.Objects;
 
 public class Coordinates extends AbstractEntity {
-
+    @JsonIgnore
     protected List<ObjectId> offers;
 
+    @JsonIgnore
     protected List<ObjectId> requests;
 
     protected double latitude;
 
     protected double longitude;
 
+    @JsonIgnore
     protected int hashCode;
 
 
@@ -27,24 +31,31 @@ public class Coordinates extends AbstractEntity {
         return this;
     }
 
-    public Coordinates addHelpOffer(ObjectId offer) {
-        this.offers.add(offer);
+    public <T extends AbstractHelpModel<T>> Coordinates addHelpModel(T model) {
+        if (model instanceof HelpOfferModel) {
+            this.offers.add(model.getId());
+        } else {
+            this.requests.add(model.getId());
+        }
         return this;
     }
 
-    public Coordinates deleteHelpOffer(ObjectId offer) {
-        this.offers.remove(offer);
+    public <T extends AbstractHelpModel<T>> Coordinates removeHelpModel(T model) {
+
+        if (model instanceof HelpOfferModel) {
+            this.offers.remove(model.getId());
+        } else {
+            this.requests.remove(model.getId());
+        }
         return this;
     }
 
-    public Coordinates addHelpRequest(ObjectId request) {
-        this.requests.add(request);
-        return this;
+    public boolean noOtherRefsBesideId(ObjectId id) {
+        return (this.requests != null && this.requests.size() == 1 && this.requests.contains(id)) || (this.offers != null && this.offers.size() == 1 && this.offers.contains(id));
     }
 
-    public Coordinates deleteHelpRequest(ObjectId request) {
-        this.requests.remove(request);
-        return this;
+    public boolean hasRefToId(Object id) {
+        return (this.requests != null && this.requests.contains(id)) || (this.offers != null && this.offers.contains(id));
     }
 
     public List<ObjectId> getHelpRequests() {
@@ -91,6 +102,12 @@ public class Coordinates extends AbstractEntity {
         this.hashCode = hashCode;
         return this;
     }
+
+    public Coordinates mergeWithUpdate(CoordinatesUpdate update) {
+        super.mergeWithUpdate(update, this);
+        return this.calculateHashCode();
+    }
+
 
     @Override
     public boolean equals(Object o) {

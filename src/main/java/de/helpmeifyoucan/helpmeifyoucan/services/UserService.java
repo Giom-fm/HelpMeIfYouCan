@@ -152,6 +152,9 @@ public class UserService extends AbstractService<UserModel> {
 
         var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update, userId);
 
+        if (!updatedAddress.getId().equals(updatingUser.getUserAddress())) {
+            this.exchangeAddress(userId, updatedAddress.getId());
+        }
         return lazy ? updatingUser.setUserAddress(updatedAddress.getId()) : updatingUser.setFullAddress(updatedAddress);
     }
 
@@ -187,12 +190,11 @@ public class UserService extends AbstractService<UserModel> {
     /**
      * We want to delete one and add the other address reference to a user
      *
-     * @param userId          the user to apply changes to
-     * @param addressToDelete address to delete
-     * @param addressToAdd    address to add
+     * @param userId       the user to apply changes to
+     * @param addressToAdd address to add
      */
 
-    public UserModel exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
+    public UserModel exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
         var user = this.get(userId);
         return this.updateUserAddressField(user.setUserAddress(addressToAdd));
 

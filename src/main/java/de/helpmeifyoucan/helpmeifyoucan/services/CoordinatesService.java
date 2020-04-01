@@ -5,17 +5,19 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
-import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.set;
 
+@Service
 public class CoordinatesService extends AbstractService<Coordinates> {
 
     @Autowired
@@ -64,7 +66,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateAdd(T helpModel) {
+    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateAdd(T helpModel) {
         var coordinatesToSave = helpModel.getCoordinates();
 
         var addressFilter = eq("hashCode", coordinatesToSave.calculateHashCode().getHashCode());
@@ -79,77 +81,116 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    //TODO
-    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateUpdate(T helpModel) {
-        return null;
-    }
 
-    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateDelete(T helpModel) {
-        var coordinatesToDelete = this.getById(helpModel.getCoordinates().getId());
+    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateUpdate(T helpModel, CoordinatesUpdate update) {
 
-        if (helpModel instanceof HelpRequestModel) {
-            coordinatesToDelete.deleteHelpRequest(helpModel.getId());
-        } else if (helpModel instanceof HelpOfferModel) {
-            coordinatesToDelete.deleteHelpOffer(helpModel.getId());
-        } else {
+
+        if (helpModel.getCoordinates() == null) {
             //todo exception
         }
+
+        return this.updateCoordinates(helpModel, update);
+
+    }
+
+    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateDelete(T helpModel) {
+        var coordinatesToDelete = this.getById(helpModel.getCoordinates().getId());
+
+        coordinatesToDelete.removeHelpModel(helpModel);
+
+        var isRequest = getModelClass(helpModel);
 
         if (coordinatesToDelete.noHelpModelRefs()) {
             deleteById(coordinatesToDelete.getId());
             return coordinatesToDelete;
         } else {
-            return this.updateClassCorrespondingField(coordinatesToDelete, helpModel);
+            return this.updateClassCorrespondingField(coordinatesToDelete, isRequest);
         }
 
 
     }
 
+    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinates(T helpModel, CoordinatesUpdate update) {
 
-    public <T extends AbstractHelpModel> Coordinates addHelpModelToCoordinates(Coordinates coordinates, T helpModel) {
+        var coordsToUpdate = this.getOptional(eq(helpModel.getCoordinates().getId()));
 
-        Bson updatedFields = null;
-        if (helpModel instanceof HelpRequestModel) {
-            coordinates.addHelpRequest(helpModel.getId());
-        } else if (helpModel instanceof HelpOfferModel) {
-            coordinates.addHelpOffer(helpModel.getId());
-        } else {
+        if (coordsToUpdate.isEmpty() || !coordsToUpdate.get().hasRefToId(helpModel.getId())) {
             //TODO EXCEPTION
         }
 
-        return this.updateClassCorrespondingField(coordinates, helpModel);
+        var existingCoordsToUpdate = coordsToUpdate.get();
+        var mergedCoords = existingCoordsToUpdate.mergeWithUpdate(update);
+
+        var filter = eq("hashCode", mergedCoords.getHashCode());
+        var updatedCoordinatesExistingInDb = this.getOptional(filter);
+
+        if (existingCoordsToUpdate.noOtherRefsBesideId(helpModel.getId())) {
+            return this.updateCoordinatesWithNoOtherRefs(update, existingCoordsToUpdate, updatedCoordinatesExistingInDb, helpModel);
+        } else {
+            return this.updateCoordinatesWithOtherRefs(mergedCoords, existingCoordsToUpdate, updatedCoordinatesExistingInDb, helpModel);
+        }
+
     }
 
-    public <T extends AbstractHelpModel> Coordinates saveNewCoordinates(T helpModel) {
+
+    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinatesWithOtherRefs(Coordinates mergedAddress, Coordinates existingAddress, Optional<Coordinates> updatedAddressExistingInDB, T helpModel) {
+        this.deleteModelFromCoordinates(existingAddress, helpModel);
+
+        if (updatedAddressExistingInDB.isPresent()) {
+            var existingAddressInDb = updatedAddressExistingInDB.get();
+            //TODO return to calling class to exchange fields
+            return this.addHelpModelToCoordinates(existingAddressInDb, helpModel);
+        } else {
+            return this.save(mergedAddress);
+        }
+    }
+
+
+    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinatesWithNoOtherRefs(CoordinatesUpdate coordinatesUpdate, Coordinates existingCoordinates, Optional<Coordinates> updatedDbAddressIfExisting, T helpModel) {
+        if (updatedDbAddressIfExisting.isPresent()) {
+            this.deleteModelFromCoordinates(existingCoordinates, helpModel);
+            return this.addHelpModelToCoordinates(updatedDbAddressIfExisting.get(), helpModel);
+        } else {
+            return this.updateExistingField(existingCoordinates.getId(), coordinatesUpdate.toFilter());
+        }
+    }
+
+    public <T extends AbstractHelpModel<T>> Coordinates addHelpModelToCoordinates(Coordinates coordinates, T helpModel) {
+
+        var isRequest = this.getModelClass(helpModel);
+        coordinates.addHelpModel(helpModel);
+        return this.updateClassCorrespondingField(coordinates, isRequest);
+    }
+
+    public <T extends AbstractHelpModel<T>> void deleteModelFromCoordinates(Coordinates coordinates, T helpModel) {
+        var isRequest = this.getModelClass(helpModel);
+        coordinates.removeHelpModel(helpModel);
+        this.updateClassCorrespondingField(coordinates, isRequest);
+    }
+
+    public <T extends AbstractHelpModel<T>> Coordinates saveNewCoordinates(T helpModel) {
 
         var coordinatesToSave = helpModel.getCoordinates();
 
-        if (helpModel instanceof HelpOfferModel) {
-            coordinatesToSave.addHelpOffer(helpModel.getId());
-
-        } else if (helpModel instanceof HelpRequestModel) {
-            coordinatesToSave.addHelpRequest(helpModel.getId());
-
-        } else {
-            //todo exception
-
-        }
+        coordinatesToSave.addHelpModel(helpModel);
 
         return this.save(coordinatesToSave);
     }
 
-    private <T extends AbstractHelpModel> Coordinates updateClassCorrespondingField(Coordinates coordinates, T helpModel) {
-        Bson updatedFields = null;
-        if (helpModel instanceof HelpRequestModel) {
+    private Coordinates updateClassCorrespondingField(Coordinates coordinates, boolean isRequest) {
+        Bson updatedFields;
+        if (isRequest) {
             updatedFields = set("requests", coordinates.getHelpRequests());
-
-        } else if (helpModel instanceof HelpOfferModel) {
-            updatedFields = set("offers", coordinates.getHelpOffers());
         } else {
-            //TODO EXCEPTION
+            updatedFields = set("offers", coordinates.getHelpOffers());
         }
         return this.updateExistingField(coordinates.getId(), updatedFields);
 
     }
+
+    private <T extends AbstractHelpModel<T>> boolean getModelClass(T helpModel) {
+        return helpModel instanceof HelpRequestModel;
+    }
+
 
 }

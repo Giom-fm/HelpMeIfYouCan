@@ -22,7 +22,6 @@ import static com.mongodb.client.model.Updates.set;
 @Service
 public class AddressService extends AbstractService<AddressModel> {
 
-    private UserService userService;
 
     @Autowired
     public AddressService(MongoDatabase dataBase) {
@@ -89,8 +88,6 @@ public class AddressService extends AbstractService<AddressModel> {
 
         return this.updateExistingField(updatedFields, address.getId());
     }
-
-
 
 
     /**
@@ -229,13 +226,10 @@ public class AddressService extends AbstractService<AddressModel> {
 
         this.deleteUserFromAddress(addressToUpdate, userId);
 
-        if (potentialExistingAddress.isEmpty()) {
-            userService.exchangeAddress(userId, addressToUpdate.getId(), mergedAddress.setUsers(Collections.singletonList(userId)).generateId().getId());
-            return this.save(mergedAddress);
+        if (potentialExistingAddress.isPresent()) {
+            return addUserToAddress(potentialExistingAddress.get(), userId);
         } else {
-            var existingAddressModel = potentialExistingAddress.get();
-            userService.exchangeAddress(userId, addressToUpdate.getId(), existingAddressModel.getId());
-            return addUserToAddress(existingAddressModel, userId);
+            return this.save(mergedAddress.setUsers(Collections.singletonList(userId)).generateId());
         }
     }
 
@@ -259,10 +253,5 @@ public class AddressService extends AbstractService<AddressModel> {
         }
     }
 
-
-    @Autowired
-    public void setUserModelController(UserService userModelController) {
-        this.userService = userModelController;
-    }
 
 }
