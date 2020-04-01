@@ -1,9 +1,9 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import com.mongodb.MongoCommandException;
-import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -45,7 +45,7 @@ public class AddressController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable ObjectId id) {
-        this.addressModelController.delete(id);
+        this.addressModelController.deleteById(id);
     }
 
     //REVIEW

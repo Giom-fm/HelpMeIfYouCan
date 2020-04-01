@@ -40,7 +40,7 @@ public class UserModelServiceTest {
     @Before
     public void setUpTest() {
         clearCollection();
-        testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+        testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de").setPhoneNr("901890");
 
     }
 
@@ -58,6 +58,23 @@ public class UserModelServiceTest {
 
 
     }
+
+
+    @Test
+    public void userTryingToSaveAlreadyExistingAddress_existingAddressShouldBeAdded() {
+        AddressModel existingAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
+        AddressModel addedAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
+
+        this.addressService.save(existingAddress);
+
+        this.userService.save(testUser);
+
+        this.userService.handleUserAddressAddRequest(testUser.getId(), addedAddress, false);
+
+        assertEquals(this.userService.get(testUser.getId()).getUserAddress(), existingAddress.getId());
+
+    }
+
 
     @Test
     public void givenValidUserToSave_RetrievedUserShouldBeEqualToSavedUser() {
@@ -256,7 +273,6 @@ public class UserModelServiceTest {
 
         UserModel updatedUser = this.userService.deleteAddressFromUser(testUser, new ObjectId());
     }
-
 
 
     @Test(expected = ResponseStatusException.class)

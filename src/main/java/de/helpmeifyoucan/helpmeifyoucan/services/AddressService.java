@@ -51,11 +51,11 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     public boolean exists(Bson filter) {
-        return this.getOptional(filter).isPresent();
+        return super.getOptional(filter).isPresent();
     }
 
 
-    public boolean delete(ObjectId id) {
+    public boolean deleteById(ObjectId id) {
         var filter = eq("_id", id);
 
         return super.delete(filter);
@@ -104,6 +104,19 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateUserField(address.addUserAddress(userId));
     }
 
+
+    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
+        var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
+        var dbAddress = this.getOptional(addressFilter);
+
+        if (dbAddress.isPresent()) {
+            return this.addUserToAddress(dbAddress.get(), userId);
+        } else {
+            return this.save(addressToAdd.addUserAddress(userId));
+        }
+
+    }
+
     /**
      * User want to update his userAddress, so give him this entrypoint into the controller to manage the workflow
      *
@@ -121,18 +134,6 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateAddress(addressToUpdate, update, userId);
     }
 
-
-    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
-        var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
-        var dbAddress = this.getOptional(addressFilter);
-
-        if (dbAddress.isPresent()) {
-            return this.addUserToAddress(dbAddress.get(), userId);
-        } else {
-            return this.save(addressToAdd.addUserAddress(userId));
-        }
-
-    }
 
     /**
      * UserController calls this Method to process AddressModel after it deleted a User from its references
@@ -165,7 +166,7 @@ public class AddressService extends AbstractService<AddressModel> {
         var addressWithUserRemoved = address.removeUserAddress(userId);
 
         if (addressWithUserRemoved.noUserReferences()) {
-            if (this.delete(addressWithUserRemoved.getId())) {
+            if (this.deleteById(addressWithUserRemoved.getId())) {
                 return address;
             }
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
