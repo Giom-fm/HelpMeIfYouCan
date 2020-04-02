@@ -1,27 +1,29 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
+import static com.mongodb.client.model.Filters.eq;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
+
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
 @Service
 public class UserService extends AbstractService<UserModel> {
@@ -44,24 +46,20 @@ public class UserService extends AbstractService<UserModel> {
         super.createIndex(Indexes.ascending("email"), options);
     }
 
-    public UserModel save(UserModel user) {
-        return super.save(user);
-    }
-
     public UserModel get(ObjectId id) {
         var user = super.getById(id);
 
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException(id);
         }
         return user;
     }
 
-    public UserModel getByEmail(String email) {
+    public UserModel getByEmail(String email) throws UserNotFoundException {
         var filter = Filters.eq("email", email);
         var user = super.getByFilter(filter);
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException(email);
         }
         return user;
     }
@@ -71,7 +69,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to update the Uses given fields, so we first check if the password is correct, we then create a filter for these fields, to update them in the db
+     * We want to update the Uses given fields, so we first check if the password is
+     * correct, we then create a filter for these fields, to update them in the db
      * we then update the user and return the updated user
      *
      * @param updatedFields the fields to update
@@ -81,17 +80,19 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
+        // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
+        // wird dann
+        // nur aufgerufen wenn es kein Auth exception gab.
         var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
         if (!hashedPassword) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_WRONG);
+            throw new PasswordMismatchException();
         }
 
         var updateFilter = eq(id);
-
         var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
         if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.UPDATE_FAILED);
+            throw new UserNotFoundException(id);
         }
         return updatedUser;
     }
@@ -101,7 +102,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     /**
-     * We want to know if an object matching our filter exists, so we query the db for it. if it exists it will be inside the optional otherwise its not
+     * We want to know if an object matching our filter exists, so we query the db
+     * for it. if it exists it will be inside the optional otherwise its not
      *
      * @param filter the filter to search by
      * @return the Optional containing the object
@@ -118,9 +120,7 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     public void delete(ObjectId id) {
-        if (!super.delete(Filters.eq("_id", id))) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
-        }
+        super.delete(Filters.eq("_id", id));
     }
 
     /**
@@ -150,11 +150,11 @@ public class UserService extends AbstractService<UserModel> {
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
         var updatingUser = this.get(userId);
 
-        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update, userId);
+        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update,
+                userId);
 
         return lazy ? updatingUser.setUserAddress(updatedAddress.getId()) : updatingUser.setFullAddress(updatedAddress);
     }
-
 
     /**
      * We want to get the User Model of the calling user, so we fetch it from db and
@@ -211,7 +211,8 @@ public class UserService extends AbstractService<UserModel> {
         try {
             return this.updateUserAddressField(user.setUserAddress(null));
         } catch (UnsupportedOperationException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+            // REVIEW UnsupportedOperationException ??
+            throw new AddressNotFoundException(addressId);
         }
 
     }
@@ -224,17 +225,16 @@ public class UserService extends AbstractService<UserModel> {
      * @return the updated user
      */
     public UserModel updateUserAddressField(UserModel user) {
-        Bson updatedFields = set("userAddress", user.getUserAddress());
+        Bson updatedFields = Updates.set("userAddress", user.getUserAddress());
 
         var filter = Filters.eq("_id", user.getId());
 
         var updatedUser = super.updateExistingFields(filter, updatedFields);
         if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException(user.getEmail());
         }
         return updatedUser;
     }
-
 
     @Autowired
     public void setAddressModelController(AddressService addressModelController) {

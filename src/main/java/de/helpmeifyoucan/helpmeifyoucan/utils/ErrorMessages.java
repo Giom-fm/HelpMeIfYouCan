@@ -3,14 +3,8 @@ package de.helpmeifyoucan.helpmeifyoucan.utils;
 public final class ErrorMessages {
 
     // Email
-    public static final String EMAIL_TAKEN = "Email already taken";
     public static final String EMAIL_NOT_SET = "Email is needed";
     public static final String EMAIL_PATTERN_ERROR = "Email is in invalid format";
-    // User
-    public static final String USER_NOT_FOUND = "User not found";
-    // Address
-    public static final String ADDRESS_NOT_FOUND = "Address not found";
-
 
     //DBERRORS
     public static final String DELETE_NOT_ACKNOWLEDGED = "Internal Database error";

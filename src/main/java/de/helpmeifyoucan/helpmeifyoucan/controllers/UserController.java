@@ -1,13 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
+import javax.validation.Valid;
+
 import com.mongodb.MongoCommandException;
 import com.mongodb.MongoWriteException;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,10 +12,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.Valid;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 
 @RestController
 @RequestMapping("/user")
@@ -31,7 +42,7 @@ public class UserController {
     }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({ Role.ROLE_NAME_USER })
     @GetMapping("/me")
     public UserModel getMe() {
         var id = this.getIdFromContext();
@@ -39,7 +50,7 @@ public class UserController {
 
     }
 
-    @Secured({ Roles.ROLE_NAME_USER })
+    @Secured({ Role.ROLE_NAME_USER })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
@@ -47,28 +58,26 @@ public class UserController {
         this.userModelController.delete(id);
     }
 
-    @Secured({Roles.ROLE_NAME_USER})
+    @Secured({ Role.ROLE_NAME_USER })
     @PatchMapping("/me")
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
         return this.userModelController.update(user, id);
     }
 
-    @Secured({Roles.ROLE_NAME_USER})
+    @Secured({ Role.ROLE_NAME_USER })
     @PostMapping(path = "/addaddress/{lazy}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel addUserAddress(@Valid @RequestBody AddressModel address, @PathVariable boolean lazy) {
         return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address, lazy);
     }
 
-
-    @Secured({Roles.ROLE_NAME_USER})
+    @Secured({ Role.ROLE_NAME_USER })
     @PostMapping(path = "/updateaddress/{lazy}")
     public UserModel updateUserAdress(@Valid @RequestBody AddressUpdate update, @PathVariable boolean lazy) {
         return this.userModelController.handleUserAddressUpdateRequest(getIdFromContext(), update, lazy);
     }
 
-
-    @Secured({Roles.ROLE_NAME_USER})
+    @Secured({ Role.ROLE_NAME_USER })
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(path = "/deleteaddress/", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
@@ -76,20 +85,20 @@ public class UserController {
     }
 
     // ADMIN ENDPOINTS --------------------------------
-    @Secured({Roles.ROLE_NAME_ADMIN})
+    @Secured({ Role.ROLE_NAME_ADMIN })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@Valid @RequestBody UserModel user) {
         this.userModelController.save(user);
     }
 
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({ Role.ROLE_NAME_ADMIN })
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
         return this.userModelController.update(user, id);
     }
 
-    @Secured({ Roles.ROLE_NAME_ADMIN })
+    @Secured({ Role.ROLE_NAME_ADMIN })
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable ObjectId id) {
@@ -110,7 +119,7 @@ public class UserController {
     }
 
     private ObjectId getIdFromContext() {
-        return new ObjectId(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }

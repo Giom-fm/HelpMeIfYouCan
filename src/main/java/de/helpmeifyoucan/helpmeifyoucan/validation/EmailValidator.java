@@ -3,17 +3,13 @@ package de.helpmeifyoucan.helpmeifyoucan.validation;
 import java.util.regex.Pattern;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 
 public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
-    private static final String COUNTRY_REGEX = "^[a-zA-Z0-9]+[a-zA-Z\\._-]{0,63}@[a-zA-Z0-9]{1,200}+\\.[a-zA-Z]{2,50}$";
-    private static final Pattern COUNTRY_PATTERN = Pattern.compile(COUNTRY_REGEX);
+    private static final String EMAIL_REGEX = "^[a-zA-Z0-9]+[a-zA-Z\\._-]{0,63}@[a-zA-Z0-9]{1,200}+\\.[a-zA-Z]{2,50}$";
+    private static final Pattern EMAIl_PATTERN = Pattern.compile(EMAIL_REGEX);
     private boolean canBeNull;
 
     @Override
@@ -24,14 +20,17 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context) {
 
-        if (email == null) {
-            if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_NOT_SET);
-            }
-            return true;
-        } else if (!COUNTRY_PATTERN.matcher(email).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.EMAIL_PATTERN_ERROR);
+        var valid = true;
+        context.disableDefaultConstraintViolation();
+
+        if (email == null && !this.canBeNull) {
+            context.buildConstraintViolationWithTemplate(ErrorMessages.EMAIL_NOT_SET).addConstraintViolation();
+            valid = false;
+        } else if (!EMAIl_PATTERN.matcher(email).matches()) {
+            context.buildConstraintViolationWithTemplate(ErrorMessages.EMAIL_PATTERN_ERROR).addConstraintViolation();
+            valid = false;
         }
-        return true;
+
+        return valid;
     }
 }

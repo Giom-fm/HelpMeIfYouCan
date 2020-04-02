@@ -26,7 +26,7 @@ public abstract class AbstractService<T extends AbstractEntity> {
         this.database = database;
     }
 
-    protected T save(T entity) {
+    public T save(T entity) {
         this.collection.insertOne(entity);
         return entity;
     }
@@ -44,7 +44,6 @@ public abstract class AbstractService<T extends AbstractEntity> {
     }
 
     protected boolean delete(Bson filter) {
-
         return this.collection.deleteOne(filter).wasAcknowledged();
     }
 

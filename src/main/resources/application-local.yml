@@ -20,3 +20,14 @@ database:
 jwt:
   secret: yeipu7koo6ceez5quieDeenooxeep9wu
   expiration: 864000000
+logbook:
+  format.style: http
+  filter.enabled: true
+  secure-filter.enabled: false
+  strategy: default
+  obfuscate:
+    headers:
+      - Authorization
+    parameters:
+      - password
+      - currentPassword

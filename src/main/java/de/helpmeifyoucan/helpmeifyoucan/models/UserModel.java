@@ -1,17 +1,20 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Roles;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.types.ObjectId;
+import java.util.List;
+import java.util.Objects;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
-import java.util.List;
-import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.types.ObjectId;
+
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 
 public class UserModel extends AbstractEntity {
 
@@ -38,7 +41,7 @@ public class UserModel extends AbstractEntity {
     @JsonIgnore
     protected String password;
 
-    protected List<Roles> roles;
+    protected List<Role> roles;
 
     protected boolean enabled;
 
@@ -58,12 +61,12 @@ public class UserModel extends AbstractEntity {
         return verified;
     }
 
-    public UserModel setRoles(List<Roles> roles) {
+    public UserModel setRoles(List<Role> roles) {
         this.roles = roles;
         return this;
     }
 
-    public List<Roles> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
