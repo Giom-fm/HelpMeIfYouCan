@@ -32,7 +32,7 @@ public class AddressController {
 
     @GetMapping("/{id}")
     public AddressModel get(@PathVariable ObjectId id) {
-        return addressModelController.get(id);
+        return addressModelController.getById(id);
     }
 
 

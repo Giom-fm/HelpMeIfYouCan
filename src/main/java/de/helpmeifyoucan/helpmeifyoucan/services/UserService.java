@@ -57,6 +57,10 @@ public class UserService extends AbstractService<UserModel> {
         return user;
     }
 
+    public UserModel getById(ObjectId id) {
+        return super.getById(id);
+    }
+
     public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
         var user = super.getByFilter(filter);
@@ -118,7 +122,7 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     public void delete(ObjectId id) {
-        if (super.delete(Filters.eq("_id", id)).getDeletedCount() == 0) {
+        if (!super.delete(Filters.eq("_id", id)).wasAcknowledged()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
         }
     }

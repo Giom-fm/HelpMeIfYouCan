@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import org.bson.types.ObjectId;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,6 +21,11 @@ public class Coordinates extends AbstractEntity {
 
     @JsonIgnore
     protected int hashCode;
+
+    public Coordinates() {
+        this.offers = new LinkedList<>();
+        this.requests = new LinkedList<>();
+    }
 
 
     public List<ObjectId> getHelpOffers() {
@@ -51,11 +57,11 @@ public class Coordinates extends AbstractEntity {
     }
 
     public boolean noOtherRefsBesideId(ObjectId id) {
-        return (this.requests != null && this.requests.size() == 1 && this.requests.contains(id)) || (this.offers != null && this.offers.size() == 1 && this.offers.contains(id));
+        return (this.requests.size() == 1 && this.requests.contains(id)) || (this.offers.size() == 1 && this.offers.contains(id));
     }
 
     public boolean hasRefToId(Object id) {
-        return (this.requests != null && this.requests.contains(id)) || (this.offers != null && this.offers.contains(id));
+        return (this.requests.size() > 0 && this.requests.contains(id)) || (this.offers.size() > 0 && this.offers.contains(id));
     }
 
     public List<ObjectId> getHelpRequests() {
@@ -103,6 +109,11 @@ public class Coordinates extends AbstractEntity {
         return this;
     }
 
+    public Coordinates generateId() {
+        super.setId(new ObjectId());
+        return this;
+    }
+
     public Coordinates mergeWithUpdate(CoordinatesUpdate update) {
         super.mergeWithUpdate(update, this);
         return this.calculateHashCode();
@@ -123,5 +134,16 @@ public class Coordinates extends AbstractEntity {
     @Override
     public int hashCode() {
         return Objects.hash(getLatitude(), getLongitude());
+    }
+
+    @Override
+    public String toString() {
+        return "Coordinates{" +
+                "helpOffers=" + offers +
+                ", requests=" + requests +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", hashCode=" + hashCode +
+                '}';
     }
 }

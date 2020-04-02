@@ -48,9 +48,10 @@ public class HelpOfferModel extends AbstractHelpModel {
     }
 
 
-    public void generateId() {
+    public HelpOfferModel generateId() {
         this.setId(new ObjectId());
         this.datePublished = new Date();
+        return this;
     }
 
 

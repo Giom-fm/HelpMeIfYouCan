@@ -15,6 +15,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.mongodb.client.model.Filters.eq;
+
 @Repository
 public abstract class AbstractService<T extends AbstractEntity> {
 
@@ -49,6 +51,12 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.deleteOne(filter);
     }
 
+    public boolean deleteById(ObjectId id) {
+        var filter = eq("_id", id);
+
+        return this.delete(filter).wasAcknowledged();
+    }
+
     protected boolean exists(Bson filter) {
         return this.getOptional(filter).isPresent();
     }
@@ -69,7 +77,7 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
-    protected Optional<T> getOptional(Bson filter) {
+    public Optional<T> getOptional(Bson filter) {
         return Optional.ofNullable(getByFilter(filter));
     }
 

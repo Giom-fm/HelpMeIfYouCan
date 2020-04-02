@@ -49,6 +49,10 @@ public class AddressService extends AbstractService<AddressModel> {
         return address;
     }
 
+    public AddressModel getById(ObjectId id) {
+        return super.getById(id);
+    }
+
     public boolean exists(Bson filter) {
         return super.getOptional(filter).isPresent();
     }
@@ -57,7 +61,7 @@ public class AddressService extends AbstractService<AddressModel> {
     public boolean deleteById(ObjectId id) {
         var filter = eq("_id", id);
 
-        return super.delete(filter).wasAcknowledged();
+        return super.delete(filter).getDeletedCount() > 0;
     }
 
     public Optional<AddressModel> getOptional(Bson filter) {

@@ -1,6 +1,8 @@
 package de.helpmeifyoucan.helpmeifyoucan;
 
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.CoordinatesService;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,8 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static com.mongodb.client.model.Filters.eq;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -31,7 +32,7 @@ public class CoordinatesServiceTest {
     public void givenCoordinates_ItShouldBeSavedAndRetrievedCorrectly() {
         this.coordinatesService.save(testCoords);
 
-        assertEquals(testCoords, this.coordinatesService.get(testCoords.getId()));
+        assertEquals(testCoords, this.coordinatesService.getById(testCoords.getId()));
     }
 
     @Test
@@ -42,7 +43,56 @@ public class CoordinatesServiceTest {
 
     }
 
-    
+    @Test
+    public void givenIdOfSavedObject_ItShouldBeDeleted() {
+        this.coordinatesService.save(testCoords);
+        this.coordinatesService.deleteById(testCoords.getId());
+        assertFalse(this.coordinatesService.exists(eq(testCoords.getId())));
+    }
+
+    @Test
+    public void givenIdOfExistingObjectAndUpdate_fieldsShouldBeUpdatedAccordingly() {
+
+        this.coordinatesService.save(testCoords);
+        CoordinatesUpdate update = new CoordinatesUpdate().setLatitude(11.22).setLongitude(22.11);
+
+        this.coordinatesService.updateExistingField(testCoords.getId(), update.toFilter());
+
+        var updatedCoords = this.coordinatesService.getById(testCoords.getId());
+
+        assertEquals(updatedCoords.getLatitude(), update.getLatitude(), 0.0);
+    }
+
+    @Test
+    public void givenModelContainingCoordinatesNotExisting_theyShouldBeSaved() {
+        HelpOfferModel testOffer = new HelpOfferModel().setCoordinates(testCoords).generateId();
+
+
+        this.coordinatesService.handleHelpModelCoordinateAdd(testOffer);
+
+        assertTrue(coordinatesService.exists(eq(testCoords.getId())));
+
+        var savedCoords = this.coordinatesService.getById(testCoords.getId());
+        assertTrue(savedCoords.hasRefToId(testOffer.getId()));
+
+    }
+
+    @Test
+    public void givenRequestContainingAlreadySavedCoords_RequestShouldBeAddedToCoords() {
+        this.coordinatesService.save(testCoords);
+
+        Coordinates duplicateCoordinates = new Coordinates().setLatitude(testCoords.getLatitude()).setLongitude(testCoords.getLongitude());
+
+        HelpOfferModel testOffer = new HelpOfferModel().setCoordinates(duplicateCoordinates);
+
+        Coordinates updatedExistingCoordinates = this.coordinatesService.handleHelpModelCoordinateAdd(testOffer);
+
+        assertEquals(testCoords.getId(), updatedExistingCoordinates.getId());
+
+
+    }
+
+
     @Before
     public void clearDb() {
         this.coordinatesService.getCollection().drop();

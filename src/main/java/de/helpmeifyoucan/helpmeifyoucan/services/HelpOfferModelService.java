@@ -11,8 +11,6 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Optional;
-
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
@@ -48,13 +46,6 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         return this.getOptional(filter).isPresent();
     }
 
-    public Optional<HelpOfferModel> getOptional(Bson filter) {
-        return super.getOptional(filter);
-    }
-
-    public void deleteById(ObjectId id) {
-        super.delete(eq(id));
-    }
 
     public HelpOfferModel update(ObjectId requestToUpdate, HelpOfferUpdate update, ObjectId updatingUser) {
 

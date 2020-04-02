@@ -62,9 +62,10 @@ public class HelpRequestModel extends AbstractHelpModel {
         return this;
     }
 
-    public void generateId() {
+    public HelpRequestModel generateId() {
         this.setId(new ObjectId());
         this.datePublished = new Date();
+        return this;
     }
 
     @Override

@@ -39,20 +39,17 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         return super.save(coordinates.calculateHashCode());
     }
 
-    public Coordinates get(ObjectId id) {
-        return super.getById(id);
-    }
-
-    public boolean exists(Bson filter) {
-        return this.getOptional(filter).isPresent();
-    }
 
     public boolean deleteById(ObjectId id) {
         return super.delete(eq(id)).wasAcknowledged();
     }
 
-    public Optional<Coordinates> getOptional(Bson filter) {
-        return super.getOptional(filter);
+    public Coordinates getById(ObjectId id) {
+        return super.getById(id);
+    }
+
+    public boolean exists(Bson filter) {
+        return this.getOptional(filter).isPresent();
     }
 
     public Coordinates updateExistingField(ObjectId id, Bson updatedFields) {
@@ -180,9 +177,9 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     private Coordinates updateClassCorrespondingField(Coordinates coordinates, boolean isRequest) {
         Bson updatedFields;
         if (isRequest) {
-            updatedFields = set("requests", coordinates.getHelpRequests());
+            updatedFields = set("helpRequests", coordinates.getHelpRequests());
         } else {
-            updatedFields = set("offers", coordinates.getHelpOffers());
+            updatedFields = set("helpOffers", coordinates.getHelpOffers());
         }
         return this.updateExistingField(coordinates.getId(), updatedFields);
 

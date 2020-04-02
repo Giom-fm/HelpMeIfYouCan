@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,7 +35,10 @@ public class AddressModel extends AbstractEntity {
     protected int hashCode;
 
 
-    @JsonIgnore
+    public AddressModel() {
+        this.users = new LinkedList<>();
+    }
+
     public List<ObjectId> getUsers() {
         return this.users;
     }

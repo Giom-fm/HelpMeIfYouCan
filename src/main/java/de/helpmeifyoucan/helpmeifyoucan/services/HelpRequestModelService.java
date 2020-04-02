@@ -55,9 +55,6 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return super.getOptional(filter);
     }
 
-    public void deleteById(ObjectId id) {
-        super.delete(eq(id));
-    }
 
     public HelpRequestModel update(ObjectId requestToUpdate, HelpRequestUpdate update, ObjectId updatingUser) {
 

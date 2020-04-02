@@ -1,9 +1,11 @@
 package de.helpmeifyoucan.helpmeifyoucan.filters;
 
 import com.auth0.jwt.JWT;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.Login;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,16 +22,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
-import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.Login;
 
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private final AuthenticationManager authenticationManager;
@@ -68,7 +65,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .withExpiresAt(new Date(System.currentTimeMillis() + config.getExpiration()))
                 .sign(HMAC512(this.config.getSecret().getBytes()));
 
-        var user = this.userService.get(new ObjectId(id));
+        var user = this.userService.getById(new ObjectId(id));
         var login = new Login(user.getName(), user.getLastName(), token);
 
         res.setStatus(HttpStatus.OK.value());
