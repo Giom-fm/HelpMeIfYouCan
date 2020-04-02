@@ -10,11 +10,19 @@ public class ErrorResponse {
     private final Date timestamp;
     private final Object data;
 
-    public ErrorResponse(CustomException error) {
-        this.code = error.getCode();
-        this.message = error.getMessage();
+    public ErrorResponse(String message, int code) {
+        this(message, code, null);
+    }
+
+    public ErrorResponse(String message, int code, Object data) {
+        this.code = code;
+        this.message = message;
         this.timestamp = new Date();
-        this.data = error.getData();
+        this.data = data;
+    }
+
+    public ErrorResponse(CustomException error) {
+        this(error.getMessage(), error.getCode(), error.getData());
     }
 
     public String getMessage() {

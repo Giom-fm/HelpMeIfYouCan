@@ -59,7 +59,7 @@ public class UserService extends AbstractService<UserModel> {
         return user;
     }
 
-    public UserModel getByEmail(String email) {
+    public UserModel getByEmail(String email) throws UserNotFoundException {
         var filter = Filters.eq("email", email);
         var user = super.getByFilter(filter);
         if (user == null) {

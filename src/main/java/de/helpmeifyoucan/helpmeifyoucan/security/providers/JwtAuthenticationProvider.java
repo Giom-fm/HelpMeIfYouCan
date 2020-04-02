@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.security;
+package de.helpmeifyoucan.helpmeifyoucan.security.providers;
 
 import java.util.Collection;
 import java.util.Date;
@@ -8,19 +8,22 @@ import java.util.stream.Collectors;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import de.helpmeifyoucan.helpmeifyoucan.config.JwtConfig;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.security.authentications.JwtAuthentication;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 
-@Service
+@Component
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private JwtParser jwtParser;
@@ -36,18 +39,22 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         var token = authentication.getCredentials().toString();
         return this.authenticateToken(token);
+
     }
 
-    private JwtAuthentication authenticateToken(String token) {
-        var claims = this.jwtParser.parseClaimsJws(token);
-        var jwsBody = claims.getBody();
+    private JwtAuthentication authenticateToken(String token) throws AuthenticationException {
 
-        var id = new ObjectId(jwsBody.getSubject());
+        try {
+            var claims = this.jwtParser.parseClaimsJws(token);
+            var jwsBody = claims.getBody();
+            var id = new ObjectId(jwsBody.getSubject());
+            var roles = (List<String>) jwsBody.get("roles", List.class);
+            var authorities = this.rolesToAuthorities(roles);
+            return new JwtAuthentication(id, token, authorities);
+        } catch (JwtException ex) {
+            throw new BadCredentialsException("Token is invalid", ex);
+        }
 
-        var roles = (List<String>) jwsBody.get("roles", List.class);
-        var authorities = this.rolesToAuthorities(roles);
-
-        return new JwtAuthentication(id, token, authorities);
     }
 
     public String generateToken(Authentication authentication) {

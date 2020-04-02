@@ -1,38 +1,42 @@
-package de.helpmeifyoucan.helpmeifyoucan.security;
+package de.helpmeifyoucan.helpmeifyoucan.security.authentications;
 
 import java.util.Collection;
 import java.util.List;
 
-import org.bson.types.ObjectId;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
-public class JwtAuthentication implements Authentication {
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
 
-    private static final long serialVersionUID = 8265789418513754940L;
-    private final String token;
-    private final ObjectId id;
+public class EmailPasswordAuthentication implements Authentication {
+
+    private static final long serialVersionUID = -2105474794750369618L;
+    private final String password;
+    private final String email;
     private final boolean authenticated;
-    private final List<GrantedAuthority> authorities;
+    private final List<? extends GrantedAuthority> authorities;
+    private final UserModel user;
 
-    public JwtAuthentication(ObjectId id, String token, List<GrantedAuthority> authorities) {
-        this.id = id;
-        this.token = token;
+    public EmailPasswordAuthentication(UserModel user, List<? extends GrantedAuthority> authorities) {
+        this.user = user;
+        this.email = user.getEmail();
+        this.password = user.getPassword();
         this.authorities = authorities;
         this.authenticated = true;
     }
 
-    public JwtAuthentication(String token) {
-        this.id = null;
-        this.token = token;
+    public EmailPasswordAuthentication(Credentials credentials) {
+        this.email = credentials.getEmail();
+        this.password = credentials.getPassword();
         this.authorities = null;
+        this.user = null;
         this.authenticated = false;
     }
 
     @Override
     public String getName() {
-        return this.id.toString();
+        return this.email;
     }
 
     @Override
@@ -42,7 +46,7 @@ public class JwtAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return this.token;
+        return this.password;
     }
 
     @Override
@@ -52,7 +56,7 @@ public class JwtAuthentication implements Authentication {
 
     @Override
     public Object getPrincipal() {
-        return this.id;
+        return this.user;
     }
 
     @Override
