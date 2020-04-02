@@ -13,13 +13,10 @@ import com.mongodb.client.model.Indexes;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
@@ -60,7 +57,6 @@ public class AddressService extends AbstractService<AddressModel> {
 
     public boolean delete(ObjectId id) {
         var filter = eq("_id", id);
-
         return super.delete(filter);
     }
 
@@ -73,8 +69,7 @@ public class AddressService extends AbstractService<AddressModel> {
         var updatedAddress = super.updateExistingFields(filter, updatedFields);
 
         if (updatedAddress == null) {
-            // FIXME ???
-            throw new UserNotFoundException("user");
+            throw new AddressNotFoundException(address);
         }
 
         return updatedAddress;
@@ -90,15 +85,12 @@ public class AddressService extends AbstractService<AddressModel> {
 
     public AddressModel updateUserField(AddressModel address) {
         Bson updatedFields = set("users", address.getUsers());
-
         return this.updateExistingField(updatedFields, address.getId());
     }
 
-
-
-
     /**
-     * We want to add a user to addresses user references and do so by updating the addresses users field
+     * We want to add a user to addresses user references and do so by updating the
+     * addresses users field
      *
      * @param address the address to update
      * @param userId  Users userId to add
@@ -109,22 +101,18 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     /**
-     * User want to update his userAddress, so give him this entrypoint into the controller to manage the workflow
+     * User want to update his userAddress, so give him this entrypoint into the
+     * controller to manage the workflow
      *
      * @param update the update to perform
      * @param userId this updating user
      * @return the id of the new or updated Address
      */
 
-    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
-
-
-        if (addressToUpdate == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
+    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update,
+            ObjectId userId) {
         return this.updateAddress(addressToUpdate, update, userId);
     }
-
 
     public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
         var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
@@ -154,8 +142,9 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     /**
-     * We want to delete a User from a Addresses references and insert it back into the db. We do not want
-     * to insert Address with no referneces back into the db, so we check for it
+     * We want to delete a User from a Addresses references and insert it back into
+     * the db. We do not want to insert Address with no referneces back into the db,
+     * so we check for it
      *
      * @param address Address to modify /delete
      * @param userId  user To delete from Address
@@ -164,16 +153,13 @@ public class AddressService extends AbstractService<AddressModel> {
     // FIXME THIS WILL NOT BE VALID WITH ADDED REFERENCES
     public AddressModel deleteUserFromAddress(AddressModel address, ObjectId userId) {
         if (!address.containsUser(userId)) {
-            new UserNotFoundException(userId.toString());
+            throw new UserNotFoundException(userId);
         }
         var addressWithUserRemoved = address.removeUserAddress(userId);
 
         if (addressWithUserRemoved.noUserReferences()) {
-            if (this.delete(addressWithUserRemoved.getId())) {
-                return address;
-            }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
-
+            this.delete(addressWithUserRemoved.getId());
+            return address;
         } else {
             return this.updateUserField(addressWithUserRemoved);
         }
@@ -234,7 +220,7 @@ public class AddressService extends AbstractService<AddressModel> {
             Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
 
         if (!addressToUpdate.containsUser(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException(userId);
         }
 
         this.deleteUserFromAddress(addressToUpdate, userId);

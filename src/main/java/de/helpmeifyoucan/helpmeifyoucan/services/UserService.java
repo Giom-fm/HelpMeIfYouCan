@@ -7,23 +7,21 @@ import java.util.Optional;
 
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.Updates;
 
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
@@ -48,15 +46,11 @@ public class UserService extends AbstractService<UserModel> {
         super.createIndex(Indexes.ascending("email"), options);
     }
 
-    public UserModel save(UserModel user) {
-        return super.save(user);
-    }
-
     public UserModel get(ObjectId id) {
         var user = super.getById(id);
 
         if (user == null) {
-            throw new UserNotFoundException(id.toString());
+            throw new UserNotFoundException(id);
         }
         return user;
     }
@@ -86,7 +80,8 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
-        // FIXME wird in Zukunft vom Authmanager übernommen -> Endpunkt update wird dann
+        // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
+        // wird dann
         // nur aufgerufen wenn es kein Auth exception gab.
         var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
         if (!hashedPassword) {
@@ -94,11 +89,10 @@ public class UserService extends AbstractService<UserModel> {
         }
 
         var updateFilter = eq(id);
-
         var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
         if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.UPDATE_FAILED);
+            throw new UserNotFoundException(id);
         }
         return updatedUser;
     }
@@ -126,9 +120,7 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     public void delete(ObjectId id) {
-        if (!super.delete(Filters.eq("_id", id))) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
-        }
+        super.delete(Filters.eq("_id", id));
     }
 
     /**
@@ -219,7 +211,8 @@ public class UserService extends AbstractService<UserModel> {
         try {
             return this.updateUserAddressField(user.setUserAddress(null));
         } catch (UnsupportedOperationException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+            // REVIEW UnsupportedOperationException ??
+            throw new AddressNotFoundException(addressId);
         }
 
     }

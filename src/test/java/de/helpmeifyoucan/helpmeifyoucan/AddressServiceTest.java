@@ -1,11 +1,11 @@
 package de.helpmeifyoucan.helpmeifyoucan;
 
 
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import static com.mongodb.client.model.Filters.eq;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.web.server.ResponseStatusException;
 
-import static com.mongodb.client.model.Filters.eq;
-import static org.junit.Assert.*;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -41,7 +45,6 @@ public class AddressServiceTest {
     @Before
     public void setUpTest() {
 
-
         testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
         testAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
@@ -57,7 +60,7 @@ public class AddressServiceTest {
         assertEquals(testAddress, retrievedAddress);
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test(expected = AddressNotFoundException.class)
     public void givenNotExistingObjectId_NotFoundShouldBeThrown() {
         this.addressService.get(new ObjectId());
     }
@@ -73,7 +76,7 @@ public class AddressServiceTest {
         assertFalse(addressService.exists(eq(new ObjectId())));
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test(expected = AddressNotFoundException.class)
     public void givenNotExistingObjectId_FieldsCannotBeUpdatedAndExceptionIsThrown() {
         AddressUpdate update = new AddressUpdate().setHouseNumber("15");
 
@@ -93,10 +96,11 @@ public class AddressServiceTest {
         assertEquals(updatedAddress, testAddress);
     }
 
-    @Test(expected = ResponseStatusException.class)
+    // REVIEW
+   /*  @Test(expected = AddressNotFoundException.class)
     public void givenNullAddress_UpdateFailsAndThrowsException() {
         this.addressService.updateUserField(new AddressModel());
-    }
+    } */
 
     @Test
     public void givenValidAddress_UserFieldShouldBeUpdatedAccordingly() {
@@ -110,7 +114,7 @@ public class AddressServiceTest {
         assertTrue(updatedAddress.getUsers().contains(dummy));
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test(expected = UserNotFoundException.class)
     public void givenAddressNotContainingUserAddress_ExceptionShouldBeThrown() {
         this.addressService.deleteUserFromAddress(testAddress, new ObjectId());
     }
@@ -119,9 +123,7 @@ public class AddressServiceTest {
     public void givenSavedAddressWithOneUserRef_AddressShouldBeDeletedAfterUserRemoval() {
         testUser.setId(new ObjectId());
         this.addressService.save(testAddress.addUserAddress(testUser.getId()));
-
         this.addressService.deleteUserFromAddress(this.addressService.get(testAddress.getId()), testUser.getId());
-
         assertFalse(this.addressService.exists(eq(testAddress.getId())));
     }
 
@@ -141,7 +143,7 @@ public class AddressServiceTest {
         assertTrue(updatedAddress.containsUser(testUser.getId()));
     }
 
-    @Test(expected = ResponseStatusException.class)
+    @Test(expected = AddressNotFoundException.class)
     public void givenIncorrectAddress_ExceptionShouldBeThrown() {
         this.addressService.updateAddress(new ObjectId(), new AddressUpdate(), new ObjectId());
     }
