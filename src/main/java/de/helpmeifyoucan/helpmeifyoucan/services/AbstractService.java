@@ -4,6 +4,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.*;
+import com.mongodb.client.result.DeleteResult;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractEntity;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -43,9 +44,9 @@ public abstract class AbstractService<T extends AbstractEntity> {
 
     }
 
-    protected boolean delete(Bson filter) {
+    protected DeleteResult delete(Bson filter) {
 
-        return this.collection.deleteOne(filter).wasAcknowledged();
+        return this.collection.deleteOne(filter);
     }
 
     protected boolean exists(Bson filter) {

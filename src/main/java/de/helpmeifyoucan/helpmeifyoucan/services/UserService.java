@@ -118,7 +118,7 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     public void delete(ObjectId id) {
-        if (!super.delete(Filters.eq("_id", id))) {
+        if (super.delete(Filters.eq("_id", id)).getDeletedCount() == 0) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
         }
     }

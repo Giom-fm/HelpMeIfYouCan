@@ -4,29 +4,26 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
-import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpRequestUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
-@Service
-public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
-
+public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
     private CoordinatesService coordinatesService;
 
     @Autowired
-    public HelpRequestModelService(MongoDatabase dataBase, CoordinatesService coordinatesService) {
+    public HelpOfferModelService(MongoDatabase dataBase, CoordinatesService coordinatesService) {
         super(dataBase);
-        super.createCollection("helpRequests", HelpRequestModel.class);
+        super.createCollection("helpRequests", HelpOfferModel.class);
         this.createIndex();
         this.coordinatesService = coordinatesService;
     }
@@ -38,11 +35,11 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         super.createIndex(Indexes.ascending("datePublished"), options);
     }
 
-    public HelpRequestModel save(HelpRequestModel requestModel) {
+    public HelpOfferModel save(HelpOfferModel requestModel) {
         return super.save(requestModel);
     }
 
-    public HelpRequestModel getById(ObjectId id) {
+    public HelpOfferModel getById(ObjectId id) {
         var filter = eq(id);
         return super.getByFilter(filter);
     }
@@ -51,7 +48,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return this.getOptional(filter).isPresent();
     }
 
-    public Optional<HelpRequestModel> getOptional(Bson filter) {
+    public Optional<HelpOfferModel> getOptional(Bson filter) {
         return super.getOptional(filter);
     }
 
@@ -59,7 +56,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         super.delete(eq(id));
     }
 
-    public HelpRequestModel update(ObjectId requestToUpdate, HelpRequestUpdate update, ObjectId updatingUser) {
+    public HelpOfferModel update(ObjectId requestToUpdate, HelpOfferUpdate update, ObjectId updatingUser) {
 
         var updateFilter = and(eq(requestToUpdate), in("user", updatingUser));
 
@@ -71,7 +68,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return updatedRequest;
     }
 
-    public HelpRequestModel saveNewRequest(HelpRequestModel request, ObjectId user) {
+    public HelpOfferModel saveNewRequest(HelpOfferModel request, ObjectId user) {
 
         request.generateId();
         var requestWithCoordsAdded = request.setCoordinates(this.coordinatesService.handleHelpModelCoordinateAdd(request));
@@ -79,12 +76,12 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return this.save(requestWithCoordsAdded);
     }
 
-    public HelpRequestModel handleCoordinatesUpdate(ObjectId requestId, CoordinatesUpdate update, ObjectId updatingUser) {
-        var requestToUpdate = getByRequestIdAndUser(requestId, updatingUser);
+    public HelpOfferModel handleCoordinatesUpdate(ObjectId offerId, CoordinatesUpdate update, ObjectId updatingUser) {
+        var offerToUpdate = getByRequestIdAndUser(offerId, updatingUser);
 
-        var updatedCoordinates = this.coordinatesService.handleHelpModelCoordinateUpdate(requestToUpdate, update);
+        var updatedCoordinates = this.coordinatesService.handleHelpModelCoordinateUpdate(offerToUpdate, update);
 
-        return this.updateCoordinatesField(requestToUpdate, updatedCoordinates);
+        return this.updateCoordinatesField(offerToUpdate, updatedCoordinates);
     }
 
     public void deleteRequest(ObjectId requestToDelete, ObjectId deletingUser) {
@@ -97,14 +94,13 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
     }
 
-
-    private HelpRequestModel updateCoordinatesField(HelpRequestModel request, Coordinates coordinates) {
-        request.setCoordinates(coordinates);
+    private HelpOfferModel updateCoordinatesField(HelpOfferModel offer, Coordinates coordinates) {
+        offer.setCoordinates(coordinates);
         var updatedAddress = set("coordinates", coordinates);
-        return super.updateExistingFields(eq(request.getId()), updatedAddress);
+        return super.updateExistingFields(eq(offer.getId()), updatedAddress);
     }
 
-    public HelpRequestModel getByRequestIdAndUser(ObjectId requestId, ObjectId userId) {
+    public HelpOfferModel getByRequestIdAndUser(ObjectId requestId, ObjectId userId) {
 
         var userHasPermission = super.getOptional(and(eq(requestId), in("user", userId)));
 
@@ -112,6 +108,4 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return userHasPermission.orElseThrow();
 
     }
-
-
 }

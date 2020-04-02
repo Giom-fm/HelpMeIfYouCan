@@ -48,7 +48,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     }
 
     public boolean deleteById(ObjectId id) {
-        return super.delete(eq(id));
+        return super.delete(eq(id)).wasAcknowledged();
     }
 
     public Optional<Coordinates> getOptional(Bson filter) {
@@ -66,7 +66,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateAdd(T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateAdd(T helpModel) {
         var coordinatesToSave = helpModel.getCoordinates();
 
         var addressFilter = eq("hashCode", coordinatesToSave.calculateHashCode().getHashCode());
@@ -82,7 +82,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     }
 
 
-    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateUpdate(T helpModel, CoordinatesUpdate update) {
+    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateUpdate(T helpModel, CoordinatesUpdate update) {
 
 
         if (helpModel.getCoordinates() == null) {
@@ -93,7 +93,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates handleHelpModelCoordinateDelete(T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates handleHelpModelCoordinateDelete(T helpModel) {
         var coordinatesToDelete = this.getById(helpModel.getCoordinates().getId());
 
         coordinatesToDelete.removeHelpModel(helpModel);
@@ -110,7 +110,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinates(T helpModel, CoordinatesUpdate update) {
+    public <T extends AbstractHelpModel> Coordinates updateCoordinates(T helpModel, CoordinatesUpdate update) {
 
         var coordsToUpdate = this.getOptional(eq(helpModel.getCoordinates().getId()));
 
@@ -133,7 +133,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     }
 
 
-    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinatesWithOtherRefs(Coordinates mergedAddress, Coordinates existingAddress, Optional<Coordinates> updatedAddressExistingInDB, T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates updateCoordinatesWithOtherRefs(Coordinates mergedAddress, Coordinates existingAddress, Optional<Coordinates> updatedAddressExistingInDB, T helpModel) {
         this.deleteModelFromCoordinates(existingAddress, helpModel);
 
         if (updatedAddressExistingInDB.isPresent()) {
@@ -146,7 +146,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     }
 
 
-    public <T extends AbstractHelpModel<T>> Coordinates updateCoordinatesWithNoOtherRefs(CoordinatesUpdate coordinatesUpdate, Coordinates existingCoordinates, Optional<Coordinates> updatedDbAddressIfExisting, T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates updateCoordinatesWithNoOtherRefs(CoordinatesUpdate coordinatesUpdate, Coordinates existingCoordinates, Optional<Coordinates> updatedDbAddressIfExisting, T helpModel) {
         if (updatedDbAddressIfExisting.isPresent()) {
             this.deleteModelFromCoordinates(existingCoordinates, helpModel);
             return this.addHelpModelToCoordinates(updatedDbAddressIfExisting.get(), helpModel);
@@ -155,20 +155,20 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         }
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates addHelpModelToCoordinates(Coordinates coordinates, T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates addHelpModelToCoordinates(Coordinates coordinates, T helpModel) {
 
         var isRequest = this.getModelClass(helpModel);
         coordinates.addHelpModel(helpModel);
         return this.updateClassCorrespondingField(coordinates, isRequest);
     }
 
-    public <T extends AbstractHelpModel<T>> void deleteModelFromCoordinates(Coordinates coordinates, T helpModel) {
+    public <T extends AbstractHelpModel> void deleteModelFromCoordinates(Coordinates coordinates, T helpModel) {
         var isRequest = this.getModelClass(helpModel);
         coordinates.removeHelpModel(helpModel);
         this.updateClassCorrespondingField(coordinates, isRequest);
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates saveNewCoordinates(T helpModel) {
+    public <T extends AbstractHelpModel> Coordinates saveNewCoordinates(T helpModel) {
 
         var coordinatesToSave = helpModel.getCoordinates();
 
@@ -188,7 +188,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     }
 
-    private <T extends AbstractHelpModel<T>> boolean getModelClass(T helpModel) {
+    private <T extends AbstractHelpModel> boolean getModelClass(T helpModel) {
         return helpModel instanceof HelpRequestModel;
     }
 

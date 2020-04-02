@@ -1,18 +1,29 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
+import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
+import org.bson.types.ObjectId;
 
 import java.util.Date;
 import java.util.Objects;
 
-public class HelpRequestModel extends AbstractHelpModel<HelpRequestModel> {
+public class HelpRequestModel extends AbstractHelpModel {
 
-    protected Date datePublished;
 
     protected Date dateDue;
 
     protected HelpCategoryEnum category;
 
+
+    public HelpRequestModel setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+        return this;
+    }
+
+    public HelpRequestModel setUser(ObjectId user) {
+        this.user = user;
+        return this;
+    }
 
     public Date getDatePublished() {
         return datePublished;
@@ -20,6 +31,11 @@ public class HelpRequestModel extends AbstractHelpModel<HelpRequestModel> {
 
     public HelpRequestModel setDatePublished(Date datePublished) {
         this.datePublished = datePublished;
+        return this;
+    }
+
+    public HelpRequestModel setStatus(PostStatusEnum status) {
+        this.status = status;
         return this;
     }
 
@@ -32,6 +48,11 @@ public class HelpRequestModel extends AbstractHelpModel<HelpRequestModel> {
         return this;
     }
 
+    public HelpRequestModel setDescription(String description) {
+        this.description = description;
+        return this;
+    }
+
     public HelpCategoryEnum getCategory() {
         return category;
     }
@@ -39,6 +60,11 @@ public class HelpRequestModel extends AbstractHelpModel<HelpRequestModel> {
     public HelpRequestModel setCategory(HelpCategoryEnum category) {
         this.category = category;
         return this;
+    }
+
+    public void generateId() {
+        this.setId(new ObjectId());
+        this.datePublished = new Date();
     }
 
     @Override

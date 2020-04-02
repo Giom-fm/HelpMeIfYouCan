@@ -31,7 +31,7 @@ public class Coordinates extends AbstractEntity {
         return this;
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates addHelpModel(T model) {
+    public <T extends AbstractHelpModel> Coordinates addHelpModel(T model) {
         if (model instanceof HelpOfferModel) {
             this.offers.add(model.getId());
         } else {
@@ -40,7 +40,7 @@ public class Coordinates extends AbstractEntity {
         return this;
     }
 
-    public <T extends AbstractHelpModel<T>> Coordinates removeHelpModel(T model) {
+    public <T extends AbstractHelpModel> Coordinates removeHelpModel(T model) {
 
         if (model instanceof HelpOfferModel) {
             this.offers.remove(model.getId());
@@ -108,14 +108,16 @@ public class Coordinates extends AbstractEntity {
         return this.calculateHashCode();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Coordinates that = (Coordinates) o;
         return Double.compare(that.getLatitude(), getLatitude()) == 0 &&
-                Double.compare(that.getLongitude(), getLongitude()) == 0;
+                Double.compare(that.getLongitude(), getLongitude()) == 0 &&
+                getHashCode() == that.getHashCode() &&
+                Objects.equals(offers, that.offers) &&
+                Objects.equals(requests, that.requests);
     }
 
     @Override

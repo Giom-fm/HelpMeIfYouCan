@@ -57,7 +57,7 @@ public class AddressService extends AbstractService<AddressModel> {
     public boolean deleteById(ObjectId id) {
         var filter = eq("_id", id);
 
-        return super.delete(filter);
+        return super.delete(filter).wasAcknowledged();
     }
 
     public Optional<AddressModel> getOptional(Bson filter) {
