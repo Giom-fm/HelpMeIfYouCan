@@ -33,6 +33,8 @@ public class AddressModel extends AbstractEntity {
     @JsonIgnore
     protected int hashCode;
 
+
+    @JsonIgnore
     public List<ObjectId> getUsers() {
         return this.users;
     }

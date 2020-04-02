@@ -17,9 +17,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.server.ResponseStatusException;
 
 import static com.mongodb.client.model.Filters.eq;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -43,6 +41,21 @@ public class UserModelServiceTest {
     public void setUpTest() {
         clearCollection();
         testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+
+    }
+
+
+    @Test
+    public void withTwoUsersSavedInCollection_TheOnesMatchingTheFilterShouldBeReturned() {
+        this.userService.save(new UserModel().setName("Name").setLastName("Jaeger").setEmail("abc@mail.de"));
+        this.userService.save(new UserModel().setName("Name").setLastName("fournier").setEmail("bsc@mail.de"));
+        this.userService.save(testUser);
+
+
+        var result = this.userService.getAllByFilter(eq("name", "Name"));
+
+        assertEquals(result.size(), 2);
+
 
     }
 
@@ -144,7 +157,7 @@ public class UserModelServiceTest {
     public void givenIncorrectUserId_AddressAddShouldThrowError() {
         AddressModel address = new AddressModel().setCountry("germany");
 
-        this.userService.handleUserAddressAddRequest(new ObjectId(), address);
+        this.userService.handleUserAddressAddRequest(new ObjectId(), address, false);
     }
 
     @Test
@@ -153,9 +166,9 @@ public class UserModelServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address);
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address, true);
 
-        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+        assertEquals(updatedUser.getUserAddress(), address.getId());
     }
 
 
@@ -164,10 +177,10 @@ public class UserModelServiceTest {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
         this.userService.save(testUser);
 
-        this.userService.handleUserAddressAddRequest(testUser.getId(), address);
+        this.userService.handleUserAddressAddRequest(testUser.getId(), address, false);
         userService.handleUserAddressDeleteRequest(testUser.getId(), address.getId());
 
-        assertTrue(testUser.noAddressReferences());
+        assertTrue(testUser.noAddressReference());
     }
 
     @Test
@@ -177,7 +190,7 @@ public class UserModelServiceTest {
 
         UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
 
-        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+        assertEquals(updatedUser.getUserAddress(), address.getId());
     }
 
 
@@ -193,20 +206,20 @@ public class UserModelServiceTest {
     public void givenUserWithAddedAddressAndAddressToDelete_ItShouldExchangeAddressesAccordingly() {
         AddressModel addressToDelete = new AddressModel().generateId();
 
-        testUser.addAddress(addressToDelete.getId());
+        testUser.setUserAddress(addressToDelete.getId());
         this.userService.save(testUser);
 
         AddressModel addressToAdd = new AddressModel().generateId();
 
         UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
-        assertTrue(updatedUser.getAddresses().size() == 1 && updatedUser.getAddresses().contains(addressToAdd.getId()));
+        assertEquals(updatedUser.getUserAddress(), (addressToAdd.getId()));
     }
 
     @Test(expected = ResponseStatusException.class)
     public void givenNotExistingUserId_ExchangeAddressesShouldThrowException() {
         AddressModel addressToDelete = new AddressModel().generateId();
 
-        testUser.addAddress(addressToDelete.getId());
+        testUser.setUserAddress(addressToDelete.getId());
 
         testUser.setId(new ObjectId());
 
@@ -221,13 +234,13 @@ public class UserModelServiceTest {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.addressService.save(address.addUserAddress(testUser.getId()));
 
-        testUser.addAddress(address.getId());
+        testUser.setUserAddress(address.getId());
 
         this.userService.save(testUser);
 
         UserModel updatedUser = this.userService.deleteAddressFromUser(this.userService.get(testUser.getId()), address.getId());
 
-        assertTrue(updatedUser.noAddressReferences());
+        assertTrue(updatedUser.noAddressReference());
 
     }
 
@@ -237,40 +250,27 @@ public class UserModelServiceTest {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.addressService.save(address.addUserAddress(testUser.getId()));
 
-        testUser.addAddress(address.getId());
+        testUser.setUserAddress(address.getId());
 
         this.userService.save(testUser);
 
         UserModel updatedUser = this.userService.deleteAddressFromUser(testUser, new ObjectId());
     }
 
-    @Test
-    public void givenTwoAddresses_TheyShouldBeAddedCorrectly() {
-        AddressModel address1 = new AddressModel().generateId();
-        AddressModel address2 = new AddressModel().generateId();
 
-        testUser.addAddress(address1.getId());
-        testUser.addAddress(address2.getId());
-
-        this.userService.save(testUser);
-
-        UserModel updatedUser = this.userService.get(testUser.getId());
-
-        assertTrue(updatedUser.getAddresses().contains(address1.getId()) && updatedUser.getAddresses().contains(address2.getId()));
-    }
 
     @Test(expected = ResponseStatusException.class)
     public void givenWrongUserId_FieldsShouldNotBeUpdatedAndExceptionShouldBeThrown() {
-        this.userService.updateUserAddressField(testUser.addAddress(new ObjectId()));
+        this.userService.updateUserAddressField(testUser.setUserAddress(new ObjectId()));
     }
 
     @Test
     public void givenRightUser_AddressFieldShouldBeUpdatedAccordingly() {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.userService.save(testUser);
-        UserModel updatedUser = this.userService.updateUserAddressField(testUser.addAddress(address.getId()));
+        UserModel updatedUser = this.userService.updateUserAddressField(testUser.setUserAddress(address.getId()));
 
-        assertTrue(updatedUser.getAddresses().contains(address.getId()));
+        assertEquals(updatedUser.getUserAddress(), address.getId());
 
     }
 
@@ -284,5 +284,6 @@ public class UserModelServiceTest {
         this.addressService.createIndex();
 
     }
+
 
 }

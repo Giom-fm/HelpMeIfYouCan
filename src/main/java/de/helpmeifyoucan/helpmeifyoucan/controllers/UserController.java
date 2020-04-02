@@ -1,12 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
+import javax.validation.Valid;
+
 import com.mongodb.MongoCommandException;
 import com.mongodb.MongoWriteException;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +12,24 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.Valid;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 
 @RestController
 @RequestMapping("/user")
@@ -54,14 +66,20 @@ public class UserController {
     }
 
     @Secured({ Role.ROLE_NAME_USER })
-    @PostMapping(path = "/addaddress", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserModel addUserAddress(@Valid @RequestBody AddressModel address) {
-        return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address);
+    @PostMapping(path = "/addaddress/{lazy}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel addUserAddress(@Valid @RequestBody AddressModel address, @PathVariable boolean lazy) {
+        return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address, lazy);
+    }
+
+    @Secured({ Role.ROLE_NAME_USER })
+    @PostMapping(path = "/updateaddress/{lazy}")
+    public UserModel updateUserAdress(@Valid @RequestBody AddressUpdate update, @PathVariable boolean lazy) {
+        return this.userModelController.handleUserAddressUpdateRequest(getIdFromContext(), update, lazy);
     }
 
     @Secured({ Role.ROLE_NAME_USER })
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(path = "/deleteaddress/{addressId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/deleteaddress/", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
         return this.userModelController.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
     }

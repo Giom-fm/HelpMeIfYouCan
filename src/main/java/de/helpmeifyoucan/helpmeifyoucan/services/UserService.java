@@ -1,16 +1,15 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
+import static com.mongodb.client.model.Filters.eq;
+
+import java.util.List;
+import java.util.Optional;
+
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -20,10 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Optional;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
 @Service
 public class UserService extends AbstractService<UserModel> {
@@ -66,6 +68,10 @@ public class UserService extends AbstractService<UserModel> {
             throw new UserNotFoundException(email);
         }
         return user;
+    }
+
+    public List<UserModel> getAllByFilter(Bson filter) {
+        return super.getAllByFilter(filter);
     }
 
     /**
@@ -137,18 +143,25 @@ public class UserService extends AbstractService<UserModel> {
      * @return the Updated User
      */
 
-    public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address) {
-        var addressFilter = eq("hashCode", address.calculateHash().getHashCode());
-        var dbAddress = addressService.getOptional(addressFilter);
-        var user = this.get(userId);
-        if (dbAddress.isPresent()) {
-            addressService.addUserToAddress(dbAddress.get(), user.getId());
-            return this.addAddressToUser(user, dbAddress.get());
+    public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address, boolean lazy) {
 
-        } else {
-            addressService.save(address.addUserAddress(userId));
-            return this.addAddressToUser(user, address);
-        }
+        var user = this.get(userId);
+
+        var addedAddress = this.addressService.handleUserServiceAddressAdd(address, userId);
+
+        this.addAddressToUser(user, addedAddress);
+
+        return lazy ? user.setUserAddress(addedAddress.getId()) : user.setFullAddress(addedAddress);
+
+    }
+
+    public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
+        var updatingUser = this.get(userId);
+
+        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update,
+                userId);
+
+        return lazy ? updatingUser.setUserAddress(updatedAddress.getId()) : updatingUser.setFullAddress(updatedAddress);
     }
 
     /**
@@ -175,7 +188,7 @@ public class UserService extends AbstractService<UserModel> {
      */
     public UserModel addAddressToUser(UserModel user, AddressModel address) {
 
-        return this.updateUserAddressField(user.addAddress(address.getId()));
+        return this.updateUserAddressField(user.setUserAddress(address.getId()));
 
     }
 
@@ -189,7 +202,7 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel exchangeAddress(ObjectId userId, ObjectId addressToDelete, ObjectId addressToAdd) {
         var user = this.get(userId);
-        return this.updateUserAddressField(user.removeAddress(addressToDelete).addAddress(addressToAdd));
+        return this.updateUserAddressField(user.setUserAddress(addressToAdd));
 
     }
 
@@ -202,11 +215,11 @@ public class UserService extends AbstractService<UserModel> {
      * @return the edited User
      */
     public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
-        addressService.handleUserControllerAddressDelete(addressId, user.getId());
+        addressService.handleUserServiceAddressDelete(addressId, user.getId());
         try {
-            return this.updateUserAddressField(user.removeAddress(addressId));
+            return this.updateUserAddressField(user.setUserAddress(null));
         } catch (UnsupportedOperationException e) {
-            throw new AddressNotFoundException(addressId.toString());
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
         }
 
     }
@@ -219,7 +232,7 @@ public class UserService extends AbstractService<UserModel> {
      * @return the updated user
      */
     public UserModel updateUserAddressField(UserModel user) {
-        Bson updatedFields = set("addresses", user.getAddresses());
+        Bson updatedFields = Updates.set("userAddress", user.getUserAddress());
 
         var filter = Filters.eq("_id", user.getId());
 

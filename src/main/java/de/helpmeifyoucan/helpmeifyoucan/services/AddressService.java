@@ -1,13 +1,15 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Updates.set;
+
+import java.util.Collections;
+import java.util.Optional;
+
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
+
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Collections;
-import java.util.Optional;
-
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
 @Service
 public class AddressService extends AbstractService<AddressModel> {
@@ -92,24 +94,11 @@ public class AddressService extends AbstractService<AddressModel> {
         return this.updateExistingField(updatedFields, address.getId());
     }
 
-    /**
-     * UserController calls this Method to process AddressModel after it deleted a
-     * User from its references
-     *
-     * @param addressId the edited Address
-     * @param userId    the User who held the address
-     */
-    public void handleUserControllerAddressDelete(ObjectId addressId, ObjectId userId) {
-        try {
-            this.deleteUserFromAddress(this.get(addressId), userId);
-        } catch (Exception e) {
-            throw new AddressNotFoundException(addressId.toString());
-        }
-    }
+
+
 
     /**
-     * We want to add a user to addresses user references and do so by updating the
-     * addresses users field
+     * We want to add a user to addresses user references and do so by updating the addresses users field
      *
      * @param address the address to update
      * @param userId  Users userId to add
@@ -120,9 +109,53 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     /**
-     * We want to delete a User from a Addresses references and insert it back into
-     * the db. We do not want to insert Address with no referneces back into the db,
-     * so we check for it
+     * User want to update his userAddress, so give him this entrypoint into the controller to manage the workflow
+     *
+     * @param update the update to perform
+     * @param userId this updating user
+     * @return the id of the new or updated Address
+     */
+
+    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
+
+
+        if (addressToUpdate == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+        }
+        return this.updateAddress(addressToUpdate, update, userId);
+    }
+
+
+    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
+        var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
+        var dbAddress = this.getOptional(addressFilter);
+
+        if (dbAddress.isPresent()) {
+            return this.addUserToAddress(dbAddress.get(), userId);
+        } else {
+            return this.save(addressToAdd.addUserAddress(userId));
+        }
+
+    }
+
+    /**
+     * UserController calls this Method to process AddressModel after it deleted a
+     * User from its references
+     *
+     * @param addressId the edited Address
+     * @param userId    the User who held the address
+     */
+    public void handleUserServiceAddressDelete(ObjectId addressId, ObjectId userId) {
+        try {
+            this.deleteUserFromAddress(this.get(addressId), userId);
+        } catch (Exception e) {
+            throw new AddressNotFoundException(addressId.toString());
+        }
+    }
+
+    /**
+     * We want to delete a User from a Addresses references and insert it back into the db. We do not want
+     * to insert Address with no referneces back into the db, so we check for it
      *
      * @param address Address to modify /delete
      * @param userId  user To delete from Address

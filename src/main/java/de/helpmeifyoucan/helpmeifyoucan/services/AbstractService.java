@@ -10,6 +10,8 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,13 +26,17 @@ public abstract class AbstractService<T extends AbstractEntity> {
         this.database = database;
     }
 
-    // TODO INSERTMANY
     protected T save(T entity) {
         this.collection.insertOne(entity);
         return entity;
     }
 
-    //TODO GETALL
+
+    protected List<T> getAllByFilter(Bson filter) {
+        return this.collection.find(filter).into(new LinkedList<>());
+
+    }
+
     protected T getById(ObjectId id) {
         var filter = Filters.eq("_id", id);
         return collection.find(filter).first();
