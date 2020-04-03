@@ -1,14 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.StreetNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.StreetPatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidStreet;
 
 public class StreetValidator implements ConstraintValidator<ValidStreet, String> {
@@ -26,11 +24,11 @@ public class StreetValidator implements ConstraintValidator<ValidStreet, String>
     public boolean isValid(String street, ConstraintValidatorContext context) {
         if (street == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.STREET_NOT_SET);
+                throw new StreetNotSetException();
             }
             return true;
         } else if (!STREET_PATTERN.matcher(street).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.STREET_PATTERN_ERROR);
+            throw new StreetPatternException();
         }
         return true;
     }

@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.CustomException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.NotFoundException;
 
-public class UserExceptions {
+public final class UserExceptions {
 
     public static class UserNotFoundException extends NotFoundException {
 

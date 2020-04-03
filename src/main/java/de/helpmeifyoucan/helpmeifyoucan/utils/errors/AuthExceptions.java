@@ -2,7 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.CustomException;
 
-public class AuthExceptions {
+public final class AuthExceptions {
 
     public static class PasswordMismatchException extends CustomException {
 

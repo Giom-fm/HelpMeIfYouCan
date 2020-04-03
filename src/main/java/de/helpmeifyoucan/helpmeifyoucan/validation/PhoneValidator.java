@@ -1,13 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PhoneNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PhonePatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 
 public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
@@ -25,11 +24,11 @@ public class PhoneValidator implements ConstraintValidator<ValidPhone, String> {
     public boolean isValid(String phone, ConstraintValidatorContext context) {
         if (phone == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PHONE_NOT_SET);
+                throw new PhoneNotSetException();
             }
             return true;
         } else if (!PHONE_PATTERN.matcher(phone).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PHONE_PATTERN_ERROR);
+            throw new PhonePatternException();
         }
         return true;
     }

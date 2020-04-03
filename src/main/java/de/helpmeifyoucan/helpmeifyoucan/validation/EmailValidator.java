@@ -1,9 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.EmailNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.EmailPatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 
 public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
@@ -19,18 +22,16 @@ public class EmailValidator implements ConstraintValidator<ValidEmail, String> {
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context) {
-
-        var valid = true;
-        context.disableDefaultConstraintViolation();
-
-        if (email == null && !this.canBeNull) {
-            context.buildConstraintViolationWithTemplate(ErrorMessages.EMAIL_NOT_SET).addConstraintViolation();
-            valid = false;
+        if (email == null) {
+            if (!this.canBeNull) {
+                throw new EmailNotSetException();
+            }
+            return true;
         } else if (!EMAIl_PATTERN.matcher(email).matches()) {
-            context.buildConstraintViolationWithTemplate(ErrorMessages.EMAIL_PATTERN_ERROR).addConstraintViolation();
-            valid = false;
+            throw new EmailPatternException();
         }
 
-        return valid;
+        return true;
+        
     }
 }
