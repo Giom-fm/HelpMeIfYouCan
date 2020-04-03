@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PhonePatternException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.ZipcodePatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.ZipCodeValidator;
 
@@ -29,7 +28,7 @@ public class ZipcodeValidationTest {
         assertFalse(validator.isValid("", null));
     }
 
-    @Test(expected = PhonePatternException.class)
+    @Test(expected = ZipcodePatternException.class)
     public void zipcode_ToShort() {
         assertFalse(validator.isValid("1234", null));
     }

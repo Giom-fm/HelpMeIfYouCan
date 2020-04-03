@@ -11,7 +11,7 @@ import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidStreet;
 
 public class StreetValidator implements ConstraintValidator<ValidStreet, String> {
 
-    private static final String STREET_REGEX = "^(([A-ZÄÜÖ]|[a-zäüöß]){3,24}(\\s|-))*([A-ZÄÜÖ]|[a-zäüöß]){2,24}$";
+    private static final String STREET_REGEX = "^(([A-ZÄÜÖ]|[a-zäüöß]){3,24}(\\s|-))*([A-ZÄÜÖ]|[a-zäüöß]){3,24}$";
     private static final Pattern STREET_PATTERN = Pattern.compile(STREET_REGEX);
     private boolean canBeNull;
 
