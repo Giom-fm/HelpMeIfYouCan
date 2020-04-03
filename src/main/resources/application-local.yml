@@ -18,7 +18,7 @@ database:
   host: "localhost"
   name: helpmeifyoucan
 jwt:
-  secret: yeipu7koo6ceez5quieDeenooxeep9wu
+  secret: ujaerahgh4ohqui6OJ8ta9aughaitha5ohtookaem1eeH3doh9hei0Oovu8kai1H
   expiration: 864000000
 logbook:
   format.style: http
