@@ -1,13 +1,15 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
+
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordAlphabeticException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordLengthException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordNumericException;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 
 public class PasswordValidator implements ConstraintValidator<ValidPassword, String> {
 
@@ -29,26 +31,17 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
     @Override
     public boolean isValid(String password, ConstraintValidatorContext context) {
 
-        String message = "";
-        boolean valid = true;
         if (password == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_NOT_SET);
+                throw new PasswordNotSetException();
             }
             return true;
         } else if (!LENGTH_PATTERN.matcher(password).matches()) {
-            message = ErrorMessages.PASSWORD_LENGTH;
-            valid = false;
+            throw new PasswordLengthException();
         } else if (!NUMERIC_PATTERN.matcher(password).matches()) {
-            message = ErrorMessages.PASSWORD_NUMERIC;
-            valid = false;
+            throw new PasswordNumericException();
         } else if (!ALPHABETIC_PATTERN.matcher(password).matches()) {
-            message = ErrorMessages.PASSWORD_ALPHABETIC;
-            valid = false;
-        }
-
-        if (!valid) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, message);
+            throw new PasswordAlphabeticException();
         }
 
         return true;

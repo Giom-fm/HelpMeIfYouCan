@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan;
+package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.junit.Assert.assertEquals;
@@ -28,7 +28,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFound
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class UserModelServiceTest {
+public class UserServiceTest {
 
 
     @Autowired
@@ -50,6 +50,13 @@ public class UserModelServiceTest {
 
     }
 
+    public void clearCollection() {
+        this.userService.getCollection().drop();
+        this.userService.createIndex();
+
+        this.addressService.getCollection().drop();
+        this.addressService.createIndex();
+    }
 
     @Test
     public void withTwoUsersSavedInCollection_TheOnesMatchingTheFilterShouldBeReturned() {
@@ -278,17 +285,4 @@ public class UserModelServiceTest {
         assertEquals(updatedUser.getUserAddress(), address.getId());
 
     }
-
-
-    @Before
-    public void clearCollection() {
-        this.userService.getCollection().drop();
-        this.userService.createIndex();
-
-        this.addressService.getCollection().drop();
-        this.addressService.createIndex();
-
-    }
-
-
 }

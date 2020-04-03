@@ -1,10 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-public class AbstractExceptions {
+public final class AbstractExceptions {
 
     public static abstract class CustomException extends RuntimeException {
-
-        private static final long serialVersionUID = 8958131703713106616L;
+     
+        private static final long serialVersionUID = 722628591402222442L;
         private Object data;
         private int code;
 

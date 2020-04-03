@@ -1,13 +1,13 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidCountry;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
+import java.util.regex.Pattern;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
-import java.util.regex.Pattern;
+
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.CountryNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.CountryPatternException;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidCountry;
 
 public class CountryValidator implements ConstraintValidator<ValidCountry, String> {
 
@@ -25,11 +25,11 @@ public class CountryValidator implements ConstraintValidator<ValidCountry, Strin
 
         if (country == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.COUNTRY_NOT_SET);
+                throw new CountryNotSetException();
             }
             return true;
         } else if (!COUNTRY_PATTERN.matcher(country).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.COUNTRY_PATTERN_ERROR);
+            throw new CountryPatternException();
         }
         return true;
     }

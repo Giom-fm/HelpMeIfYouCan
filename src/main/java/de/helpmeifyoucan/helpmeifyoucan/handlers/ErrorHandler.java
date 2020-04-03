@@ -32,13 +32,13 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public final ResponseEntity<ErrorResponse> handleAuthenticationExceptions(AuthenticationException ex) {
-        var error = new ErrorResponse(ex.getMessage(), 123, null);
+        var error = new ErrorResponse(ex.getMessage(), 500, null);
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
     public final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
-        var error = new ErrorResponse("Internal Server Error", 999, null);
+        var error = new ErrorResponse("Internal Server Error", 0, null);
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -1,13 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.ZipcodeNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.ZipcodePatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidZipCode;
 
 public class ZipCodeValidator implements ConstraintValidator<ValidZipCode, String> {
@@ -25,11 +24,11 @@ public class ZipCodeValidator implements ConstraintValidator<ValidZipCode, Strin
     public boolean isValid(String zipcode, ConstraintValidatorContext context) {
         if (zipcode == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.ZIPCODE_NOT_SET);
+                throw new ZipcodeNotSetException();
             }
             return true;
         } else if (!ZIPCODE_PATTERN.matcher(zipcode).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.ZIPCODE_PATTERN_ERROR);
+            throw new ZipcodePatternException();
         }
         return true;
     }

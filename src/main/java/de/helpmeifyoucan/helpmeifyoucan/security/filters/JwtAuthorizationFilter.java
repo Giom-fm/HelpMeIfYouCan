@@ -40,7 +40,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 var jwtAuthenticationAttempt = new JwtAuthentication(token);
                 var jwtAuthenticationResult = this.authenticationManager.authenticate(jwtAuthenticationAttempt);
                 SecurityContextHolder.getContext().setAuthentication(jwtAuthenticationResult);
-                chain.doFilter(request, response);
             }
         } catch (AuthenticationException ex) {
             SecurityContextHolder.clearContext();
@@ -52,5 +51,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             FilterUtils.send(response, error);
         }
 
+        chain.doFilter(request, response);
     }
 }

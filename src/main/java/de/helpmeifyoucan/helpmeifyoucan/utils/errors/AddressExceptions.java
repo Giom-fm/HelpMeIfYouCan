@@ -4,7 +4,7 @@ import org.bson.types.ObjectId;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.NotFoundException;
 
-public class AddressExceptions {
+public final class  AddressExceptions {
 
     public static class AddressNotFoundException extends NotFoundException {
 

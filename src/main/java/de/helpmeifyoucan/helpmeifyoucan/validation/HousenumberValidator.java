@@ -1,18 +1,17 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.HousenumberNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.HousenumberPatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidHouseNumber;
 
-public class HouseNumberValidator implements ConstraintValidator<ValidHouseNumber, String> {
+public class HousenumberValidator implements ConstraintValidator<ValidHouseNumber, String> {
 
-    private static final String HOUSENUMBER_REGEX = "^[1-9][0-9]{0,2}(\\s)?[a-zA-Z]?$";
+    private static final String HOUSENUMBER_REGEX = "^[1-9][0-9]{0,3}(\\s)?[a-zA-Z]?$";
     private static final Pattern HOUSENUMBER_PATTERN = Pattern.compile(HOUSENUMBER_REGEX);
     private boolean canBeNull;
 
@@ -25,11 +24,11 @@ public class HouseNumberValidator implements ConstraintValidator<ValidHouseNumbe
     public boolean isValid(String houseNumber, ConstraintValidatorContext context) {
         if (houseNumber == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.HOUSENUMBER_NOT_SET);
+                throw new HousenumberNotSetException();
             }
             return true;
         } else if (!HOUSENUMBER_PATTERN.matcher(houseNumber).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.HOUSENUMBER_PATTERN_ERROR);
+            throw new HousenumberPatternException();
         }
         return true;
     }
