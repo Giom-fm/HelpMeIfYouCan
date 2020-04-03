@@ -1,7 +1,7 @@
 spring:
   profiles: local
   main:
-    banner-mode: off
+    banner-mode: console
     lazy-initialization: false
 server:
   port: 8080
@@ -18,7 +18,7 @@ database:
   host: "localhost"
   name: helpmeifyoucan
 jwt:
-  secret: ujaerahgh4ohqui6OJ8ta9aughaitha5ohtookaem1eeH3doh9hei0Oovu8kai1H
+  secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
   expiration: 864000000
 logbook:
   format.style: http

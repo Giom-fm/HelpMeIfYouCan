@@ -54,7 +54,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         } catch (JwtException ex) {
             throw new BadCredentialsException("Token is invalid", ex);
         }
-
     }
 
     public String generateToken(Authentication authentication) {
