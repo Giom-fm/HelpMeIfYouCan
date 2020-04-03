@@ -11,6 +11,7 @@ import de.helpmeifyoucan.helpmeifyoucan.dao.Database;
 @Configuration
 public class AppConfig {
 
+    
     @Bean
     public MongoDatabase setDatabase(DatabaseConfig config) {
         return new Database(config).getDatabase();
