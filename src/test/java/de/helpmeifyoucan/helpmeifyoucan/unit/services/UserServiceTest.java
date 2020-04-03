@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.services;
+package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.junit.Assert.assertEquals;
@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
@@ -48,6 +50,13 @@ public class UserServiceTest {
 
     }
 
+    public void clearCollection() {
+        this.userService.getCollection().drop();
+        this.userService.createIndex();
+
+        this.addressService.getCollection().drop();
+        this.addressService.createIndex();
+    }
 
     @Test
     public void withTwoUsersSavedInCollection_TheOnesMatchingTheFilterShouldBeReturned() {
@@ -276,17 +285,4 @@ public class UserServiceTest {
         assertEquals(updatedUser.getUserAddress(), address.getId());
 
     }
-
-
-    @Before
-    public void clearCollection() {
-        this.userService.getCollection().drop();
-        this.userService.createIndex();
-
-        this.addressService.getCollection().drop();
-        this.addressService.createIndex();
-
-    }
-
-
 }

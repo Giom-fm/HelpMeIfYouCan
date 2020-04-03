@@ -1,4 +1,5 @@
-package de.helpmeifyoucan.helpmeifyoucan.validation;
+package de.helpmeifyoucan.helpmeifyoucan.unit.validation;
+
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -6,6 +7,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.NamePatternException;
+import de.helpmeifyoucan.helpmeifyoucan.validation.NameValidator;
 
 public class NameValidationTest {
 

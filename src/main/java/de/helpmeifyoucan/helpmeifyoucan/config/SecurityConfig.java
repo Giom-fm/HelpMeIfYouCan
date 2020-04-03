@@ -73,11 +73,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 return source;
         }
 
-        private JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
+        JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
                 return new JwtAuthorizationFilter(this.authenticationManager(), this.errorHandler);
         }
 
-        private AuthenticationProcessingFilter authenticationProcessingFilter() throws Exception {
+        AuthenticationProcessingFilter authenticationProcessingFilter() throws Exception {
                 return new AuthenticationProcessingFilter(this.authenticationManager(), this.jwtAuthenticationProvider,
                                 this.failureHandler);
         }

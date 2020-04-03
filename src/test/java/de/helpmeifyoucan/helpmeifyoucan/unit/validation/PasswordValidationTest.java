@@ -1,4 +1,5 @@
-package de.helpmeifyoucan.helpmeifyoucan.validation;
+package de.helpmeifyoucan.helpmeifyoucan.unit.validation;
+
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -8,6 +9,7 @@ import org.junit.Test;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordAlphabeticException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordLengthException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.PasswordNumericException;
+import de.helpmeifyoucan.helpmeifyoucan.validation.PasswordValidator;
 
 public class PasswordValidationTest {
 
