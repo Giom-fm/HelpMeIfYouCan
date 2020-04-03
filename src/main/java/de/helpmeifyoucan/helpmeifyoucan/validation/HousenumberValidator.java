@@ -9,9 +9,9 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.Housen
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.HousenumberPatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidHouseNumber;
 
-public class HouseNumberValidator implements ConstraintValidator<ValidHouseNumber, String> {
+public class HousenumberValidator implements ConstraintValidator<ValidHouseNumber, String> {
 
-    private static final String HOUSENUMBER_REGEX = "^[1-9][0-9]{0,2}(\\s)?[a-zA-Z]?$";
+    private static final String HOUSENUMBER_REGEX = "^[1-9][0-9]{0,3}(\\s)?[a-zA-Z]?$";
     private static final Pattern HOUSENUMBER_PATTERN = Pattern.compile(HOUSENUMBER_REGEX);
     private boolean canBeNull;
 

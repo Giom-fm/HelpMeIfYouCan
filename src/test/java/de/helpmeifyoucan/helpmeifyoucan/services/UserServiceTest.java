@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan;
+package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.junit.Assert.assertEquals;
@@ -19,8 +19,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
@@ -28,7 +26,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFound
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-public class UserModelServiceTest {
+public class UserServiceTest {
 
 
     @Autowired
