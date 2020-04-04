@@ -17,7 +17,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -57,21 +56,9 @@ public class UserService extends AbstractService<UserModel> {
         return user;
     }
 
-    public UserModel getById(ObjectId id) {
-        return super.getById(id);
-    }
-
     public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
-        var user = super.getByFilter(filter);
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
-        }
-        return user;
-    }
-
-    public List<UserModel> getAllByFilter(Bson filter) {
-        return super.getAllByFilter(filter);
+        return Optional.ofNullable(super.getByFilter(filter)).orElseThrow();
     }
 
     /**
@@ -92,40 +79,10 @@ public class UserService extends AbstractService<UserModel> {
 
         var updateFilter = eq(id);
 
-        var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
+        return super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
-        if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.UPDATE_FAILED);
-        }
-        return updatedUser;
     }
 
-    public boolean exits(Bson filter) {
-        return super.exists(filter);
-    }
-
-    /**
-     * We want to know if an object matching our filter exists, so we query the db for it. if it exists it will be inside the optional otherwise its not
-     *
-     * @param filter the filter to search by
-     * @return the Optional containing the object
-     */
-
-    public Optional<UserModel> getOptional(Bson filter) {
-        return super.getOptional(filter);
-    }
-
-    /**
-     * We want to delete a user by its id
-     *
-     * @param id the user id to delete
-     */
-
-    public void delete(ObjectId id) {
-        if (!super.delete(Filters.eq("_id", id)).wasAcknowledged()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
-        }
-    }
 
     /**
      * The user requests to add a new address to his addresses, as we dont want to
@@ -234,11 +191,8 @@ public class UserService extends AbstractService<UserModel> {
 
         var filter = Filters.eq("_id", user.getId());
 
-        var updatedUser = super.updateExistingFields(filter, updatedFields);
-        if (updatedUser == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
-        }
-        return updatedUser;
+        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow();
+
     }
 
 

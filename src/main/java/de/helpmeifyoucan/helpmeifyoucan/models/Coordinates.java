@@ -1,14 +1,19 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.EmbeddedCoordsMapper;
 import org.bson.types.ObjectId;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+
+@JsonSerialize(using = EmbeddedCoordsMapper.class)
 public class Coordinates extends AbstractEntity {
+
     @JsonIgnore
     protected List<ObjectId> offers;
 
@@ -27,15 +32,6 @@ public class Coordinates extends AbstractEntity {
         this.requests = new LinkedList<>();
     }
 
-
-    public List<ObjectId> getHelpOffers() {
-        return offers;
-    }
-
-    public Coordinates setHelpOffers(List<ObjectId> offers) {
-        this.offers = offers;
-        return this;
-    }
 
     public <T extends AbstractHelpModel> Coordinates addHelpModel(T model) {
         if (model instanceof HelpOfferModel) {
@@ -57,11 +53,18 @@ public class Coordinates extends AbstractEntity {
     }
 
     public boolean noOtherRefsBesideId(ObjectId id) {
-        return (this.requests.size() == 1 && this.requests.contains(id)) || (this.offers.size() == 1 && this.offers.contains(id));
+        return (this.offers.isEmpty() && this.requests.size() == 1 && this.requests.contains(id)) || (this.requests.isEmpty() && this.offers.size() == 1 && this.offers.contains(id));
     }
 
     public boolean hasRefToId(Object id) {
-        return (this.requests.size() > 0 && this.requests.contains(id)) || (this.offers.size() > 0 && this.offers.contains(id));
+        return this.requests.contains(id) || this.offers.contains(id);
+    }
+
+    public <T extends AbstractHelpModel> Coordinates clearRefsAndAddId(T helpModel) {
+        this.requests.clear();
+        this.offers.clear();
+
+        return this.addHelpModel(helpModel);
     }
 
     public List<ObjectId> getHelpRequests() {
@@ -70,6 +73,15 @@ public class Coordinates extends AbstractEntity {
 
     public Coordinates setHelpRequests(List<ObjectId> requests) {
         this.requests = requests;
+        return this;
+    }
+
+    public List<ObjectId> getHelpOffers() {
+        return offers;
+    }
+
+    public Coordinates setHelpOffers(List<ObjectId> offers) {
+        this.offers = offers;
         return this;
     }
 
@@ -97,7 +109,7 @@ public class Coordinates extends AbstractEntity {
     }
 
     public boolean noHelpModelRefs() {
-        return (this.requests != null && this.requests.size() > 0) || (this.offers != null && this.offers.size() > 0);
+        return this.requests.isEmpty() && this.offers.isEmpty();
     }
 
     public int getHashCode() {
@@ -115,6 +127,7 @@ public class Coordinates extends AbstractEntity {
     }
 
     public Coordinates mergeWithUpdate(CoordinatesUpdate update) {
+
         super.mergeWithUpdate(update, this);
         return this.calculateHashCode();
     }
@@ -138,9 +151,9 @@ public class Coordinates extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "Coordinates{" +
-                "helpOffers=" + offers +
-                ", requests=" + requests +
+        return "Coordinates{" + "id=" + id +
+                ", helpOffers=" + offers +
+                ", helpRequests=" + requests +
                 ", latitude=" + latitude +
                 ", longitude=" + longitude +
                 ", hashCode=" + hashCode +

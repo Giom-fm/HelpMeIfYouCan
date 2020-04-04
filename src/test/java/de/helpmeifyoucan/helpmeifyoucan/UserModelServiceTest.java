@@ -24,7 +24,8 @@ import static org.junit.Assert.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class UserModelServiceTest {
 
-
+    @Autowired
+    private StaticDbClear clear;
     @Autowired
     private UserService userService;
 
@@ -39,7 +40,6 @@ public class UserModelServiceTest {
 
     @Before
     public void setUpTest() {
-        clearCollection();
         testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de").setPhoneNr("901890");
 
     }
@@ -93,12 +93,12 @@ public class UserModelServiceTest {
     @Test
     public void afterSavingUser_ExistsShouldBeTrue() {
         this.userService.save(testUser);
-        assertTrue(this.userService.exits(eq(testUser.getId())));
+        assertTrue(this.userService.exists(eq(testUser.getId())));
     }
 
     @Test
     public void givenNotExistingId_ExistsShouldBeFalse() {
-        assertFalse(this.userService.exits(eq(new ObjectId())));
+        assertFalse(this.userService.exists(eq(new ObjectId())));
     }
 
 
@@ -106,9 +106,9 @@ public class UserModelServiceTest {
     public void afterSavingUserAndDeletingUser_UserShouldNotExistAnymore() {
         this.userService.save(testUser);
 
-        this.userService.delete(testUser.getId());
+        this.userService.deleteById(testUser.getId());
 
-        assertFalse(this.userService.exits(eq(testUser.getId())));
+        assertFalse(this.userService.exists(eq(testUser.getId())));
     }
 
     @Test(expected = MongoWriteException.class)
@@ -129,6 +129,8 @@ public class UserModelServiceTest {
         assertEquals(testUser, retrievedUser);
     }
 
+
+    //TODO
     @Test(expected = ResponseStatusException.class)
     public void givenNotExistingEmail_NotFoundShouldThrowNotFound() {
         this.userService.getByEmail("notExisting");
@@ -137,7 +139,7 @@ public class UserModelServiceTest {
 
     @Test
     public void existsOnNotExistingUser_ShouldBeFalse() {
-        assertFalse(this.userService.exits(eq(new ObjectId())));
+        assertFalse(this.userService.exists(eq(new ObjectId())));
     }
 
     @Test(expected = ResponseStatusException.class)
@@ -261,6 +263,8 @@ public class UserModelServiceTest {
 
     }
 
+
+    //TODO
     @Test(expected = ResponseStatusException.class)
     public void givenWrongUserIdAddressIdCombination_MethodShouldThrowException() {
         testUser.setId(new ObjectId());
@@ -275,6 +279,7 @@ public class UserModelServiceTest {
     }
 
 
+    //TODO
     @Test(expected = ResponseStatusException.class)
     public void givenWrongUserId_FieldsShouldNotBeUpdatedAndExceptionShouldBeThrown() {
         this.userService.updateUserAddressField(testUser.setUserAddress(new ObjectId()));
@@ -293,11 +298,7 @@ public class UserModelServiceTest {
 
     @Before
     public void clearCollection() {
-        this.userService.getCollection().drop();
-        this.userService.createIndex();
-
-        this.addressService.getCollection().drop();
-        this.addressService.createIndex();
+        clear.clearDb();
 
     }
 

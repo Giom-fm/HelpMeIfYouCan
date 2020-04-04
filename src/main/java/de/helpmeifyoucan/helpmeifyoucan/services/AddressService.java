@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Collections;
 import java.util.Optional;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
 @Service
@@ -30,7 +30,7 @@ public class AddressService extends AbstractService<AddressModel> {
         this.createIndex();
     }
 
-    public void createIndex() {
+    private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
@@ -41,43 +41,6 @@ public class AddressService extends AbstractService<AddressModel> {
         return super.save(address.calculateHash());
     }
 
-    public AddressModel get(ObjectId id) {
-        var address = super.getById(id);
-        if (address == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
-        return address;
-    }
-
-    public AddressModel getById(ObjectId id) {
-        return super.getById(id);
-    }
-
-    public boolean exists(Bson filter) {
-        return super.getOptional(filter).isPresent();
-    }
-
-
-    public boolean deleteById(ObjectId id) {
-        var filter = eq("_id", id);
-
-        return super.delete(filter).getDeletedCount() > 0;
-    }
-
-    public Optional<AddressModel> getOptional(Bson filter) {
-        return super.getOptional(filter);
-    }
-
-    public AddressModel updateExistingField(Bson updatedFields, ObjectId address) {
-        var filter = eq(address);
-        var updatedAddress = super.updateExistingFields(filter, updatedFields);
-
-        if (updatedAddress == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
-        }
-
-        return updatedAddress;
-    }
 
     /**
      * When changes to User references occur, wen want the db model to change accodingly, we do so by
@@ -88,9 +51,10 @@ public class AddressService extends AbstractService<AddressModel> {
      */
 
     public AddressModel updateUserField(AddressModel address) {
+        var idFilter = eq(address.getId());
         Bson updatedFields = set("users", address.getUsers());
 
-        return this.updateExistingField(updatedFields, address.getId());
+        return super.updateExistingFields(idFilter, updatedFields);
     }
 
 
@@ -106,7 +70,8 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
 
-    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
+    private AddressModel addNewAddress(AddressModel addressToAdd, ObjectId userId) {
+
         var addressFilter = eq("hashCode", addressToAdd.calculateHash().getHashCode());
         var dbAddress = this.getOptional(addressFilter);
 
@@ -115,7 +80,11 @@ public class AddressService extends AbstractService<AddressModel> {
         } else {
             return this.save(addressToAdd.addUserAddress(userId));
         }
+    }
 
+    public AddressModel handleUserServiceAddressAdd(AddressModel addressToAdd, ObjectId userId) {
+
+        return this.addNewAddress(addressToAdd, userId);
     }
 
     /**
@@ -128,26 +97,24 @@ public class AddressService extends AbstractService<AddressModel> {
 
     public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
 
+        var userHasPermission = this.userHasPermissionToUpdateAddress(addressToUpdate, userId);
 
-        if (addressToUpdate == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
-        return this.updateAddress(addressToUpdate, update, userId);
+        return this.updateAddress(userHasPermission, update, userId);
     }
 
 
     /**
      * UserController calls this Method to process AddressModel after it deleted a User from its references
      *
-     * @param addressId the edited Address
-     * @param userId    the User who held the address
+     * @param userId the User who held the address
      */
-    public void handleUserServiceAddressDelete(ObjectId addressId, ObjectId userId) {
-        try {
-            this.deleteUserFromAddress(this.get(addressId), userId);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
+    public AddressModel handleUserServiceAddressDelete(ObjectId addressToBeDeleted, ObjectId userId) {
+
+        //TODO EXCEPTION
+        var userHasPermission = this.userHasPermissionToUpdateAddress(addressToBeDeleted, userId);
+
+        return this.deleteUserFromAddress(userHasPermission, userId);
+
     }
 
 
@@ -160,17 +127,14 @@ public class AddressService extends AbstractService<AddressModel> {
      */
 
     //FIXME THIS WILL NOT BE VALID WITH ADDED REFERENCES
-    public AddressModel deleteUserFromAddress(AddressModel address, ObjectId userId) {
-        if (!address.containsUser(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
-        }
+    private AddressModel deleteUserFromAddress(AddressModel address, ObjectId userId) {
+
         var addressWithUserRemoved = address.removeUserAddress(userId);
 
         if (addressWithUserRemoved.noUserReferences()) {
-            if (this.deleteById(addressWithUserRemoved.getId())) {
-                return address;
-            }
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED);
+            //TODO EXCEPTION
+
+            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED));
 
         } else {
             return this.updateUserField(addressWithUserRemoved);
@@ -185,29 +149,23 @@ public class AddressService extends AbstractService<AddressModel> {
      * The address has other users referring to it: we need to delete the requesting user from the addresses userreferences,
      * create a new address, check if its hashcode already and add the requesting user to its or the matching address user references
      *
-     * @param addressId     the Address to update
      * @param addressUpdate the update changes
      * @param userId        the user who requested the update
      * @return the new or updated address
      */
-    public AddressModel updateAddress(ObjectId addressId, AddressUpdate addressUpdate, ObjectId userId) {
-        var address = this.getOptional(eq("_id", addressId));
+    private AddressModel updateAddress(AddressModel address, AddressUpdate addressUpdate, ObjectId userId) {
 
-        if (address.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
-        }
-        var existingAddress = address.get();
-        var mergeWithAddressUpdate = existingAddress.mergeWithAddressUpdate(addressUpdate);
+        var mergeWithAddressUpdate = address.mergeWithAddressUpdate(addressUpdate);
         var filter = eq("hashCode", mergeWithAddressUpdate.getHashCode());
         var optionalAddressModel = this.getOptional(filter);
 
-        if (existingAddress.noUserReferences() || (existingAddress.getUsers().size() == 1 && existingAddress.getUsers().contains(userId))) {
+        if (address.noUserReferences() || (address.getUsers().size() == 1)) {
 
-            return this.updateAddressWithNoOtherReferences(addressUpdate, existingAddress, optionalAddressModel, userId);
+            return this.updateAddressWithNoOtherReferences(addressUpdate, address, optionalAddressModel, userId);
 
         } else {
 
-            return this.updateAddressWithOtherReferences(mergeWithAddressUpdate, existingAddress, optionalAddressModel, userId);
+            return this.updateAddressWithOtherReferences(mergeWithAddressUpdate, address, optionalAddressModel, userId);
         }
     }
 
@@ -222,11 +180,7 @@ public class AddressService extends AbstractService<AddressModel> {
      * @param userId                   the user
      * @return the Updated /saved address
      */
-    public AddressModel updateAddressWithOtherReferences(AddressModel mergedAddress, AddressModel addressToUpdate, Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
-
-        if (!addressToUpdate.containsUser(userId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
-        }
+    private AddressModel updateAddressWithOtherReferences(AddressModel mergedAddress, AddressModel addressToUpdate, Optional<AddressModel> potentialExistingAddress, ObjectId userId) {
 
         this.deleteUserFromAddress(addressToUpdate, userId);
 
@@ -253,8 +207,15 @@ public class AddressService extends AbstractService<AddressModel> {
             this.deleteUserFromAddress(existingAddress, userId);
             return this.addUserToAddress(potentialExistingAddress.get(), userId);
         } else {
-            return this.updateExistingField(addressUpdate.toFilter(), existingAddress.getId());
+            return super.updateExistingFields(eq(existingAddress.getId()), addressUpdate.toFilter());
         }
+    }
+
+    private AddressModel userHasPermissionToUpdateAddress(ObjectId addressId, ObjectId userId) {
+        var addressIdAndUserIdFilter = and(eq(addressId), in("users", userId));
+
+        //TODO
+        return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter)).orElseThrow();
     }
 
 

@@ -35,7 +35,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
-        super.createIndex(Indexes.ascending("datePublished"), options);
+        super.createIndex(Indexes.ascending("datePublished", "user"), options);
     }
 
     public HelpRequestModel save(HelpRequestModel requestModel) {
@@ -71,9 +71,12 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
     public HelpRequestModel saveNewRequest(HelpRequestModel request, ObjectId user) {
 
         request.generateId();
-        var requestWithCoordsAdded = request.setCoordinates(this.coordinatesService.handleHelpModelCoordinateAdd(request));
 
-        return this.save(requestWithCoordsAdded);
+        var addedCords = this.coordinatesService.handleHelpModelCoordinateAdd(request);
+
+        this.updateEmbeddedCoordinates(addedCords);
+
+        return this.save(request.setCoordinates(addedCords));
     }
 
     public HelpRequestModel handleCoordinatesUpdate(ObjectId requestId, CoordinatesUpdate update, ObjectId updatingUser) {
@@ -81,17 +84,31 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
         var updatedCoordinates = this.coordinatesService.handleHelpModelCoordinateUpdate(requestToUpdate, update);
 
-        return this.updateCoordinatesField(requestToUpdate, updatedCoordinates);
+        this.updateEmbeddedCoordinates(updatedCoordinates);
+
+        return requestToUpdate.setCoordinates(updatedCoordinates);
     }
 
-    public void deleteRequest(ObjectId requestToDelete, ObjectId deletingUser) {
+    public HelpRequestModel deleteRequest(ObjectId requestToDelete, ObjectId deletingUser) {
 
         var deleteFilter = and(eq(requestToDelete), in("user", deletingUser));
 
-        if (super.delete(deleteFilter).getDeletedCount() == 0) {
-            //TODO exception
-        }
+        var deletedOffer = this.findOneAndDelete(deleteFilter);
 
+        var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedOffer);
+
+        this.updateEmbeddedCoordinates(deletedCoords);
+
+        return deletedOffer;
+
+    }
+
+    public long updateEmbeddedCoordinates(Coordinates updatedCoords) {
+        var filter = in("coordinates._id", updatedCoords.getId());
+
+        var update = set("coordinates", updatedCoords);
+
+        return this.updateMany(filter, update).getModifiedCount();
     }
 
 

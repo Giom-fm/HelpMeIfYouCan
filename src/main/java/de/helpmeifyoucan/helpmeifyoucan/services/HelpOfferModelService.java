@@ -7,13 +7,16 @@ import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
-import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
 
+@Service
 public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
     private CoordinatesService coordinatesService;
@@ -21,7 +24,7 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
     @Autowired
     public HelpOfferModelService(MongoDatabase dataBase, CoordinatesService coordinatesService) {
         super(dataBase);
-        super.createCollection("helpRequests", HelpOfferModel.class);
+        super.createCollection("helpOffers", HelpOfferModel.class);
         this.createIndex();
         this.coordinatesService = coordinatesService;
     }
@@ -30,22 +33,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
-        super.createIndex(Indexes.ascending("datePublished"), options);
+        super.createIndex(Indexes.ascending("datePublished", "user"), options);
     }
-
-    public HelpOfferModel save(HelpOfferModel requestModel) {
-        return super.save(requestModel);
-    }
-
-    public HelpOfferModel getById(ObjectId id) {
-        var filter = eq(id);
-        return super.getByFilter(filter);
-    }
-
-    public boolean exists(Bson filter) {
-        return this.getOptional(filter).isPresent();
-    }
-
 
     public HelpOfferModel update(ObjectId requestToUpdate, HelpOfferUpdate update, ObjectId updatingUser) {
 
@@ -59,44 +48,55 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         return updatedRequest;
     }
 
-    public HelpOfferModel saveNewRequest(HelpOfferModel request, ObjectId user) {
+    public HelpOfferModel saveNewOffer(HelpOfferModel offer, ObjectId user) {
 
-        request.generateId();
-        var requestWithCoordsAdded = request.setCoordinates(this.coordinatesService.handleHelpModelCoordinateAdd(request));
+        offer.generateId();
 
-        return this.save(requestWithCoordsAdded);
+        var addedCoords = this.coordinatesService.handleHelpModelCoordinateAdd(offer);
+
+        this.updateEmbeddedCoordinates(addedCoords);
+
+        return this.save(offer.setCoordinates(addedCoords).setUser(user));
     }
 
     public HelpOfferModel handleCoordinatesUpdate(ObjectId offerId, CoordinatesUpdate update, ObjectId updatingUser) {
-        var offerToUpdate = getByRequestIdAndUser(offerId, updatingUser);
+        var offerToUpdate = userIsAllowedToEditModel(offerId, updatingUser);
 
         var updatedCoordinates = this.coordinatesService.handleHelpModelCoordinateUpdate(offerToUpdate, update);
 
-        return this.updateCoordinatesField(offerToUpdate, updatedCoordinates);
+        this.updateEmbeddedCoordinates(updatedCoordinates);
+
+        return offerToUpdate.setCoordinates(updatedCoordinates);
+
     }
 
-    public void deleteRequest(ObjectId requestToDelete, ObjectId deletingUser) {
+    public HelpOfferModel deleteRequest(ObjectId requestToDelete, ObjectId deletingUser) {
 
         var deleteFilter = and(eq(requestToDelete), in("user", deletingUser));
 
-        if (super.delete(deleteFilter).getDeletedCount() == 0) {
-            //TODO exception
-        }
-
-    }
-
-    private HelpOfferModel updateCoordinatesField(HelpOfferModel offer, Coordinates coordinates) {
-        offer.setCoordinates(coordinates);
-        var updatedAddress = set("coordinates", coordinates);
-        return super.updateExistingFields(eq(offer.getId()), updatedAddress);
-    }
-
-    public HelpOfferModel getByRequestIdAndUser(ObjectId requestId, ObjectId userId) {
-
-        var userHasPermission = super.getOptional(and(eq(requestId), in("user", userId)));
-
         //TODO
-        return userHasPermission.orElseThrow();
+        var deletedOffer = Optional.ofNullable(this.findOneAndDelete(deleteFilter)).orElseThrow();
+
+        var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedOffer);
+
+        this.updateEmbeddedCoordinates(deletedCoords);
+
+        return deletedOffer;
+
+    }
+
+    public long updateEmbeddedCoordinates(Coordinates updatedCoords) {
+        var filter = in("coordinates._id", updatedCoords.getId());
+
+        var update = set("coordinates", updatedCoords);
+
+        return this.updateMany(filter, update).getModifiedCount();
+    }
+
+    public HelpOfferModel userIsAllowedToEditModel(ObjectId requestId, ObjectId userId) {
+
+        return Optional.ofNullable(getByFilter(and(eq(requestId), in("user", userId)))).orElseThrow();
+
 
     }
 }

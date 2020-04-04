@@ -5,11 +5,16 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class HelpOfferModel extends AbstractHelpModel {
 
     protected List<HelpCategoryEnum> categories;
+
+    public HelpOfferModel() {
+        this.categories = new LinkedList<>();
+    }
 
     public HelpOfferModel setUser(ObjectId user) {
         this.user = user;
@@ -29,6 +34,11 @@ public class HelpOfferModel extends AbstractHelpModel {
 
     public HelpOfferModel setStatus(PostStatusEnum status) {
         this.status = status;
+        return this;
+    }
+
+    public HelpOfferModel setDatePublished(Date date) {
+        this.datePublished = date;
         return this;
     }
 
@@ -54,5 +64,17 @@ public class HelpOfferModel extends AbstractHelpModel {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return "HelpOfferModel{" +
+                " id=" + id +
+                ", categories=" + categories +
+                ", user=" + user +
+                ", coordinates=" + coordinates +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", datePublished=" + datePublished +
 
+                '}';
+    }
 }

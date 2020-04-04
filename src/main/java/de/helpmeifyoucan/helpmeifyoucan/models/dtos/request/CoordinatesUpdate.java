@@ -4,9 +4,9 @@ import org.bson.conversions.Bson;
 
 public class CoordinatesUpdate extends ModelUpdate {
 
-    protected double latitude;
+    public double latitude;
 
-    protected double longitude;
+    public double longitude;
 
     public double getLatitude() {
         return latitude;

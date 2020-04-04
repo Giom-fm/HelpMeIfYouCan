@@ -1,5 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
 
@@ -9,7 +11,9 @@ import java.util.Objects;
 public abstract class AbstractHelpModel extends AbstractEntity {
 
 
+    @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId user;
+
 
     protected Coordinates coordinates;
 
@@ -18,7 +22,6 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     protected PostStatusEnum status;
 
     protected Date datePublished;
-
 
     public ObjectId getUser() {
         return user;
@@ -59,7 +62,8 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     @Override
     public String toString() {
         return "AbstractHelp{" +
-                "user=" + user +
+                "id" + id +
+                ", user=" + user +
                 ", coordinates=" + coordinates +
                 ", description='" + description + '\'' +
                 ", status=" + status +

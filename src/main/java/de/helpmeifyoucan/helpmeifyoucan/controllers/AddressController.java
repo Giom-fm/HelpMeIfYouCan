@@ -5,6 +5,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class AddressController {
 
     AddressService addressModelController;
 
+    @Autowired
     public AddressController(AddressService addressModelController) {
         this.addressModelController = addressModelController;
     }
@@ -36,9 +38,10 @@ public class AddressController {
     }
 
 
+    //TODO
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
-        return addressModelController.updateAddress(id, address, getIdFromContext());
+        return addressModelController.handleUserServiceAddressUpdate(id, address, getIdFromContext());
 
     }
 
