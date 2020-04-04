@@ -1,24 +1,21 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
-
-import java.util.Collections;
-import java.util.Optional;
-
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
+import java.util.Collections;
+import java.util.Optional;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Updates.set;
 
 @Service
 public class AddressService extends AbstractService<AddressModel> {
@@ -139,7 +136,7 @@ public class AddressService extends AbstractService<AddressModel> {
         if (addressWithUserRemoved.noUserReferences()) {
             //TODO EXCEPTION
 
-            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.DELETE_NOT_ACKNOWLEDGED));
+            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new UserNotFoundException(userId));
 
         } else {
             return this.updateUserField(addressWithUserRemoved);

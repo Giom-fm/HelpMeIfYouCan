@@ -11,14 +11,11 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -200,7 +197,7 @@ public class UserService extends AbstractService<UserModel> {
 
         var filter = Filters.eq("_id", user.getId());
 
-        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow(() -> UserNotFoundException(user.getEmail()));
+        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     }
 

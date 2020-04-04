@@ -1,6 +1,7 @@
-package de.helpmeifyoucan.helpmeifyoucan;
+package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
 
+import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
