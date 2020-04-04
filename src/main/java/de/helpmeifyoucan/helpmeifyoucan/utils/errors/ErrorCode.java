@@ -15,6 +15,11 @@ public enum ErrorCode {
      */
     USER_TAKEN(109, "User \"%s\" already taken"),
 
+    /**
+     * {@code 400 - User \"%s\" not found}
+     */
+    USER_EMAIL_NOT_FOUND(104, "UserEmail \"%s\" not found"),
+
     // -------------------------------------------------------------------------
     // Address
     // -------------------------------------------------------------------------
@@ -164,7 +169,7 @@ public enum ErrorCode {
     private int code;
     private String message;
 
-    private ErrorCode(int code, String message) {
+    ErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

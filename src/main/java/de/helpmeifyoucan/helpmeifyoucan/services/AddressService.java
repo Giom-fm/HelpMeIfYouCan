@@ -5,7 +5,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +111,6 @@ public class AddressService extends AbstractService<AddressModel> {
      */
     public AddressModel handleUserServiceAddressDelete(ObjectId addressToBeDeleted, ObjectId userId) {
 
-        //TODO EXCEPTION
         var userHasPermission = this.userHasPermissionToUpdateAddress(addressToBeDeleted, userId);
 
         return this.deleteUserFromAddress(userHasPermission, userId);
@@ -134,9 +133,8 @@ public class AddressService extends AbstractService<AddressModel> {
         var addressWithUserRemoved = address.removeUserAddress(userId);
 
         if (addressWithUserRemoved.noUserReferences()) {
-            //TODO EXCEPTION
 
-            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new UserNotFoundException(userId));
+            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new AddressExceptions.AddressNotFoundException(address.getId()));
 
         } else {
             return this.updateUserField(addressWithUserRemoved);
@@ -223,7 +221,7 @@ public class AddressService extends AbstractService<AddressModel> {
         var addressIdAndUserIdFilter = and(eq(addressId), in("users", userId));
 
         //TODO
-        return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter)).orElseThrow();
+        return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter)).orElseThrow(() -> new AddressExceptions.AddressNotFoundException(addressId));
     }
 
 

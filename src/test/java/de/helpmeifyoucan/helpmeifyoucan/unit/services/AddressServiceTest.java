@@ -7,7 +7,6 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -60,15 +59,6 @@ private StaticDbClear clear;
     }
 
 
-    //TODO
-
-
-      @Test(expected = AddressNotFoundException.class)
-      public void givenNotExistingObjectId_NotFoundShouldBeThrown() {
-      this.addressService.getById(new ObjectId());
-      }
-
-
     @Test
     public void givenExistingObjectIdAndUpdate_AddressFieldsShouldBeUpdatedAccordingly() {
         this.testUser.setId(new ObjectId());
@@ -94,11 +84,6 @@ private StaticDbClear clear;
         AddressModel updatedAddress = this.addressService.updateUserField(testAddress);
 
         assertTrue(updatedAddress.getUsers().contains(dummy));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void givenAddressNotContainingUserAddress_ExceptionShouldBeThrown() {
-        this.addressService.handleUserServiceAddressDelete(testAddress.getId(), new ObjectId());
     }
 
 

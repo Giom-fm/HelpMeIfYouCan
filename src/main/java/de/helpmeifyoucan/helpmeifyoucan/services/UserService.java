@@ -10,6 +10,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -59,7 +60,7 @@ public class UserService extends AbstractService<UserModel> {
     //TODO
     public UserModel getByEmail(String email) throws UserNotFoundException {
         var filter = Filters.eq("email", email);
-        return Optional.ofNullable(super.getByFilter(filter)).orElseThrow();
+        return Optional.ofNullable(super.getByFilter(filter)).orElseThrow(() -> new UserExceptions.UserNotFoundByEmailException(email));
     }
 
     /**

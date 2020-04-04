@@ -9,6 +9,7 @@ import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import org.bson.types.ObjectId;
 import org.junit.Before;
@@ -134,7 +135,7 @@ public class UserServiceTest {
         assertEquals(testUser, retrievedUser);
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test(expected = UserExceptions.UserNotFoundByEmailException.class)
     public void givenNotExistingEmail_NotFoundShouldThrowNotFound() {
         this.userService.getByEmail("notExisting");
 
