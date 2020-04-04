@@ -76,14 +76,12 @@ private StaticDbClear clear;
 
     @Test
     public void givenValidAddress_UserFieldShouldBeUpdatedAccordingly() {
-        this.addressService.save(testAddress);
 
-        ObjectId dummy = new ObjectId();
-        testAddress.addUserAddress(dummy);
+        testUser.setId(new ObjectId());
+        this.addressService.handleUserServiceAddressAdd(testAddress, testUser.getId());
 
-        AddressModel updatedAddress = this.addressService.updateUserField(testAddress);
-
-        assertTrue(updatedAddress.getUsers().contains(dummy));
+        var updatedAddress = this.addressService.getById(testAddress.getId());
+        assertTrue(updatedAddress.getUsers().contains(testUser.getId()));
     }
 
 

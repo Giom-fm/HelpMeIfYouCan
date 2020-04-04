@@ -4,6 +4,7 @@ import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
@@ -211,7 +212,7 @@ public class UserServiceTest {
         this.userService.save(testUser);
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
-        UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address.generateId(), false);
 
         assertEquals(updatedUser.getUserAddress(), address.getId());
     }
@@ -221,34 +222,8 @@ public class UserServiceTest {
         testUser.setId(new ObjectId());
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
-        UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address.generateId(), false);
 
-    }
-
-    @Test
-    public void givenUserWithAddedAddressAndAddressToDelete_ItShouldExchangeAddressesAccordingly() {
-        AddressModel addressToDelete = new AddressModel().generateId();
-
-        testUser.setUserAddress(addressToDelete.getId());
-        this.userService.save(testUser);
-
-        AddressModel addressToAdd = new AddressModel().generateId();
-
-        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToAdd.getId());
-        assertEquals(updatedUser.getUserAddress(), (addressToAdd.getId()));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void givenNotExistingUserId_ExchangeAddressesShouldThrowException() {
-        AddressModel addressToDelete = new AddressModel().generateId();
-
-        testUser.setUserAddress(addressToDelete.getId());
-
-        testUser.setId(new ObjectId());
-
-        AddressModel addressToAdd = new AddressModel().generateId();
-
-        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToAdd.getId());
     }
 
     @Test
@@ -261,7 +236,7 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.deleteAddressFromUser(this.userService.get(testUser.getId()), address.getId());
+        UserModel updatedUser = this.userService.handleUserAddressDeleteRequest(this.userService.get(testUser.getId()).getId(), address.getId());
 
         assertTrue(updatedUser.noAddressReference());
 
@@ -277,21 +252,21 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        this.userService.deleteAddressFromUser(testUser, new ObjectId());
+        this.userService.handleUserAddressDeleteRequest(testUser.getId(), new ObjectId());
     }
 
 
 
     @Test(expected = UserNotFoundException.class)
     public void givenWrongUserId_FieldsShouldNotBeUpdatedAndExceptionShouldBeThrown() {
-        this.userService.updateUserAddressField(testUser.setUserAddress(new ObjectId()));
+        this.userService.handleUserAddressUpdateRequest(new ObjectId(), new AddressUpdate(), false);
     }
 
     @Test
     public void givenRightUser_AddressFieldShouldBeUpdatedAccordingly() {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.userService.save(testUser);
-        UserModel updatedUser = this.userService.updateUserAddressField(testUser.setUserAddress(address.getId()));
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address, false);
 
         assertEquals(updatedUser.getUserAddress(), address.getId());
 

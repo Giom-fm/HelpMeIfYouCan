@@ -37,28 +37,21 @@ public class UserService extends AbstractService<UserModel> {
         createIndex();
     }
 
-    public void createIndex() {
+    private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
         super.createIndex(Indexes.ascending("email"), options);
     }
 
-    public UserModel save(UserModel user) {
-        return super.save(user);
-    }
 
     public UserModel get(ObjectId id) {
-        var user = super.getById(id);
 
-        if (user == null) {
-            throw new UserNotFoundException(id);
-        }
-        return user;
+        return Optional.ofNullable(super.getById(id)).orElseThrow(() -> new UserExceptions.UserNotFoundException(id));
+
     }
 
-    //TODO
-    public UserModel getByEmail(String email) throws UserNotFoundException {
+    public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
         return Optional.ofNullable(super.getByFilter(filter)).orElseThrow(() -> new UserExceptions.UserNotFoundByEmailException(email));
     }
@@ -148,7 +141,7 @@ public class UserService extends AbstractService<UserModel> {
      * @param address Address to add
      * @return the updated user
      */
-    public UserModel addAddressToUser(UserModel user, AddressModel address) {
+    private UserModel addAddressToUser(UserModel user, AddressModel address) {
 
         return this.updateUserAddressField(user.setUserAddress(address.getId()));
 
@@ -161,7 +154,7 @@ public class UserService extends AbstractService<UserModel> {
      * @param addressToAdd address to add
      */
 
-    public UserModel exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
+    private UserModel exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
         var user = this.get(userId);
         return this.updateUserAddressField(user.setUserAddress(addressToAdd));
 
@@ -175,7 +168,7 @@ public class UserService extends AbstractService<UserModel> {
      * @param addressId Address to delete
      * @return the edited User
      */
-    public UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
+    private UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserServiceAddressDelete(addressId, user.getId());
         try {
             return this.updateUserAddressField(user.setUserAddress(null));
@@ -193,7 +186,7 @@ public class UserService extends AbstractService<UserModel> {
      * @param user the user to update
      * @return the updated user
      */
-    public UserModel updateUserAddressField(UserModel user) {
+    private UserModel updateUserAddressField(UserModel user) {
         Bson updatedFields = set("userAddress", user.getUserAddress());
 
         var filter = Filters.eq("_id", user.getId());
