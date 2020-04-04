@@ -98,7 +98,7 @@ public class Annotations {
     }
 
     @Documented
-    @Constraint(validatedBy = HouseNumberValidator.class)
+    @Constraint(validatedBy = HousenumberValidator.class)
     @Target({ ElementType.FIELD })
     @Retention(RetentionPolicy.RUNTIME)
     public @interface ValidHouseNumber {

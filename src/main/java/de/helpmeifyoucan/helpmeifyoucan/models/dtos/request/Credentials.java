@@ -1,13 +1,25 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
+
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 
 public class Credentials {
 
-
+    @ValidEmail
     private String email;
-    
+
     @ValidPassword
     private String password;
+
+    public Credentials(){
+
+    }
+
+    public Credentials(String email, String password){
+        this.email = email;
+        this.password = password;
+    }
+
 
     public String getEmail() {
         return email;

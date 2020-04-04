@@ -5,7 +5,11 @@
 * Java 11
 
 ## Start
-Select the profile that you want to use in *application.yml*.
-Set environment variables *DATABASE_PASSWORD* with your credentials.
+Set environment variable *DATABASE_PASSWORD* with your credentials.  
+Set environment variable *PROFILE* for your Spring profile.  
+Available Profiles:
+* local
+* development
+* production
 
-`set -lx DATABASE_PASSWORD <PASSWORD> && ./mvnw spring-boot:run`
+`set -lx DATABASE_PASSWORD <PASSWORD> && set -lx PROFILE <PROFILE> && ./mvnw spring-boot:run`

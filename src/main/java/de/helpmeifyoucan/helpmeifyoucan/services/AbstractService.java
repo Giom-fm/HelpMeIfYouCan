@@ -89,7 +89,6 @@ public abstract class AbstractService<T extends AbstractEntity> {
 
     protected void createCollection(String collectionName, Class<T> collectionClass) {
         this.collection = database.getCollection(collectionName, collectionClass).withWriteConcern(WriteConcern.W1);
-        System.out.println(collection.getWriteConcern());
     }
 
     public void resetDB() {

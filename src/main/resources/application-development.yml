@@ -1,15 +1,17 @@
 spring:
   profiles: development
   main:
-    banner-mode: off
-    lazy-initialization: true
+    banner-mode: console
+    lazy-initialization: false
 server:
   port: 8080
+  error.include-stacktrace: always
 logging:
   level:
     .: error
     org.springframework: INFO
     org.zalando.logbook: TRACE
+    org.apache.tomcat: INFO
     org.mongodb.driver:
       .: INFO
       cluster: OFF
@@ -20,5 +22,16 @@ database:
   user: dbUser
   password: ${DATABASE_PASSWORD}
 jwt:
-  secret: yeipu7koo6ceez5quieDeenooxeep9wu
+  secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
   expiration: 864000000
+logbook:
+  format.style: http
+  filter.enabled: true
+  secure-filter.enabled: false
+  strategy: default
+  obfuscate:
+    headers:
+      - Authorization
+    parameters:
+      - password
+      - currentPassword

@@ -1,13 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.validation;
 
 import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
-
-import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.NameNotSetException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.NamePatternException;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
 
 public class NameValidator implements ConstraintValidator<ValidName, String> {
@@ -25,11 +24,11 @@ public class NameValidator implements ConstraintValidator<ValidName, String> {
     public boolean isValid(String name, ConstraintValidatorContext context) {
         if (name == null) {
             if (!this.canBeNull) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.NAME_NOT_SET);
+                throw new NameNotSetException();
             }
             return true;
         } else if (!NAME_PATTERN.matcher(name).matches()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.NAME_PATTERN_ERROR);
+            throw new NamePatternException();
         }
         return true;
     }

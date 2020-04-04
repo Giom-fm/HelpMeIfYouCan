@@ -8,6 +8,9 @@ import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ErrorMessages;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -51,18 +54,20 @@ public class UserService extends AbstractService<UserModel> {
         var user = super.getById(id);
 
         if (user == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.USER_NOT_FOUND);
+            throw new UserNotFoundException(id);
         }
         return user;
     }
 
-    public UserModel getByEmail(String email) {
+    //TODO
+    public UserModel getByEmail(String email) throws UserNotFoundException {
         var filter = Filters.eq("email", email);
         return Optional.ofNullable(super.getByFilter(filter)).orElseThrow();
     }
 
     /**
-     * We want to update the Uses given fields, so we first check if the password is correct, we then create a filter for these fields, to update them in the db
+     * We want to update the Uses given fields, so we first check if the password is
+     * correct, we then create a filter for these fields, to update them in the db
      * we then update the user and return the updated user
      *
      * @param updatedFields the fields to update
@@ -72,9 +77,12 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel update(UserUpdate updatedFields, ObjectId id) {
 
+        // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
+        // wird dann
+        // nur aufgerufen wenn es kein Auth exception gab.
         var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
         if (!hashedPassword) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ErrorMessages.PASSWORD_WRONG);
+            throw new PasswordMismatchException();
         }
 
         var updateFilter = eq(id);
@@ -111,14 +119,14 @@ public class UserService extends AbstractService<UserModel> {
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
         var updatingUser = this.get(userId);
 
-        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update, userId);
+        var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update,
+                userId);
 
         if (!updatedAddress.getId().equals(updatingUser.getUserAddress())) {
             this.exchangeAddress(userId, updatedAddress.getId());
         }
         return lazy ? updatingUser.setUserAddress(updatedAddress.getId()) : updatingUser.setFullAddress(updatedAddress);
     }
-
 
     /**
      * We want to get the User Model of the calling user, so we fetch it from db and
@@ -174,7 +182,8 @@ public class UserService extends AbstractService<UserModel> {
         try {
             return this.updateUserAddressField(user.setUserAddress(null));
         } catch (UnsupportedOperationException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, ErrorMessages.ADDRESS_NOT_FOUND);
+            // REVIEW UnsupportedOperationException ??
+            throw new AddressNotFoundException(addressId);
         }
 
     }
@@ -191,10 +200,9 @@ public class UserService extends AbstractService<UserModel> {
 
         var filter = Filters.eq("_id", user.getId());
 
-        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow();
+        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow(() -> UserNotFoundException(user.getEmail()));
 
     }
-
 
     @Autowired
     public void setAddressModelController(AddressService addressModelController) {

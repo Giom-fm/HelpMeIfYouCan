@@ -59,7 +59,7 @@ public class AddressController {
     }
 
     private ObjectId getIdFromContext() {
-        return new ObjectId(SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
