@@ -48,6 +48,10 @@ public class UserModel extends AbstractEntity {
     protected boolean verified;
 
 
+    public UserModel() {
+
+    }
+
     public UserModel setName(String name) {
         this.name = name;
         return this;

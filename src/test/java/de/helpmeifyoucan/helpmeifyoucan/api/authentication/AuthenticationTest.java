@@ -1,11 +1,11 @@
 package de.helpmeifyoucan.helpmeifyoucan.api.authentication;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.net.URI;
-import java.util.LinkedList;
-
+import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.LoginResponse;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,11 +20,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.Credentials;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.response.LoginResponse;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import java.net.URI;
+import java.util.LinkedList;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -34,6 +34,8 @@ public class AuthenticationTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private StaticDbClear clear;
     @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
@@ -46,8 +48,8 @@ public class AuthenticationTest {
 
     @Before
     public void setup() {
+        clear.clearDb();
         host = "http://localhost:" + port;
-        this.clearCollection();
         var roles = new LinkedList<Role>();
         roles.add(Role.ROLE_USER);
         user = new UserModel().setName("Name").setLastName("Lastname").setPassword(passwordEncoder.encode("password1"))
@@ -55,10 +57,6 @@ public class AuthenticationTest {
         this.userService.save(user);
     }
 
-    public void clearCollection() {
-        this.userService.getCollection().drop();
-        this.userService.createIndex();
-    }
 
     @Test
     public void signin_success() throws Exception {

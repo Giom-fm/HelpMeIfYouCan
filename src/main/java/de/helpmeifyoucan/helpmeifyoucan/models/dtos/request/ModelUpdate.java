@@ -19,6 +19,7 @@ public class ModelUpdate {
     protected Bson toFilter(Object obj) {
 
         Field[] runtimeFields = obj.getClass().getDeclaredFields();
+
         List<Bson> filter = new ArrayList<>();
 
         Arrays.stream(runtimeFields).filter(x -> {

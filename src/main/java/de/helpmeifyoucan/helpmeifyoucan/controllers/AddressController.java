@@ -1,10 +1,11 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import com.mongodb.MongoCommandException;
-import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class AddressController {
 
     AddressService addressModelController;
 
+    @Autowired
     public AddressController(AddressService addressModelController) {
         this.addressModelController = addressModelController;
     }
@@ -32,23 +34,25 @@ public class AddressController {
 
     @GetMapping("/{id}")
     public AddressModel get(@PathVariable ObjectId id) {
-        return addressModelController.get(id);
+        return addressModelController.getById(id);
     }
 
+
+    //TODO
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel update(@Valid @RequestBody AddressUpdate address, @PathVariable ObjectId id) {
-        return addressModelController.updateAddress(id, address, getIdFromContext());
+        return addressModelController.handleUserServiceAddressUpdate(id, address, getIdFromContext());
 
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{id}")
     public void delete(@PathVariable ObjectId id) {
-        this.addressModelController.delete(id);
+        this.addressModelController.deleteById(id);
     }
 
-    // REVIEW
-    @ExceptionHandler(value = { MongoCommandException.class })
+    //REVIEW
+    @ExceptionHandler(value = {MongoCommandException.class})
     protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "Address already exists";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);

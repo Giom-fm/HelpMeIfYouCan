@@ -54,8 +54,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
-        var id = this.getIdFromContext();
-        this.userModelController.delete(id);
+        this.userModelController.deleteById(this.getIdFromContext());
     }
 
     @Secured({ Role.ROLE_NAME_USER })
@@ -102,7 +101,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable ObjectId id) {
-        this.userModelController.delete(id);
+        this.userModelController.deleteById(id);
     }
 
     // REVIEW
