@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractHelpModel extends AbstractEntity {
@@ -14,6 +15,7 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId user;
 
+    protected List<HelpModelApplication> applications;
 
     protected Coordinates coordinates;
 
@@ -22,6 +24,7 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     protected PostStatusEnum status;
 
     protected Date datePublished;
+
 
     public ObjectId getUser() {
         return user;
@@ -43,6 +46,10 @@ public abstract class AbstractHelpModel extends AbstractEntity {
         return datePublished;
     }
 
+    public List<HelpModelApplication> getApplications() {
+        return applications;
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -61,12 +68,14 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     @Override
     public String toString() {
-        return "AbstractHelp{" +
-                "id" + id +
-                ", user=" + user +
+        return "AbstractHelpModel{" +
+                "user=" + user +
+                ", applications=" + applications +
                 ", coordinates=" + coordinates +
                 ", description='" + description + '\'' +
                 ", status=" + status +
+                ", datePublished=" + datePublished +
+                ", id=" + id +
                 '}';
     }
 }

@@ -4,7 +4,9 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpRequestUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.*;
 
 @Service
 public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
@@ -56,6 +58,48 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
     }
 
+    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, UserModel user) {
+
+        application.setUser(user).generateId();
+
+        var idFilter = eq(helpRequest);
+        var addApplicationsUpdate = push("applications", application);
+        super.updateExistingFields(idFilter, addApplicationsUpdate);
+
+        return application;
+    }
+
+    public void deleteApplication(ObjectId helpRequest, ObjectId application, ObjectId deletingUser) {
+
+        var idAndApplicationIdFilter = and(eq(helpRequest), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user._id", deletingUser))),
+                (elemMatch("acceptedApplication", and(eq(application), in("user._id", deletingUser))))));
+
+        var pullApplication = pull("applications", eq(application));
+        var pullAcceptedApplication = pull("acceptedApplication", eq(application));
+
+        var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
+
+        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
+    }
+
+
+    public HelpModelApplication acceptApplication(ObjectId helpRequest, ObjectId application, ObjectId acceptingUser) {
+
+        var idFilter = and(eq(helpRequest), eq("user", acceptingUser), elemMatch("applications", eq(application)));
+
+        var offer = Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow();
+
+        var acceptedApplication = offer.acceptApplication(application);
+
+        var addApplicationToAccepted = push("acceptedApplication", acceptedApplication);
+
+        var removeApplicationFromApplications = pull("applications", eq(application));
+
+        this.updateExistingFields(eq(helpRequest), combine(addApplicationToAccepted, removeApplicationFromApplications));
+
+        return acceptedApplication;
+    }
+
 
     /**
      * We want to save a new helpRequest, so we first generate an id, to then save the embedded coordinates and finally save the request with a added ref to the added coordinates
@@ -66,7 +110,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
      */
     public HelpRequestModel saveNewRequest(HelpRequestModel request, ObjectId user) {
 
-        request.generateId();
+        request.setUser(user).generateId();
 
         var addedCords = this.coordinatesService.handleHelpModelCoordinateAdd(request);
 

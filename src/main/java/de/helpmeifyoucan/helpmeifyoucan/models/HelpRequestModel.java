@@ -5,15 +5,31 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class HelpRequestModel extends AbstractHelpModel {
 
+    protected HelpModelApplication acceptedApplication;
 
     protected Date dateDue;
 
     protected HelpCategoryEnum category;
 
+
+    public HelpRequestModel setApplications(List<HelpModelApplication> applications) {
+        this.applications = applications;
+        return this;
+    }
+
+    public HelpModelApplication getAcceptedApplication() {
+        return acceptedApplication;
+    }
+
+    public HelpRequestModel setAcceptedApplication(HelpModelApplication acceptedApplication) {
+        this.acceptedApplication = acceptedApplication;
+        return this;
+    }
 
     public HelpRequestModel setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
@@ -60,6 +76,14 @@ public class HelpRequestModel extends AbstractHelpModel {
     public HelpRequestModel setCategory(HelpCategoryEnum category) {
         this.category = category;
         return this;
+    }
+
+    public HelpModelApplication acceptApplication(ObjectId application) {
+        //TODO
+        var acceptedApplication = this.applications.stream().filter(x -> x.getId().equals(application)).findFirst().orElseThrow();
+        this.acceptedApplication = acceptedApplication;
+        this.applications.remove(acceptedApplication);
+        return acceptedApplication;
     }
 
     public HelpRequestModel generateId() {

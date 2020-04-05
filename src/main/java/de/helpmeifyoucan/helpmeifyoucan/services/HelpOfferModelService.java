@@ -4,6 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.*;
 
 @Service
 public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
@@ -51,8 +52,51 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
 
         return Optional.ofNullable(super.updateExistingFields(updateFilter, update.toFilter())).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(offerToUpdate));
-
     }
+
+
+    public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application) {
+        application.generateId();
+
+        var idFilter = eq(helpOffer);
+        var addApplicationsUpdate = push("applications", application);
+        super.updateExistingFields(idFilter, addApplicationsUpdate);
+
+        return application;
+    }
+
+    public boolean deleteApplication(ObjectId helpOffer, ObjectId application, ObjectId deletingUser) {
+
+        var idAndApplicationIdFilter = and(eq(helpOffer), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user._id", deletingUser))),
+                (elemMatch("acceptedApplications", and(eq(application), in("user._id", deletingUser))))));
+
+        var pullApplication = pull("applications", eq(application));
+        var pullAcceptedApplication = pull("acceptedApplications", eq(application));
+
+        var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
+
+        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
+
+        return true;
+    }
+
+    public HelpModelApplication acceptApplication(ObjectId helpOffer, ObjectId application, ObjectId acceptingUser) {
+
+        var idFilter = and(eq(helpOffer), eq("user", acceptingUser), elemMatch("applications", eq(application)));
+
+        var offer = Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow();
+
+        var acceptedApplication = offer.acceptApplication(application);
+
+        var addApplicationToAccepted = push("acceptedApplications", acceptedApplication);
+
+        var removeApplicationFromApplications = pull("applications", eq(application));
+
+        this.updateExistingFields(eq(helpOffer), combine(addApplicationToAccepted, removeApplicationFromApplications));
+
+        return acceptedApplication;
+    }
+
 
     /**
      * We want to save a new helpOffer, so we first generate an id,  to then save the embedded coordinates and finally save the offer with a added ref to the added coordinates

@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RequestMapping("/address")
 public class AddressController {
 
-    AddressService addressModelController;
+   private AddressService addressModelController;
 
     @Autowired
     public AddressController(AddressService addressModelController) {

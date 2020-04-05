@@ -10,10 +10,31 @@ import java.util.List;
 
 public class HelpOfferModel extends AbstractHelpModel {
 
+    protected List<HelpModelApplication> acceptedApplications;
+
     protected List<HelpCategoryEnum> categories;
+
 
     public HelpOfferModel() {
         this.categories = new LinkedList<>();
+
+        this.acceptedApplications = new LinkedList<>();
+
+    }
+
+
+    public HelpOfferModel setApplications(List<HelpModelApplication> applications) {
+        this.applications = applications;
+        return this;
+    }
+
+    public List<HelpModelApplication> getAcceptedApplications() {
+        return acceptedApplications;
+    }
+
+    public HelpOfferModel setAcceptedApplications(List<HelpModelApplication> acceptedApplications) {
+        this.acceptedApplications = acceptedApplications;
+        return this;
     }
 
     public HelpOfferModel setUser(ObjectId user) {
@@ -55,6 +76,14 @@ public class HelpOfferModel extends AbstractHelpModel {
         this.categories.add(category);
 
         return this;
+    }
+
+    public HelpModelApplication acceptApplication(ObjectId application) {
+        //TODO
+        var acceptedApplication = this.applications.stream().filter(x -> x.getId().equals(application)).findFirst().orElseThrow();
+        this.acceptedApplications.add(acceptedApplication);
+        this.applications.remove(acceptedApplication);
+        return acceptedApplication;
     }
 
 

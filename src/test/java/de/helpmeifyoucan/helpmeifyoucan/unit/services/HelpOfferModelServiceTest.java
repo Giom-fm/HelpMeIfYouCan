@@ -2,6 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
 import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
@@ -20,7 +21,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
@@ -43,9 +44,10 @@ public class HelpOfferModelServiceTest {
     @Before
     public void setUpTest() {
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
-        testUser = new UserModel();
+        testUser = new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de");
         testUser.setId(new ObjectId());
         testOffer = new HelpOfferModel().setUser(testUser.getId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+        clear.clearDb();
     }
 
     @Test
@@ -86,8 +88,45 @@ public class HelpOfferModelServiceTest {
     }
 
 
-    @Before
-    public void clearDb() {
-        clear.clearDb();
+    @Test
+    public void givenApplicationsToSave_itShouldBeSaved() {
+        this.helpService.saveNewOffer(testOffer, testUser.getId());
+
+        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+
+        var updateOffer = this.helpService.getById(testOffer.getId());
+
+        assertEquals(updateOffer.getApplications().get(0), testApplication);
+
+        assertTrue(updateOffer.getApplications().contains(testApplication));
     }
+
+    @Test
+    public void givenApplicationToDelete_itShouldBeRemoved() {
+        this.helpService.saveNewOffer(testOffer, testUser.getId());
+
+        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+
+        this.helpService.deleteApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
+
+        var updatedOffer = this.helpService.getById(testOffer.getId());
+        assertFalse(updatedOffer.getApplications().contains(testApplication));
+    }
+
+    @Test
+    public void givenApplicationToAccept_itShouldBeAcceptedCorrectly() {
+        this.helpService.saveNewOffer(testOffer, testUser.getId());
+
+        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+
+        this.helpService.acceptApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
+    }
+
+
 }
