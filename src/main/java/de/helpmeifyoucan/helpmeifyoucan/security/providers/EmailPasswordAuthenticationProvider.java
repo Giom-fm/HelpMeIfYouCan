@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 import de.helpmeifyoucan.helpmeifyoucan.security.authentications.EmailPasswordAuthentication;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 
 @Component
 public class EmailPasswordAuthenticationProvider implements AuthenticationProvider {
@@ -38,10 +37,9 @@ public class EmailPasswordAuthenticationProvider implements AuthenticationProvid
                 throw new BadCredentialsException("Credentials are invalid");
             }
             return new EmailPasswordAuthentication(user, this.rolesToAuthoritys(user.getRoles()));
-        } catch (UserNotFoundException ex) {
-            throw new BadCredentialsException("Credentials are invalid");
+        } catch (Exception ex) {
+            throw new BadCredentialsException("Credentials are invalid", ex);
         }
-
     }
 
     @Override

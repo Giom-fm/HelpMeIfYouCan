@@ -15,9 +15,9 @@ public enum ErrorCode {
     USER_TAKEN(109, "User \"%s\" already taken"),
 
     /**
-     * {@code 400 - User \"%s\" not found}
+     * {@code 400 - Email \"%s\" not found}
      */
-    USER_EMAIL_NOT_FOUND(104, "UserEmail \"%s\" not found"),
+    USER_EMAIL_NOT_FOUND(104, "Email \"%s\" not found"),
 
     // -------------------------------------------------------------------------
     // Address
