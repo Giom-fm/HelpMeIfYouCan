@@ -58,7 +58,7 @@ public class HelpRequestController {
 
     @PostMapping(path = "/apply/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
-        return this.helpRequestModelService.saveNewApplication(requestId, application, userService.getById(getIdFromContext()));
+        return this.helpRequestModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
 
 

@@ -6,7 +6,6 @@ import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpRequestUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
@@ -25,12 +24,15 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
     private CoordinatesService coordinatesService;
 
+    private UserService userService;
+
     @Autowired
-    public HelpRequestModelService(MongoDatabase dataBase, CoordinatesService coordinatesService) {
+    public HelpRequestModelService(MongoDatabase dataBase, CoordinatesService coordinatesService, UserService userService) {
         super(dataBase);
         super.createCollection("helpRequests", HelpRequestModel.class);
         this.createIndex();
         this.coordinatesService = coordinatesService;
+        this.userService = userService;
     }
 
     private void createIndex() {
@@ -58,9 +60,11 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
     }
 
-    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, UserModel user) {
+    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {
 
-        application.setUser(user).generateId();
+        application.generateId();
+        this.userService.handleApplicationAdd(user, application);
+        application.setUser(user);
 
         var idFilter = eq(helpRequest);
         var addApplicationsUpdate = push("applications", application);
@@ -80,6 +84,8 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
+
+        this.userService.handleApplicationDelete(deletingUser, application);
     }
 
 
@@ -111,6 +117,8 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
     public HelpRequestModel saveNewRequest(HelpRequestModel request, ObjectId user) {
 
         request.setUser(user).generateId();
+
+        this.userService.handleHelpModelAdd(HelpRequestModel.class, request.getId(), user);
 
         var addedCords = this.coordinatesService.handleHelpModelCoordinateAdd(request);
 
@@ -153,13 +161,16 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
         var deleteFilter = and(eq(requestToDelete), in("user", deletingUser));
 
-        var deletedOffer = this.findOneAndDelete(deleteFilter);
+        var deletedRequest = this.findOneAndDelete(deleteFilter);
 
-        var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedOffer);
+        var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedRequest);
+
+        this.userService.handleHelpModelDelete(HelpRequestModel.class, requestToDelete, deletingUser);
+
 
         this.updateEmbeddedCoordinates(deletedCoords);
 
-        return deletedOffer;
+        return deletedRequest;
 
     }
 

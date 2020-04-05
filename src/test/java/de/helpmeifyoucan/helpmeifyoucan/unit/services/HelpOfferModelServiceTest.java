@@ -7,6 +7,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.HelpOfferModelService;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
@@ -35,6 +36,9 @@ public class HelpOfferModelServiceTest {
     @Autowired
     private HelpOfferModelService helpService;
 
+    @Autowired
+    private UserService userService;
+
     private HelpOfferModel testOffer;
 
     private UserModel testUser;
@@ -43,11 +47,13 @@ public class HelpOfferModelServiceTest {
 
     @Before
     public void setUpTest() {
+        clear.clearDb();
+
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
         testUser = new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de");
-        testUser.setId(new ObjectId());
         testOffer = new HelpOfferModel().setUser(testUser.getId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
-        clear.clearDb();
+        this.userService.save(testUser);
+
     }
 
     @Test
@@ -90,11 +96,12 @@ public class HelpOfferModelServiceTest {
 
     @Test
     public void givenApplicationsToSave_itShouldBeSaved() {
+
         this.helpService.saveNewOffer(testOffer, testUser.getId());
 
-        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+        var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         var updateOffer = this.helpService.getById(testOffer.getId());
 
@@ -105,11 +112,12 @@ public class HelpOfferModelServiceTest {
 
     @Test
     public void givenApplicationToDelete_itShouldBeRemoved() {
+
         this.helpService.saveNewOffer(testOffer, testUser.getId());
 
-        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+        var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         this.helpService.deleteApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
 
@@ -121,9 +129,9 @@ public class HelpOfferModelServiceTest {
     public void givenApplicationToAccept_itShouldBeAcceptedCorrectly() {
         this.helpService.saveNewOffer(testOffer, testUser.getId());
 
-        var testApplication = new HelpModelApplication().setUser(testUser).setMessage("testmessage").setTelephoneNr("01231548135");
+        var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication);
+        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         this.helpService.acceptApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
     }

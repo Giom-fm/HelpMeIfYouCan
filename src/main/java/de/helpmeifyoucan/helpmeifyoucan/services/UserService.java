@@ -4,11 +4,9 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
@@ -21,7 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.*;
 
 @Service
 public class UserService extends AbstractService<UserModel> {
@@ -131,6 +129,22 @@ public class UserService extends AbstractService<UserModel> {
         return this.deleteAddressFromUser(this.get(userId), addressId);
     }
 
+    public UserModel handleHelpModelAdd(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId, ObjectId userId) {
+        return this.addHelpModel(userId, modelId, modelClass);
+    }
+
+    public UserModel handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId, ObjectId userId) {
+        return this.deleteHelpModel(userId, modelId, modelClass);
+    }
+
+    public UserModel handleApplicationAdd(ObjectId userId, HelpModelApplication application) {
+        return this.addApplication(userId, application);
+    }
+
+    public UserModel handleApplicationDelete(ObjectId userId, ObjectId applicationId) {
+        return this.deleteApplication(userId, applicationId);
+    }
+
     // user address operations
 
     /**
@@ -170,13 +184,7 @@ public class UserService extends AbstractService<UserModel> {
      */
     private UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserServiceAddressDelete(addressId, user.getId());
-        try {
-            return this.updateUserAddressField(user.setUserAddress(null));
-        } catch (UnsupportedOperationException e) {
-            // REVIEW UnsupportedOperationException ??
-            throw new AddressNotFoundException(addressId);
-        }
-
+        return this.updateUserAddressField(user.setUserAddress(null));
     }
 
     /**
@@ -193,6 +201,29 @@ public class UserService extends AbstractService<UserModel> {
 
         return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
+    }
+
+    private UserModel addHelpModel(ObjectId userId, ObjectId modelId, Class<? extends AbstractHelpModel> model) {
+        var idFilter = eq(userId);
+        return model.equals(HelpOfferModel.class) ? super.updateExistingFields(idFilter, push("helpOffers", modelId)) : super.updateExistingFields(idFilter, push("helpRequests", modelId));
+    }
+
+    private UserModel deleteHelpModel(ObjectId userId, ObjectId modelId, Class<? extends AbstractHelpModel> model) {
+        var idFilter = eq(userId);
+        return model.equals(HelpOfferModel.class) ? super.updateExistingFields(idFilter, pull("helpOffers", eq(modelId))) : super.updateExistingFields(idFilter, pull("helpRequests", eq(modelId)));
+
+    }
+
+    private UserModel addApplication(ObjectId userId, HelpModelApplication application) {
+        var idFilter = eq(userId);
+
+        return this.updateExistingFields(idFilter, push("applications", application));
+    }
+
+    private UserModel deleteApplication(ObjectId userId, ObjectId applicationId) {
+        var idFilter = eq(userId);
+
+        return this.updateExistingFields(idFilter, pull("applications", eq(applicationId)));
     }
 
     @Autowired

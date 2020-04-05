@@ -1,6 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
@@ -13,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
@@ -38,6 +40,21 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     public Coordinates save(Coordinates coordinates) {
         return super.save(coordinates.calculateHashCode());
+    }
+
+    public List<Coordinates> getAll() {
+        var exists = Filters.exists("id");
+        return super.getAllByFilter(exists);
+    }
+
+    public List<Coordinates> getAllRequests() {
+        var requestFilter = where("this.helpRequests.length > 0");
+        return getAllByFilter(requestFilter);
+    }
+
+    public List<Coordinates> getAllOffers() {
+        var offerFilter = where("this.helpOffers.length > 0");
+        return getAllByFilter(offerFilter);
     }
 
 

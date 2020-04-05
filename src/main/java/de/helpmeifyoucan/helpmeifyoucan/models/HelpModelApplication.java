@@ -6,18 +6,39 @@ import java.util.Objects;
 
 public class HelpModelApplication extends AbstractEntity {
 
-
     private String message;
 
-    private UserModel user;
+    private String name;
+
+    private String lastName;
+
+    private ObjectId user;
 
     private String telephoneNr;
 
-    public UserModel getUser() {
+    public String getName() {
+        return name;
+    }
+
+    public HelpModelApplication setName(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public HelpModelApplication setLastName(String lastName) {
+        this.lastName = lastName;
+        return this;
+    }
+
+    public ObjectId getUser() {
         return user;
     }
 
-    public HelpModelApplication setUser(UserModel user) {
+    public HelpModelApplication setUser(ObjectId user) {
         this.user = user;
         return this;
     }
@@ -41,9 +62,10 @@ public class HelpModelApplication extends AbstractEntity {
     }
 
     public HelpModelApplication generateId() {
-        this.id = new ObjectId();
+        this.setId(new ObjectId());
         return this;
     }
+
 
     @Override
     public boolean equals(Object o) {

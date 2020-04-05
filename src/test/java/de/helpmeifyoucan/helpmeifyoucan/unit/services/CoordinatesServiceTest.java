@@ -229,6 +229,18 @@ public class CoordinatesServiceTest {
 
     }
 
+    @Test
+    public void savedTWoRequests_getAllRequestsShouldreturnBoth() {
+        HelpOfferModel testOffer = new HelpOfferModel().setCoordinates(testCoords).generateId();
+
+        testCoords.setHelpOffers(Collections.singletonList(testOffer.getId()));
+
+        this.coordinatesService.save(testCoords);
+
+        System.out.println(this.coordinatesService.getAllRequests());
+
+    }
+
 
     @Before
     public void clearDb() {

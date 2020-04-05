@@ -23,12 +23,15 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
     private CoordinatesService coordinatesService;
 
+    private UserService userService;
+
     @Autowired
-    public HelpOfferModelService(MongoDatabase dataBase, CoordinatesService coordinatesService) {
+    public HelpOfferModelService(MongoDatabase dataBase, CoordinatesService coordinatesService, UserService userService) {
         super(dataBase);
         super.createCollection("helpOffers", HelpOfferModel.class);
         this.createIndex();
         this.coordinatesService = coordinatesService;
+        this.userService = userService;
     }
 
     private void createIndex() {
@@ -55,8 +58,11 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
     }
 
 
-    public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application) {
+    public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application, ObjectId user) {
         application.generateId();
+
+        this.userService.handleApplicationAdd(user, application);
+        application.setUser(user);
 
         var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
@@ -65,10 +71,10 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         return application;
     }
 
-    public boolean deleteApplication(ObjectId helpOffer, ObjectId application, ObjectId deletingUser) {
+    public void deleteApplication(ObjectId helpOffer, ObjectId application, ObjectId deletingUser) {
 
-        var idAndApplicationIdFilter = and(eq(helpOffer), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user._id", deletingUser))),
-                (elemMatch("acceptedApplications", and(eq(application), in("user._id", deletingUser))))));
+        var idAndApplicationIdFilter = and(eq(helpOffer), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user", deletingUser))),
+                (elemMatch("acceptedApplications", and(eq(application), in("user", deletingUser))))));
 
         var pullApplication = pull("applications", eq(application));
         var pullAcceptedApplication = pull("acceptedApplications", eq(application));
@@ -77,7 +83,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
 
-        return true;
+        this.userService.handleApplicationDelete(deletingUser, application);
+
     }
 
     public HelpModelApplication acceptApplication(ObjectId helpOffer, ObjectId application, ObjectId acceptingUser) {
@@ -107,7 +114,9 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
      */
     public HelpOfferModel saveNewOffer(HelpOfferModel offer, ObjectId user) {
 
-        offer.generateId();
+        offer.setUser(user).generateId();
+
+        this.userService.handleHelpModelAdd(HelpOfferModel.class, offer.getId(), user);
 
         var addedCoords = this.coordinatesService.handleHelpModelCoordinateAdd(offer);
 
@@ -153,6 +162,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         var deletedOffer = Optional.ofNullable(this.findOneAndDelete(deleteFilter)).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(requestToDelete));
 
         var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedOffer);
+
+        this.userService.handleHelpModelDelete(HelpOfferModel.class, requestToDelete, deletingUser);
 
         this.updateEmbeddedCoordinates(deletedCoords);
 

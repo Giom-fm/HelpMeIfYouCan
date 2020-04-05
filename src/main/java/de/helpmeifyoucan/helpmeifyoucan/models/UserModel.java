@@ -1,20 +1,17 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import java.util.List;
-import java.util.Objects;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.types.ObjectId;
-
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.types.ObjectId;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+import java.util.Objects;
 
 public class UserModel extends AbstractEntity {
 
@@ -47,9 +44,42 @@ public class UserModel extends AbstractEntity {
 
     protected boolean verified;
 
+    protected List<ObjectId> helpRequests;
+
+    protected List<ObjectId> helpOffers;
+
+    protected List<HelpModelApplication> applications;
+
 
     public UserModel() {
 
+    }
+
+    public List<ObjectId> getHelpRequests() {
+        return helpRequests;
+    }
+
+    public UserModel setHelpRequests(List<ObjectId> helpRequests) {
+        this.helpRequests = helpRequests;
+        return this;
+    }
+
+    public List<ObjectId> getHelpOffers() {
+        return helpOffers;
+    }
+
+    public UserModel setHelpOffers(List<ObjectId> helpOffers) {
+        this.helpOffers = helpOffers;
+        return this;
+    }
+
+    public List<HelpModelApplication> getApplications() {
+        return applications;
+    }
+
+    public UserModel setApplications(List<HelpModelApplication> applications) {
+        this.applications = applications;
+        return this;
     }
 
     public UserModel setName(String name) {
