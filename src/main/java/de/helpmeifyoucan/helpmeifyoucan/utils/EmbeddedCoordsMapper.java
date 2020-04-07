@@ -26,8 +26,9 @@ public class EmbeddedCoordsMapper extends StdSerializer<Coordinates> {
 
         jgen.writeStartObject();
         jgen.writeStringField("id", value.getId().toString());
-        jgen.writeNumberField("latitude", value.getLatitude());
-        jgen.writeNumberField("longitude", value.getLongitude());
+        jgen.writeObjectField("helpOffers", value.getHelpOffers());
+        jgen.writeObjectField("helpRequests", value.getLongitude());
+        jgen.writeObjectField("location", value.getLocation());
         jgen.writeEndObject();
     }
 

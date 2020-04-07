@@ -2,9 +2,11 @@ package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.services.CoordinatesService;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,12 +31,17 @@ public class CoordinatesController {
 
     @GetMapping(path = "getall/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllRequests() {
-        return this.coordinatesService.getAllRequests();
+        return this.coordinatesService.getAllRequests(20, 50, 2);
     }
 
     @GetMapping(path = "/getall/offers", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllOffers() {
-        return this.coordinatesService.getAllOffers();
+        return this.coordinatesService.getAllOffers(20, 50, 2);
+    }
+
+    @GetMapping(path = "/{id}")
+    public Coordinates getById(@PathVariable ObjectId id) {
+        return this.coordinatesService.getById(id);
     }
 
 }

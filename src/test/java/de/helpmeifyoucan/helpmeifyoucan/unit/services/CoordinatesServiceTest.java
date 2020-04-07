@@ -1,5 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
@@ -75,7 +77,8 @@ public class CoordinatesServiceTest {
 
         var updatedCoords = this.coordinatesService.getById(testCoords.getId());
 
-        assertEquals(updatedCoords.getLatitude(), update.getLatitude(), 0.0);
+        assertEquals(updatedCoords.getLocation(),
+                new Point(new Position(update.getLongitude(), update.getLatitude())));
     }
 
     @Test
@@ -119,7 +122,8 @@ public class CoordinatesServiceTest {
 
         assertEquals(testCoords.getId(), testOffer.getCoordinates().getId());
 
-        assertEquals(updatedCoordinates.getLatitude(), update.getLatitude(), 0);
+        assertEquals(updatedCoordinates.getLocation(),
+                new Point(new Position(update.getLongitude(), update.getLatitude())));
     }
 
     @Test
@@ -235,9 +239,17 @@ public class CoordinatesServiceTest {
 
         testCoords.setHelpOffers(Collections.singletonList(testOffer.getId()));
 
+        var newCoordinates = new Coordinates();
+
+        HelpOfferModel anotherOne = new HelpOfferModel().setCoordinates(newCoordinates).generateId();
+
+        newCoordinates.setLatitude(51).setLongitude(21).setHelpOffers(Collections.singletonList(anotherOne.getId()));
+
+        this.coordinatesService.save(newCoordinates);
+
         this.coordinatesService.save(testCoords);
 
-        System.out.println(this.coordinatesService.getAllRequests());
+        System.out.println(this.coordinatesService.getAllOffers(20, 50, 10));
 
     }
 
