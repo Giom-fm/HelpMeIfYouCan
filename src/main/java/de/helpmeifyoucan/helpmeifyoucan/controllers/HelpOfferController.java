@@ -37,7 +37,7 @@ public class HelpOfferController {
         return this.helpOfferModelService.update(requestId, update, getIdFromContext());
     }
 
-    @PatchMapping(path = "/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/{requestId}/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpOfferModel updateCoords(@PathVariable ObjectId requestId, @RequestBody CoordinatesUpdate update) {
         return this.helpOfferModelService.handleCoordinatesUpdate(requestId, update, getIdFromContext());
     }
@@ -53,19 +53,19 @@ public class HelpOfferController {
     }
 
 
-    @PostMapping(path = "/apply/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{requestId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
         return this.helpOfferModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
 
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/unapply/{requestId}={applicationId}")
+    @DeleteMapping(path = "/{requestId}/{applicationId}/unapply")
     public void unApplyFromRequest(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
         this.helpOfferModelService.deleteApplication(requestId, applicationId, getIdFromContext());
     }
 
-    @PatchMapping(path = "/accept/{requestId}={applicationId}")
+    @PatchMapping(path = "/{requestId}/{applicationId}/accept")
     public HelpModelApplication acceptApplication(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
         return this.helpOfferModelService.acceptApplication(requestId, applicationId, getIdFromContext());
     }
