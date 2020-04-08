@@ -6,6 +6,7 @@ import org.bson.conversions.Bson;
 
 import javax.validation.constraints.NotNull;
 
+import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
 public class CoordinatesUpdate extends ModelUpdate {
@@ -34,6 +35,7 @@ public class CoordinatesUpdate extends ModelUpdate {
     }
 
     public Bson toFilter() {
-        return set("location", new Point(new Position(this.longitude, this.latitude)));
+        return combine(super.toFilter(this), set("location", new Point(new Position(this.longitude,
+                this.latitude))));
     }
 }

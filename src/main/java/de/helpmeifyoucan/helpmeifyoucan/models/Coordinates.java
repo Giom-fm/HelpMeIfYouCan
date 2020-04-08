@@ -24,12 +24,11 @@ public class Coordinates extends AbstractEntity {
     @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> helpRequests;
 
-    @JsonIgnore
     protected double latitude;
 
-    @JsonIgnore
     protected double longitude;
 
+    @JsonIgnore
     protected Geometry location;
 
     @JsonIgnore
