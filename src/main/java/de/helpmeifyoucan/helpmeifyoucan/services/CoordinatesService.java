@@ -35,7 +35,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         IndexOptions options = new IndexOptions();
         options.unique(true);
 
-        super.createIndex(Indexes.ascending("latitude", "longitude"), options);
+        super.createIndex(Indexes.ascending("location"), options);
     }
 
     public Coordinates save(Coordinates coordinates) {
@@ -47,13 +47,15 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         return super.getAllByFilter(exists);
     }
 
-    public List<Coordinates> getAllRequests() {
-        var requestFilter = where("this.helpRequests.length > 0");
+    public List<Coordinates> getAllRequests(double longitude, double latitude, double radius) {
+        var requestFilter = and(where("this.helpRequests.length > 0"), geoWithinCenterSphere(
+                "location", longitude, latitude, radius));
         return getAllByFilter(requestFilter);
     }
 
-    public List<Coordinates> getAllOffers() {
-        var offerFilter = where("this.helpOffers.length > 0");
+    public List<Coordinates> getAllOffers(double longitude, double latitude, double radius) {
+        var offerFilter = and(where("this.helpOffers.length > 0"), geoWithinCenterSphere(
+                "location", longitude, latitude, radius));
         return getAllByFilter(offerFilter);
     }
 
@@ -172,7 +174,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
             var existingAddressInDb = updatedCoordinatesExistingInDb.get();
             return this.addHelpModelToCoordinates(existingAddressInDb, helpModel);
         } else {
-            return this.save(coordinatesToUpdate.clearRefsAndAddId(helpModel).generateId());
+            return this.save(coordinatesToUpdate.clearRefsAndAddId(helpModel).calculateHashCode().generateId());
         }
     }
 

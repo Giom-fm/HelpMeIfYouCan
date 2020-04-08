@@ -382,6 +382,632 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Offer",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "9087a9sd790a87sd0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"20\"\n    },\n    \"description\": \"this is a test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers"
+							]
+						},
+						"description": "* description\n* coordinates\n  * latitude\n  * longitude"
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"description\" : \"Edit Description\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "90a7ds0987sa90d87"
+								}
+							]
+						},
+						"description": "* description"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateCoords",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"latitude\" : \"50\"\n\t\"longitude\" : \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id/updateCoords",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":id",
+								"updateCoords"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "90a7ds0987sa90d87"
+								}
+							]
+						},
+						"description": "* latitude\n* longitude"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "908asd0987as980d7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"message\" : \"My Message\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id/apply",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":id",
+								"apply"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "908asd0987as980d7"
+								}
+							]
+						},
+						"description": "* message"
+					},
+					"response": []
+				},
+				{
+					"name": "Unapply",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:requestId/:applicationId/unapply",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":requestId",
+								":applicationId",
+								"unapply"
+							],
+							"variable": [
+								{
+									"key": "requestId",
+									"value": ""
+								},
+								{
+									"key": "applicationId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:requestId/:applicationId/accept",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"offers",
+								":requestId",
+								":applicationId",
+								"accept"
+							],
+							"variable": [
+								{
+									"key": "requestId",
+									"value": "908as7d90a8s7d"
+								},
+								{
+									"key": "applicationId",
+									"value": "9087asd908a7sd"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Request",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "9087a9sd790a87sd0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Save",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"20\"\n    },\n    \"description\": \"this is a test\",\n    \"dateDue\": \"2004-06-14T23:34:30\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests"
+							]
+						},
+						"description": "* description\n* coordinates\n  * latitude\n  * longitude\n* dateDue (ISO 8601 Format)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"description\" : \"Edit Description\",\n\t \"dateDue\": \"2004-06-14T23:34:30\"\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "90a7ds0987sa90d87"
+								}
+							]
+						},
+						"description": "* description"
+					},
+					"response": []
+				},
+				{
+					"name": "UpdateCoords",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"latitude\" : \"50\"\n\t\"longitude\" : \"10\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id/updateCoords",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":id",
+								"updateCoords"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "90a7ds0987sa90d87"
+								}
+							]
+						},
+						"description": "* latitude\n* longitude"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "90a8s7d908as7d"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"message\" : \"My Message\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id/apply",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":id",
+								"apply"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "908asd0987as980d7"
+								}
+							]
+						},
+						"description": "* message"
+					},
+					"response": []
+				},
+				{
+					"name": "Unapply",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/unapply",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":requestId",
+								":applicationId",
+								"unapply"
+							],
+							"variable": [
+								{
+									"key": "requestId",
+									"value": ""
+								},
+								{
+									"key": "applicationId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/accept",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"requests",
+								":requestId",
+								":applicationId",
+								"accept"
+							],
+							"variable": [
+								{
+									"key": "requestId",
+									"value": "908as7d90a8s7d"
+								},
+								{
+									"key": "applicationId",
+									"value": "9087asd908a7sd"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "26de7db7-20d2-4b76-a9ef-681f13c5d22a",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "427c5b9a-7a77-46b3-8b33-b6b9f77819d7",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Coords",
+			"item": [
+				{
+					"name": "Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/coordinates/requests/?longitude&latitude=50&radius=2",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"coordinates",
+								"requests",
+								""
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": null
+								},
+								{
+									"key": "latitude",
+									"value": "50"
+								},
+								{
+									"key": "radius",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "offers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/coordinates/offers/?longitude=12&latitude=50&radius=2",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								"coordinates",
+								"offers",
+								""
+							],
+							"query": [
+								{
+									"key": "longitude",
+									"value": "12"
+								},
+								{
+									"key": "latitude",
+									"value": "50"
+								},
+								{
+									"key": "radius",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "9087asd0987asd"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"auth": {
@@ -418,13 +1044,13 @@
 	],
 	"variable": [
 		{
-			"id": "b7a1a9e8-5a35-4a04-b099-486f3661dbdf",
+			"id": "9421d970-1366-48f1-ac0f-0ee813c512bd",
 			"key": "HOST",
 			"value": "localhost",
 			"type": "string"
 		},
 		{
-			"id": "8a43cf10-2727-4486-a980-ec0125e2c676",
+			"id": "86922939-c43f-4b04-adc7-1b063da49f94",
 			"key": "PORT",
 			"value": "8080",
 			"type": "string"

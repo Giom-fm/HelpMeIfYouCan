@@ -17,7 +17,8 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     protected List<HelpModelApplication> applications;
 
-    protected Coordinates coordinates;
+//    @JsonSerialize (using = EmbeddedCoordsMapper.class)
+protected Coordinates coordinates;
 
     protected String description;
 

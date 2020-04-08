@@ -17,9 +17,7 @@ public class HelpOfferModel extends AbstractHelpModel {
 
     public HelpOfferModel() {
         this.categories = new LinkedList<>();
-
         this.acceptedApplications = new LinkedList<>();
-
     }
 
 

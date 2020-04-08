@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/helprequests")
+@RequestMapping("/requests")
 public class HelpRequestController {
 
     private HelpRequestModelService helpRequestModelService;

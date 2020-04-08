@@ -16,7 +16,7 @@ logging:
 database:
   protocol: mongodb
   host: "localhost"
-  name: helpmeifyoucan
+  name: helpmeifyoucanTest
 jwt:
   secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
   expiration: 864000000
