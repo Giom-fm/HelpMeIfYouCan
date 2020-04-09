@@ -77,8 +77,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
     public void deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpOffer), or(elemMatch("applications", eq("user",
-                deletingUser))),
-                (elemMatch("acceptedApplications", eq("user", deletingUser))));
+                deletingUser)), elemMatch("acceptedApplications", eq("user",
+                deletingUser))));
 
         var pullApplication = pull("applications", in("user", deletingUser));
         var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
