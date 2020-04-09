@@ -13,9 +13,11 @@ logging:
     org.mongodb.driver:
       .: INFO
       cluster: OFF
+    de.helpmeifyoucan:
+      .: DEBUG
 database:
   protocol: mongodb
-  host: "localhost"
+  host: "database"
   name: helpmeifyoucanTest
 jwt:
   secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
