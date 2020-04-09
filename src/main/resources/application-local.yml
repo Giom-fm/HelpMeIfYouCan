@@ -7,7 +7,6 @@ server:
   port: 8080
   error:
     include-stacktrace: always
-    path: /errors
 logging:
   level:
     .: error
