@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import de.helpmeifyoucan.helpmeifyoucan.handlers.ErrorHandler;
+import de.helpmeifyoucan.helpmeifyoucan.handlers.ApiErrorHandler;
 import de.helpmeifyoucan.helpmeifyoucan.security.filters.AuthenticationProcessingFilter;
 import de.helpmeifyoucan.helpmeifyoucan.security.filters.JwtAuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.security.providers.EmailPasswordAuthenticationProvider;
@@ -28,14 +28,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         private JwtAuthenticationProvider jwtAuthenticationProvider;
         private EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider;
-        private ErrorHandler errorHandler;
+        private ApiErrorHandler errorHandler;
 
         private AuthenticationFailureHandler failureHandler;
 
         @Autowired
         public SecurityConfig(JwtAuthenticationProvider jwtAuthenticationProvider,
                         EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider,
-                        ErrorHandler errorHandler, AuthenticationFailureHandler failureHandler) {
+                        ApiErrorHandler errorHandler, AuthenticationFailureHandler failureHandler) {
                 this.jwtAuthenticationProvider = jwtAuthenticationProvider;
                 this.emailPasswordAuthenticationProvider = emailPasswordAuthenticationProvider;
                 this.errorHandler = errorHandler;
