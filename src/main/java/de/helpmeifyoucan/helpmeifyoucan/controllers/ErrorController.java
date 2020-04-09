@@ -28,7 +28,7 @@ public class ErrorController extends AbstractErrorController {
         this.errorProperties = serverProperties.getError();
     }
 
-    @RequestMapping("/error}")
+    @RequestMapping("/error")
 	public ResponseEntity<Map<String, Object>> handleException(HttpServletRequest request, HttpStatus status) {
         var includeTrace = this.errorProperties.getIncludeStacktrace().equals(IncludeStacktrace.ALWAYS);
         Map<String, Object> body = this.getErrorAttributes(request,includeTrace);
