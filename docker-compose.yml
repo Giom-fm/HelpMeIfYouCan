@@ -1,0 +1,29 @@
+version: "3.7"
+
+
+networks:
+  helpmeifyoucan:
+
+services:
+
+  app:
+    build: .
+    container_name: helpmeifyoucan-app
+    environment: 
+      - PROFILE=local
+    networks: 
+      - helpmeifyoucan
+    ports: 
+      - 8080:8080
+    depends_on: 
+      - database
+  
+  database:
+    image: mongo
+    container_name: helpmeifyoucan-db
+    networks: 
+      - helpmeifyoucan
+    ports: 
+      - 27017:27017
+
+
