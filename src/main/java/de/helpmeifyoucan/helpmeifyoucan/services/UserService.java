@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Updates.*;
 
 @Service
@@ -141,8 +142,8 @@ public class UserService extends AbstractService<UserModel> {
         return this.addApplication(userId, application);
     }
 
-    public UserModel handleApplicationDelete(ObjectId userId, ObjectId applicationId) {
-        return this.deleteApplication(userId, applicationId);
+    public UserModel handleApplicationDelete(ObjectId userId, ObjectId modelId) {
+        return this.deleteApplication(userId, modelId);
     }
 
     // user address operations
@@ -220,10 +221,11 @@ public class UserService extends AbstractService<UserModel> {
         return this.updateExistingFields(idFilter, push("applications", application));
     }
 
-    private UserModel deleteApplication(ObjectId userId, ObjectId applicationId) {
+    private UserModel deleteApplication(ObjectId userId, ObjectId requestId) {
         var idFilter = eq(userId);
 
-        return this.updateExistingFields(idFilter, pull("applications", eq(applicationId)));
+        return this.updateExistingFields(idFilter, pull("applications", in(
+                "requestId", requestId)));
     }
 
     @Autowired

@@ -62,10 +62,10 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
 
     public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application, ObjectId user) {
-        application.generateId();
+        application.setRequestId(helpOffer).generateId();
 
-        this.userService.handleApplicationAdd(user, application);
-        application.setUser(user);
+        var savingUser = this.userService.handleApplicationAdd(user, application);
+        application.addUserDetails(savingUser);
 
         var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
@@ -74,19 +74,20 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         return application;
     }
 
-    public void deleteApplication(ObjectId helpOffer, ObjectId application, ObjectId deletingUser) {
+    public void deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
 
-        var idAndApplicationIdFilter = and(eq(helpOffer), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user", deletingUser))),
-                (elemMatch("acceptedApplications", and(eq(application), in("user", deletingUser))))));
+        var idAndApplicationIdFilter = and(eq(helpOffer), or(elemMatch("applications", eq("user",
+                deletingUser))),
+                (elemMatch("acceptedApplications", eq("user", deletingUser))));
 
-        var pullApplication = pull("applications", eq(application));
-        var pullAcceptedApplication = pull("acceptedApplications", eq(application));
+        var pullApplication = pull("applications", in("user", deletingUser));
+        var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
 
-        this.userService.handleApplicationDelete(deletingUser, application);
+        this.userService.handleApplicationDelete(deletingUser, helpOffer);
 
     }
 

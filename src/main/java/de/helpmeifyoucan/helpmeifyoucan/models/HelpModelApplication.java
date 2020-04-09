@@ -16,6 +16,25 @@ public class HelpModelApplication extends AbstractEntity {
 
     private String telephoneNr;
 
+    private ObjectId requestId;
+
+    public ObjectId getRequestId() {
+        return requestId;
+    }
+
+    public HelpModelApplication setRequestId(ObjectId requestId) {
+        this.requestId = requestId;
+        return this;
+    }
+
+    public HelpModelApplication addUserDetails(UserModel user) {
+        this.lastName = user.getLastName();
+        this.name = user.getName();
+        this.telephoneNr = user.getPhoneNr();
+        this.user = user.getId();
+        return this;
+    }
+
     public String getName() {
         return name;
     }

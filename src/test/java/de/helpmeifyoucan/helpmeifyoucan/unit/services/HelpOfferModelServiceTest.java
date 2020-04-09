@@ -119,7 +119,7 @@ public class HelpOfferModelServiceTest {
 
         this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
-        this.helpService.deleteApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
+        this.helpService.deleteApplication(testOffer.getId(), testUser.getId());
 
         var updatedOffer = this.helpService.getById(testOffer.getId());
         assertFalse(updatedOffer.getApplications().contains(testApplication));

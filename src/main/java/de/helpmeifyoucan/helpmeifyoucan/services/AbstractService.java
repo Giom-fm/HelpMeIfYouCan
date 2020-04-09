@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 
 @Repository
 public abstract class AbstractService<T extends AbstractEntity> {
@@ -38,6 +39,10 @@ public abstract class AbstractService<T extends AbstractEntity> {
     public List<T> getAllByFilter(Bson filter) {
         return this.collection.find(filter).into(new LinkedList<>());
 
+    }
+
+    public List<T> getAllById(List<ObjectId> ids) {
+        return this.getAllByFilter(in("_id", ids));
     }
 
     public T getById(ObjectId id) {

@@ -63,8 +63,8 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
     public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {
 
         application.generateId();
-        this.userService.handleApplicationAdd(user, application);
-        application.setUser(user);
+        var savingUser = this.userService.handleApplicationAdd(user, application);
+        application.addUserDetails(savingUser);
 
         var idFilter = eq(helpRequest);
         var addApplicationsUpdate = push("applications", application);
