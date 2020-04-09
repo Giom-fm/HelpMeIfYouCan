@@ -17,10 +17,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-//@RequestMapping("${server.error.path:${error.path:/error}}")
+// @RequestMapping("${server.error.path:${error.path:/error}}")
 public class ErrorController extends AbstractErrorController {
 
     private final ErrorProperties errorProperties;
+    
 
     @Autowired
     public ErrorController(ErrorAttributes errorAttributes, ServerProperties serverProperties) {
@@ -29,13 +30,14 @@ public class ErrorController extends AbstractErrorController {
     }
 
     @RequestMapping("/error")
-	public ResponseEntity<Map<String, Object>> handleException(HttpServletRequest request, HttpStatus status) {
+    public ResponseEntity<Map<String, Object>> handleException(HttpServletRequest request, HttpStatus status) {
         var includeTrace = this.errorProperties.getIncludeStacktrace().equals(IncludeStacktrace.ALWAYS);
-        Map<String, Object> body = this.getErrorAttributes(request,includeTrace);
+        Map<String, Object> body = this.getErrorAttributes(request, includeTrace);
         body.put("status", status.value());
         body.put("error", status.getReasonPhrase());
-		return new ResponseEntity<>(body, status);
-	}
+     
+        return new ResponseEntity<>(body, status);
+    }
 
     @Override
     public String getErrorPath() {

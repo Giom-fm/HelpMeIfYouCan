@@ -2,7 +2,6 @@ package de.helpmeifyoucan.helpmeifyoucan.config;
 
 import com.mongodb.client.MongoDatabase;
 
-import org.springframework.boot.autoconfigure.web.ErrorProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

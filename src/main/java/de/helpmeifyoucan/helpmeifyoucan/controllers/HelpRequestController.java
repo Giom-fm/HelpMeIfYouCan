@@ -20,12 +20,10 @@ public class HelpRequestController {
 
     private HelpRequestModelService helpRequestModelService;
 
-    private UserService userService;
 
     @Autowired
     public HelpRequestController(HelpRequestModelService helpRequestModelService, UserService userService) {
         this.helpRequestModelService = helpRequestModelService;
-        this.userService = userService;
     }
 
 
