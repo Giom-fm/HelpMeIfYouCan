@@ -12,10 +12,6 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.ApiExcep
 @Component
 public class ErrorAttributes extends DefaultErrorAttributes {
 
-    public ErrorAttributes() {
-        super(false);
-    }
-
     @Override
     public Map<String, Object> getErrorAttributes(WebRequest webRequest, boolean includeStackTrace) {
 
@@ -26,6 +22,11 @@ public class ErrorAttributes extends DefaultErrorAttributes {
             ApiException ex = (ApiException) throwable;
             errorAttributes.put("code", ex.getCode());
         } 
+
+        if(includeStackTrace){
+            errorAttributes.put("trace", throwable.getStackTrace());
+        }
+     
         return errorAttributes;
     }
 }

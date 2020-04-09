@@ -19,8 +19,8 @@ logging:
       .: DEBUG
 database:
   protocol: mongodb
-  host: "database"
-  name: helpmeifyoucanTest
+  host: database
+  name: helpmeifyoucan
 jwt:
   secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
   expiration: 864000000
