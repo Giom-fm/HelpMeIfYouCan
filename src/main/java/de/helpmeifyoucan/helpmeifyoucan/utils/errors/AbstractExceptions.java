@@ -2,18 +2,18 @@ package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
 public final class AbstractExceptions {
 
-    public static abstract class CustomException extends RuntimeException {
+    public static abstract class ApiException extends RuntimeException {
      
         private static final long serialVersionUID = 722628591402222442L;
         private Object data;
         private int code;
 
-        public CustomException(String message, int code) {
+        public ApiException(String message, int code) {
             super(message);
             this.code = code;
         }
 
-        public CustomException(String message, int code, Object data) {
+        public ApiException(String message, int code, Object data) {
             this(message, code);
             this.data = data;
         }
@@ -27,7 +27,7 @@ public final class AbstractExceptions {
         }
     }
 
-    public static abstract class NotFoundException extends CustomException {
+    public static abstract class NotFoundException extends ApiException {
 
         private static final long serialVersionUID = 2761795526522376099L;
 

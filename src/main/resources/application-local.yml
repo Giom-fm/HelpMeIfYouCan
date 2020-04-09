@@ -5,6 +5,8 @@ spring:
     lazy-initialization: false
 server:
   port: 8080
+  error:
+    include-stacktrace: always
 logging:
   level:
     .: error

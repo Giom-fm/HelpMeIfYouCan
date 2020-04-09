@@ -10,21 +10,21 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import de.helpmeifyoucan.helpmeifyoucan.handlers.ErrorHandler;
+import de.helpmeifyoucan.helpmeifyoucan.handlers.ApiErrorHandler;
 
 @Component
 public class LoginAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-    private ErrorHandler erorHandler;
+    private ApiErrorHandler erorHandler;
 
-    public LoginAuthenticationFailureHandler(ErrorHandler erorHandler) {
+    public LoginAuthenticationFailureHandler(ApiErrorHandler erorHandler) {
         this.erorHandler = erorHandler;
     }
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
-        var error = this.erorHandler.handleAuthenticationExceptions(exception);
+        var error = this.erorHandler.handleAuthenticationExceptions(request);
         FilterUtils.send(response, error);
     }
 

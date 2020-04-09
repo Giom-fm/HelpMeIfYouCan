@@ -2,26 +2,26 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos.response;
 
 import java.util.Date;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.CustomException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.ApiException;
 
-public class ErrorResponse {
+public class ApiError {
     private final String message;
     private final int code;
     private final Date timestamp;
     private final Object data;
 
-    public ErrorResponse(String message, int code) {
+    public ApiError(String message, int code) {
         this(message, code, null);
     }
 
-    public ErrorResponse(String message, int code, Object data) {
+    public ApiError(String message, int code, Object data) {
         this.code = code;
         this.message = message;
         this.timestamp = new Date();
         this.data = data;
     }
 
-    public ErrorResponse(CustomException error) {
+    public ApiError(ApiException error) {
         this(error.getMessage(), error.getCode(), error.getData());
     }
 

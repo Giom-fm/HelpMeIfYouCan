@@ -1,6 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.CustomException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.ApiException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.NotFoundException;
 import org.bson.types.ObjectId;
 
@@ -21,7 +21,7 @@ public final class UserExceptions {
 
     }
 
-    public static class UserAlreadyTakenException extends CustomException {
+    public static class UserAlreadyTakenException extends ApiException {
 
         private static final long serialVersionUID = 7415040101907590277L;
         private static ErrorCode error = ErrorCode.USER_TAKEN;

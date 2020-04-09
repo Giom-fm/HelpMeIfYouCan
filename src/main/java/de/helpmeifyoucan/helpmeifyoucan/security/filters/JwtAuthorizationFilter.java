@@ -13,18 +13,18 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import de.helpmeifyoucan.helpmeifyoucan.handlers.ErrorHandler;
+import de.helpmeifyoucan.helpmeifyoucan.handlers.ApiErrorHandler;
 import de.helpmeifyoucan.helpmeifyoucan.security.authentications.JwtAuthentication;
 
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
-    private ErrorHandler errorHandler;
+    private ApiErrorHandler errorHandler;
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, ErrorHandler errorHandler) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, ApiErrorHandler errorHandler) {
         this.authenticationManager = authenticationManager;
         this.errorHandler = errorHandler;
     }
@@ -43,13 +43,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
         } catch (AuthenticationException ex) {
             SecurityContextHolder.clearContext();
-            var error = this.errorHandler.handleAuthenticationExceptions(ex);
+            var error = this.errorHandler.handleAuthenticationExceptions(request);
             FilterUtils.send(response, error);
-        } catch (Exception ex) {
-            SecurityContextHolder.clearContext();
-            var error = this.errorHandler.handleAllExceptions(ex);
-            FilterUtils.send(response, error);
-        }
+        } 
 
         chain.doFilter(request, response);
     }
