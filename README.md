@@ -1,8 +1,11 @@
 # Help Me If You Can
 
 ## Dependencies
+
+### Development
 * maven 3.6.3
 * Java 11
+### Deploy
 * Docker 19.03.8-ce
 * Docker-Compose 1.25.4
 
@@ -20,8 +23,8 @@ Available Profiles:
 ## Deploy
 
 ### Local
-To deploy the application on localhost run the preconfigured docker-compose script.  
-This will setup the application listening on *localhost:8080* with an MongoDB listening on *localhost:27017*
+To deploy the application on localhost, run the preconfigured docker-compose script.  
+This will setup the application listening on *localhost:8080* with a MongoDB listening on *localhost:27017*
 
 `docker-compose up -d`
 
