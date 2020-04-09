@@ -54,7 +54,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         } catch (JwtException ex) {
             throw new BadCredentialsException("Token is invalid", ex);
         }
-
     }
 
     public String generateToken(Authentication authentication) {
@@ -70,7 +69,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private List<GrantedAuthority> rolesToAuthorities(List<String> roles) {
         return roles.stream().map(role -> {
-            System.out.println(role);
             return new SimpleGrantedAuthority(role.toString());
         }).collect(Collectors.toList());
     }
@@ -78,7 +76,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     private List<Role> authoritiesToRoles(Collection<? extends GrantedAuthority> authorities) {
 
         return authorities.stream().map(authority -> {
-            System.out.println(authority.toString());
             return Role.valueOf(authority.toString());
         }).collect(Collectors.toList());
     }

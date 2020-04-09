@@ -1,12 +1,17 @@
 package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
-import static com.mongodb.client.model.Filters.eq;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
 import com.mongodb.MongoWriteException;
-
+import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
 import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,23 +19,20 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.services.AddressService;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AddressExceptions.AddressNotFoundException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
+import static com.mongodb.client.model.Filters.eq;
+import static org.junit.Assert.*;
 
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ActiveProfiles("test")
 public class UserServiceTest {
 
-
+    @Autowired
+    private StaticDbClear clear;
     @Autowired
     private UserService userService;
 
@@ -45,18 +47,10 @@ public class UserServiceTest {
 
     @Before
     public void setUpTest() {
-        clearCollection();
-        testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de");
+        testUser = new UserModel().setName("Marc").setLastName("Jaeger").setPassword(passwordEncoder.encode("password1")).setEmail("test@Mail.de").setPhoneNr("901890");
 
     }
 
-    public void clearCollection() {
-        this.userService.getCollection().drop();
-        this.userService.createIndex();
-
-        this.addressService.getCollection().drop();
-        this.addressService.createIndex();
-    }
 
     @Test
     public void withTwoUsersSavedInCollection_TheOnesMatchingTheFilterShouldBeReturned() {
@@ -71,6 +65,23 @@ public class UserServiceTest {
 
 
     }
+
+
+    @Test
+    public void userTryingToSaveAlreadyExistingAddress_existingAddressShouldBeAdded() {
+        AddressModel existingAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
+        AddressModel addedAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
+
+        this.addressService.save(existingAddress);
+
+        this.userService.save(testUser);
+
+        this.userService.handleUserAddressAddRequest(testUser.getId(), addedAddress, false);
+
+        assertEquals(this.userService.get(testUser.getId()).getUserAddress(), existingAddress.getId());
+
+    }
+
 
     @Test
     public void givenValidUserToSave_RetrievedUserShouldBeEqualToSavedUser() {
@@ -89,12 +100,12 @@ public class UserServiceTest {
     @Test
     public void afterSavingUser_ExistsShouldBeTrue() {
         this.userService.save(testUser);
-        assertTrue(this.userService.exits(eq(testUser.getId())));
+        assertTrue(this.userService.exists(eq(testUser.getId())));
     }
 
     @Test
     public void givenNotExistingId_ExistsShouldBeFalse() {
-        assertFalse(this.userService.exits(eq(new ObjectId())));
+        assertFalse(this.userService.exists(eq(new ObjectId())));
     }
 
 
@@ -102,9 +113,9 @@ public class UserServiceTest {
     public void afterSavingUserAndDeletingUser_UserShouldNotExistAnymore() {
         this.userService.save(testUser);
 
-        this.userService.delete(testUser.getId());
+        this.userService.deleteById(testUser.getId());
 
-        assertFalse(this.userService.exits(eq(testUser.getId())));
+        assertFalse(this.userService.exists(eq(testUser.getId())));
     }
 
     @Test(expected = MongoWriteException.class)
@@ -125,7 +136,7 @@ public class UserServiceTest {
         assertEquals(testUser, retrievedUser);
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test(expected = UserExceptions.UserNotFoundByEmailException.class)
     public void givenNotExistingEmail_NotFoundShouldThrowNotFound() {
         this.userService.getByEmail("notExisting");
 
@@ -133,7 +144,7 @@ public class UserServiceTest {
 
     @Test
     public void existsOnNotExistingUser_ShouldBeFalse() {
-        assertFalse(this.userService.exits(eq(new ObjectId())));
+        assertFalse(this.userService.exists(eq(new ObjectId())));
     }
 
     @Test(expected = PasswordMismatchException.class)
@@ -201,7 +212,7 @@ public class UserServiceTest {
         this.userService.save(testUser);
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
-        UserModel updatedUser = this.userService.addAddressToUser(testUser, address.generateId());
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address.generateId(), false);
 
         assertEquals(updatedUser.getUserAddress(), address.getId());
     }
@@ -211,33 +222,8 @@ public class UserServiceTest {
         testUser.setId(new ObjectId());
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
-        this.userService.addAddressToUser(testUser, address.generateId());
-    }
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address.generateId(), false);
 
-    @Test
-    public void givenUserWithAddedAddressAndAddressToDelete_ItShouldExchangeAddressesAccordingly() {
-        AddressModel addressToDelete = new AddressModel().generateId();
-
-        testUser.setUserAddress(addressToDelete.getId());
-        this.userService.save(testUser);
-
-        AddressModel addressToAdd = new AddressModel().generateId();
-
-        UserModel updatedUser = this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
-        assertEquals(updatedUser.getUserAddress(), (addressToAdd.getId()));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void givenNotExistingUserId_ExchangeAddressesShouldThrowException() {
-        AddressModel addressToDelete = new AddressModel().generateId();
-
-        testUser.setUserAddress(addressToDelete.getId());
-
-        testUser.setId(new ObjectId());
-
-        AddressModel addressToAdd = new AddressModel().generateId();
-
-        this.userService.exchangeAddress(testUser.getId(), addressToDelete.getId(), addressToAdd.getId());
     }
 
     @Test
@@ -250,7 +236,7 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.deleteAddressFromUser(this.userService.get(testUser.getId()), address.getId());
+        UserModel updatedUser = this.userService.handleUserAddressDeleteRequest(this.userService.get(testUser.getId()).getId(), address.getId());
 
         assertTrue(updatedUser.noAddressReference());
 
@@ -266,23 +252,32 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        this.userService.deleteAddressFromUser(testUser, new ObjectId());
+        this.userService.handleUserAddressDeleteRequest(testUser.getId(), new ObjectId());
     }
 
 
 
     @Test(expected = UserNotFoundException.class)
     public void givenWrongUserId_FieldsShouldNotBeUpdatedAndExceptionShouldBeThrown() {
-        this.userService.updateUserAddressField(testUser.setUserAddress(new ObjectId()));
+        this.userService.handleUserAddressUpdateRequest(new ObjectId(), new AddressUpdate(), false);
     }
 
     @Test
     public void givenRightUser_AddressFieldShouldBeUpdatedAccordingly() {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.userService.save(testUser);
-        UserModel updatedUser = this.userService.updateUserAddressField(testUser.setUserAddress(address.getId()));
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address, false);
 
         assertEquals(updatedUser.getUserAddress(), address.getId());
 
     }
+
+
+    @Before
+    public void clearCollection() {
+        clear.clearDb();
+
+    }
+
+
 }

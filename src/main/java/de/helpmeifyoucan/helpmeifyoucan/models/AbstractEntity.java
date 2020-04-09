@@ -10,8 +10,9 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public abstract class AbstractEntity {
+
     @JsonSerialize(converter = ObjectIdMapping.class)
-    private ObjectId id;
+    protected ObjectId id;
 
 
     public ObjectId setId(ObjectId id) {

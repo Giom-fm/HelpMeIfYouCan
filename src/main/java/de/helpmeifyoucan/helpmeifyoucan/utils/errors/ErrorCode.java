@@ -1,4 +1,3 @@
-
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
 public enum ErrorCode {
@@ -15,6 +14,11 @@ public enum ErrorCode {
      */
     USER_TAKEN(109, "User \"%s\" already taken"),
 
+    /**
+     * {@code 400 - Email \"%s\" not found}
+     */
+    USER_EMAIL_NOT_FOUND(104, "Email \"%s\" not found"),
+
     // -------------------------------------------------------------------------
     // Address
     // -------------------------------------------------------------------------
@@ -23,6 +27,37 @@ public enum ErrorCode {
      * {@code 400 -  Address \"%s\" not found}
      */
     ADDRESS_NOT_FOUND(204, "Address \"%s\" not found"),
+
+    // -------------------------------------------------------------------------
+    // Coordinates
+    // -------------------------------------------------------------------------
+
+    /**
+     * {@code 400 - Coordinates \"%s\" not found}
+     */
+
+    COORDINATES_NOT_FOUND(204, "Coordinates \"%s\" not found"),
+
+    // -------------------------------------------------------------------------
+    // HelpOffer
+    // -------------------------------------------------------------------------
+
+    /**
+     * {@code 400 - HelpOffer \"%s\" not found}
+     */
+
+    HELPOFFER_NOT_FOUND(204, "HelpOffer \"%s\" not found"),
+
+    // -------------------------------------------------------------------------
+    // HelpRequest
+    // -------------------------------------------------------------------------
+
+    /**
+     * {@code 400 - HelpOffer \"%s\" not found}
+     */
+
+    HELPREQUEST_NOT_FOUND(204, "HelpRequest \"%s\" not found"),
+
 
     // -------------------------------------------------------------------------
     // Authentication
@@ -164,7 +199,7 @@ public enum ErrorCode {
     private int code;
     private String message;
 
-    private ErrorCode(int code, String message) {
+    ErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

@@ -7,6 +7,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import de.helpmeifyoucan.helpmeifyoucan.config.DatabaseConfig;
+import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnumSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnumSerializer;
+import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +28,8 @@ public class Database {
     @Autowired
     public Database(DatabaseConfig config) {
         CodecRegistry pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        CodecRegistry pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
+
+        CodecRegistry pojoCodec = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), CodecRegistries.fromCodecs(new PostStatusEnumSerializer(), new HelpCategoryEnumSerializer()), pojoCodecRegistry);
 
         var stringBuilder = new StringBuilder();
         stringBuilder.append(config.getProtocol()).append("://");

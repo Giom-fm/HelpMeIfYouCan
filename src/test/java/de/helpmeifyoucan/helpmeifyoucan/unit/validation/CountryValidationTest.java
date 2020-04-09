@@ -6,12 +6,11 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.CountryPatternException;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions.DistrictPatternException;
-import de.helpmeifyoucan.helpmeifyoucan.validation.DistrictValidator;
+import de.helpmeifyoucan.helpmeifyoucan.validation.CountryValidator;
 
 public class CountryValidationTest {
 
-    private static DistrictValidator validator = new DistrictValidator();
+    private static CountryValidator validator = new CountryValidator();
 
     @Test
     public void country_validCountries() {
@@ -30,7 +29,7 @@ public class CountryValidationTest {
         assertFalse(validator.isValid("", null));
     }
 
-    @Test(expected = DistrictPatternException.class)
+    @Test(expected = CountryPatternException.class)
     public void country_ToShort() {
         assertFalse(validator.isValid("a", null));
     }
