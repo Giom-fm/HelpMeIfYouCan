@@ -1,25 +1,30 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
-import org.bson.codecs.pojo.annotations.BsonIgnore;
-import org.bson.types.ObjectId;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.types.ObjectId;
+
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
+
 public class UserModel extends AbstractEntity {
 
-    @NotNull(message = "Please fill in Name")
+    @ValidName
     protected String name;
 
-    @NotNull(message = "Please fill in Lastname")
+    @ValidName
     protected String lastName;
+
 
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId userAddress;
@@ -27,25 +32,30 @@ public class UserModel extends AbstractEntity {
     @BsonIgnore
     protected AddressModel fullAddress;
 
-    @NotNull(message = "Please fill in PhoneNumber")
+    @ValidPhone
     protected String phoneNr;
 
     protected String payPal;
 
-    @Email(message = "Please fill in Email")
+    @ValidEmail
     protected String email;
 
+    // REVIEW @ValidPassword sollt hier probleme machen
+    //@ValidPassword
     @JsonIgnore
     protected String password;
 
+    
     protected List<Role> roles;
 
     protected boolean enabled;
 
     protected boolean verified;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> helpRequests;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> helpOffers;
 
     protected List<HelpModelApplication> applications;
