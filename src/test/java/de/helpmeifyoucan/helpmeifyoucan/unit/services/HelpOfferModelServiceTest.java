@@ -50,7 +50,8 @@ public class HelpOfferModelServiceTest {
         clear.clearDb();
 
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
-        testUser = new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de");
+        testUser =
+                new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de").setPhoneNr("012421421");
         testOffer = new HelpOfferModel().setUser(testUser.getId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
         this.userService.save(testUser);
 

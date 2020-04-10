@@ -72,7 +72,7 @@ public class HelpRequestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/unapply/{requestId}={applicationId}")
     public void unApplyFromRequest(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
-        this.helpRequestModelService.deleteApplication(requestId, applicationId, getIdFromContext());
+        this.helpRequestModelService.deleteApplication(requestId, getIdFromContext());
     }
 
     @PatchMapping(path = "/accept/{requestId}={applicationId}")

@@ -86,6 +86,27 @@ public class HelpModelApplication extends AbstractEntity {
     }
 
 
+    public String toApplication() {
+        return "HelpModelApplication{" +
+                "message='" + message + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", id=" + id +
+                '}';
+    }
+
+
+    public String toAcceptedApplication() {
+        return "HelpModelApplication{" +
+                "message='" + message + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", user=" + user +
+                ", telephoneNr='" + telephoneNr + '\'' +
+                ", id=" + id +
+                '}';
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

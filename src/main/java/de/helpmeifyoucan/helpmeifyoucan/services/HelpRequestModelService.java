@@ -73,7 +73,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return application;
     }
 
-    public void deleteApplication(ObjectId helpRequest, ObjectId application, ObjectId deletingUser) {
+    public void deleteApplication(ObjectId helpRequest, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpRequest), or(elemMatch("applications", eq("user",
                 deletingUser)), elemMatch("acceptedApplications", eq("user",
@@ -86,7 +86,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
 
-        this.userService.handleApplicationDelete(deletingUser, application);
+        this.userService.handleApplicationDelete(deletingUser, helpRequest);
     }
 
 
