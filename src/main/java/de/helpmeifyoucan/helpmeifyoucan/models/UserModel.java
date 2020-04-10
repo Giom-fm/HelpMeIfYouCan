@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
-import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.UserApplicationsSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
@@ -53,12 +53,25 @@ public class UserModel extends AbstractEntity {
     protected List<ObjectId> helpOffers;
 
 
-    @JsonSerialize(using = ListApplicationSerializer.class)
+    @JsonSerialize(using = UserApplicationsSerializer.class)
     protected List<HelpModelApplication> applications;
+
+
+    protected List<HelpModelApplication> acceptedApplications;
 
 
     public UserModel() {
 
+    }
+
+
+    public List<HelpModelApplication> getAcceptedApplications() {
+        return acceptedApplications;
+    }
+
+    public UserModel setAcceptedApplications(List<HelpModelApplication> acceptedApplications) {
+        this.acceptedApplications = acceptedApplications;
+        return this;
     }
 
     public List<ObjectId> getHelpRequests() {

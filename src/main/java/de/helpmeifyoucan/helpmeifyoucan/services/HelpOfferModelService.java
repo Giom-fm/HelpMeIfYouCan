@@ -8,14 +8,12 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
@@ -99,6 +97,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
         var acceptedApplication = offer.acceptApplication(application);
 
+        this.userService.handleApplicationAccept(acceptedApplication, acceptingUser);
+
         var addApplicationToAccepted = push("acceptedApplications", acceptedApplication);
 
         var removeApplicationFromApplications = pull("applications", eq(application));
@@ -118,7 +118,7 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
      */
     public HelpOfferModel saveNewOffer(HelpOfferModel offer, ObjectId user) {
 
-        offer.setUser(user).setStatus(PostStatusEnum.ACTIVE).setCategories(Collections.singletonList(HelpCategoryEnum.Errands)).generateId();
+        offer.setUser(user).setStatus(PostStatusEnum.ACTIVE).generateId();
 
         this.userService.handleHelpModelAdd(HelpOfferModel.class, offer.getId(), user);
 
