@@ -6,7 +6,7 @@ import com.mongodb.client.model.geojson.Geometry;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import org.bson.types.ObjectId;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;

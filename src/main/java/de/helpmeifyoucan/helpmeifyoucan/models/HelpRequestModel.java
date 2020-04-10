@@ -1,5 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.utils.AcceptedApplicationSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
@@ -10,6 +12,7 @@ import java.util.Objects;
 
 public class HelpRequestModel extends AbstractHelpModel {
 
+    @JsonSerialize(using = AcceptedApplicationSerializer.class)
     protected HelpModelApplication acceptedApplication;
 
     protected Date dateDue;

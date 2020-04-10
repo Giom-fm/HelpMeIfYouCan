@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/requests")
@@ -38,6 +40,7 @@ public class HelpRequestController {
         return this.helpRequestModelService.update(requestId, update, getIdFromContext());
     }
 
+
     @PatchMapping(path = "/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel updateCoords(@PathVariable ObjectId requestId, @RequestBody CoordinatesUpdate update) {
         return this.helpRequestModelService.handleCoordinatesUpdate(requestId, update, getIdFromContext());
@@ -53,6 +56,10 @@ public class HelpRequestController {
         return this.helpRequestModelService.getById(requestId);
     }
 
+    @GetMapping(path = "/getall", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<HelpRequestModel> getAllById(@RequestBody List<ObjectId> ids) {
+        return this.helpRequestModelService.getAllById(ids);
+    }
 
     @PostMapping(path = "/apply/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
@@ -63,7 +70,7 @@ public class HelpRequestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/unapply/{requestId}={applicationId}")
     public void unApplyFromRequest(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
-        this.helpRequestModelService.deleteApplication(requestId, applicationId, getIdFromContext());
+        this.helpRequestModelService.deleteApplication(requestId, getIdFromContext());
     }
 
     @PatchMapping(path = "/accept/{requestId}={applicationId}")

@@ -63,8 +63,8 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
     public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {
 
         application.generateId();
-        this.userService.handleApplicationAdd(user, application);
-        application.setUser(user);
+        var savingUser = this.userService.handleApplicationAdd(user, application);
+        application.addUserDetails(savingUser);
 
         var idFilter = eq(helpRequest);
         var addApplicationsUpdate = push("applications", application);
@@ -73,19 +73,20 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
         return application;
     }
 
-    public void deleteApplication(ObjectId helpRequest, ObjectId application, ObjectId deletingUser) {
+    public void deleteApplication(ObjectId helpRequest, ObjectId deletingUser) {
 
-        var idAndApplicationIdFilter = and(eq(helpRequest), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user._id", deletingUser))),
-                (elemMatch("acceptedApplication", and(eq(application), in("user._id", deletingUser))))));
+        var idAndApplicationIdFilter = and(eq(helpRequest), or(elemMatch("applications", eq("user",
+                deletingUser)), elemMatch("acceptedApplications", eq("user",
+                deletingUser))));
 
-        var pullApplication = pull("applications", eq(application));
-        var pullAcceptedApplication = pull("acceptedApplication", eq(application));
+        var pullApplication = pull("applications", in("user", deletingUser));
+        var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
 
-        this.userService.handleApplicationDelete(deletingUser, application);
+        this.userService.handleApplicationDelete(deletingUser, helpRequest);
     }
 
 

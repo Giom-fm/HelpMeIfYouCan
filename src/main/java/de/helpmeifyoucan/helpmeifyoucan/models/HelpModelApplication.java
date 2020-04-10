@@ -1,5 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
 import java.util.Objects;
@@ -12,9 +14,30 @@ public class HelpModelApplication extends AbstractEntity {
 
     private String lastName;
 
+    @JsonSerialize(converter = ObjectIdMapping.class)
     private ObjectId user;
 
     private String telephoneNr;
+
+    @JsonSerialize(converter = ObjectIdMapping.class)
+    private ObjectId requestId;
+
+    public ObjectId getRequestId() {
+        return requestId;
+    }
+
+    public HelpModelApplication setRequestId(ObjectId requestId) {
+        this.requestId = requestId;
+        return this;
+    }
+
+    public HelpModelApplication addUserDetails(UserModel user) {
+        this.lastName = user.getLastName();
+        this.name = user.getName();
+        this.telephoneNr = user.getPhoneNr();
+        this.user = user.getId();
+        return this;
+    }
 
     public String getName() {
         return name;
@@ -65,6 +88,7 @@ public class HelpModelApplication extends AbstractEntity {
         this.setId(new ObjectId());
         return this;
     }
+
 
 
     @Override

@@ -50,7 +50,8 @@ public class HelpOfferModelServiceTest {
         clear.clearDb();
 
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
-        testUser = new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de");
+        testUser =
+                new UserModel().setLastName("og").setName("tripple").setEmail("test@mail.de").setPhoneNr("012421421");
         testOffer = new HelpOfferModel().setUser(testUser.getId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
         this.userService.save(testUser);
 
@@ -119,7 +120,7 @@ public class HelpOfferModelServiceTest {
 
         this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
-        this.helpService.deleteApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
+        this.helpService.deleteApplication(testOffer.getId(), testUser.getId());
 
         var updatedOffer = this.helpService.getById(testOffer.getId());
         assertFalse(updatedOffer.getApplications().contains(testApplication));

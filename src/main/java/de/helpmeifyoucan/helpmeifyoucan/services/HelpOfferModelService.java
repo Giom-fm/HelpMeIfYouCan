@@ -8,14 +8,12 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
@@ -62,10 +60,10 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
 
     public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application, ObjectId user) {
-        application.generateId();
+        application.setRequestId(helpOffer).generateId();
 
-        this.userService.handleApplicationAdd(user, application);
-        application.setUser(user);
+        var savingUser = this.userService.handleApplicationAdd(user, application);
+        application.addUserDetails(savingUser);
 
         var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
@@ -74,19 +72,20 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         return application;
     }
 
-    public void deleteApplication(ObjectId helpOffer, ObjectId application, ObjectId deletingUser) {
+    public void deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
 
-        var idAndApplicationIdFilter = and(eq(helpOffer), eq("user", deletingUser), or(elemMatch("applications", and(eq(application), in("user", deletingUser))),
-                (elemMatch("acceptedApplications", and(eq(application), in("user", deletingUser))))));
+        var idAndApplicationIdFilter = and(eq(helpOffer), or(elemMatch("applications", eq("user",
+                deletingUser)), elemMatch("acceptedApplications", eq("user",
+                deletingUser))));
 
-        var pullApplication = pull("applications", eq(application));
-        var pullAcceptedApplication = pull("acceptedApplications", eq(application));
+        var pullApplication = pull("applications", in("user", deletingUser));
+        var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
         Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
 
-        this.userService.handleApplicationDelete(deletingUser, application);
+        this.userService.handleApplicationDelete(deletingUser, helpOffer);
 
     }
 
@@ -97,6 +96,8 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         var offer = Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow();
 
         var acceptedApplication = offer.acceptApplication(application);
+
+        this.userService.handleApplicationAccept(acceptedApplication, acceptingUser);
 
         var addApplicationToAccepted = push("acceptedApplications", acceptedApplication);
 
@@ -117,7 +118,7 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
      */
     public HelpOfferModel saveNewOffer(HelpOfferModel offer, ObjectId user) {
 
-        offer.setUser(user).setStatus(PostStatusEnum.ACTIVE).setCategories(Collections.singletonList(HelpCategoryEnum.Errands)).generateId();
+        offer.setUser(user).setStatus(PostStatusEnum.ACTIVE).generateId();
 
         this.userService.handleHelpModelAdd(HelpOfferModel.class, offer.getId(), user);
 
@@ -171,7 +172,6 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         this.updateEmbeddedCoordinates(deletedCoords);
 
         return deletedOffer;
-
     }
 
     /**

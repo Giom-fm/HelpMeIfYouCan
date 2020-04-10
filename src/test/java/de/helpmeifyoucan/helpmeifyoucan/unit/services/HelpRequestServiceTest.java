@@ -18,7 +18,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,10 +44,12 @@ public class HelpRequestServiceTest {
 
     @Before
     public void setUpTest() {
+        clear.clearDb();
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
         testUser = new UserModel();
         testUser.setId(new ObjectId());
         testRequest = new HelpRequestModel().setUser(testUser.getId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+
     }
 
     @Test
@@ -81,9 +85,22 @@ public class HelpRequestServiceTest {
         assertEquals(updatedOffers, 2);
     }
 
+    @Test
+    public void savedTwoObjects_getAllByIdShouldReturnBoth() {
+        this.requestService.saveNewRequest(testRequest, testUser.getId());
 
-    @Before
-    public void clearDb() {
-        clear.clearDb();
+        var newRequest = new HelpRequestModel().setUser(new ObjectId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+
+        this.requestService.saveNewRequest(newRequest, newRequest.getUser());
+
+        List<ObjectId> ids = new ArrayList<>();
+        ids.add(testRequest.getId());
+        ids.add(newRequest.getId());
+        var list = this.requestService.getAllById(ids);
+
+        assertEquals(list.size(), 2);
+
     }
+
+
 }

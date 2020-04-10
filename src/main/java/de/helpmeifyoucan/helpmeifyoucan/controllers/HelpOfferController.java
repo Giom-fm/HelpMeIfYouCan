@@ -6,13 +6,14 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.HelpOfferModelService;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/offers")
@@ -21,7 +22,7 @@ public class HelpOfferController {
     private HelpOfferModelService helpOfferModelService;
 
     @Autowired
-    public HelpOfferController(HelpOfferModelService helpOfferModelService, UserService userService) {
+    public HelpOfferController(HelpOfferModelService helpOfferModelService) {
         this.helpOfferModelService = helpOfferModelService;
     }
 
@@ -52,17 +53,20 @@ public class HelpOfferController {
         return this.helpOfferModelService.getById(requestId);
     }
 
+    @GetMapping(path = "/getall", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<HelpOfferModel> getAllById(@RequestBody List<ObjectId> ids) {
+        return this.helpOfferModelService.getAllById(ids);
+    }
 
     @PostMapping(path = "/{requestId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
         return this.helpOfferModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
 
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{requestId}/{applicationId}/unapply")
-    public void unApplyFromRequest(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
-        this.helpOfferModelService.deleteApplication(requestId, applicationId, getIdFromContext());
+    public void unApplyFromRequest(@PathVariable ObjectId requestId) {
+        this.helpOfferModelService.deleteApplication(requestId, getIdFromContext());
     }
 
     @PatchMapping(path = "/{requestId}/{applicationId}/accept")
