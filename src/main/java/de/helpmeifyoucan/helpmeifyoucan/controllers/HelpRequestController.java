@@ -15,33 +15,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/requests")
 public class HelpRequestController {
 
     private HelpRequestModelService helpRequestModelService;
 
-
     @Autowired
     public HelpRequestController(HelpRequestModelService helpRequestModelService, UserService userService) {
         this.helpRequestModelService = helpRequestModelService;
     }
-
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel save(@RequestBody HelpRequestModel request) {
         return this.helpRequestModelService.saveNewRequest(request, getIdFromContext());
     }
 
-
     @PatchMapping(path = "/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel update(@PathVariable ObjectId requestId, @RequestBody HelpRequestUpdate update) {
         return this.helpRequestModelService.update(requestId, update, getIdFromContext());
     }
 
-
-    @PatchMapping(path = "/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(path = "/{requestId}/updateCoords/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel updateCoords(@PathVariable ObjectId requestId, @RequestBody CoordinatesUpdate update) {
         return this.helpRequestModelService.handleCoordinatesUpdate(requestId, update, getIdFromContext());
     }
@@ -61,27 +56,26 @@ public class HelpRequestController {
         return this.helpRequestModelService.getAllById(ids);
     }
 
-    @PostMapping(path = "/apply/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
+    @PostMapping(path = "/{requestId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId,
+            @RequestBody HelpModelApplication application) {
         return this.helpRequestModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
 
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/unapply/{requestId}={applicationId}")
-    public void unApplyFromRequest(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
+    @DeleteMapping(path = "/{requestId}/unapply")
+    public void unApplyFromRequest(@PathVariable ObjectId requestId) {
         this.helpRequestModelService.deleteApplication(requestId, getIdFromContext());
     }
 
-    @PatchMapping(path = "/accept/{requestId}={applicationId}")
-    public HelpModelApplication acceptApplication(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
+    @PatchMapping(path = "/{requestId}/{applicationId}/accept")
+    public HelpModelApplication acceptApplication(@PathVariable ObjectId requestId,
+            @PathVariable ObjectId applicationId) {
         return this.helpRequestModelService.acceptApplication(requestId, applicationId, getIdFromContext());
     }
 
-
-    //TODO get by user
-
-    //TODO get by status
+    // TODO get by user
+    // TODO get by status
 
     private ObjectId getIdFromContext() {
         return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
