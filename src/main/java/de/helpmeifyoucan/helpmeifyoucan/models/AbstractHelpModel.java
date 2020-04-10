@@ -1,9 +1,9 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ListApplicationSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -16,7 +16,7 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId user;
 
-    @JsonSerialize(converter = ListApplicationSerializer.class)
+    @JsonSerialize(using = ListApplicationSerializer.class)
     protected List<HelpModelApplication> applications;
 
 

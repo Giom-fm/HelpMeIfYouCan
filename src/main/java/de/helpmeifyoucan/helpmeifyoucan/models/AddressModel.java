@@ -4,7 +4,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ListObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;

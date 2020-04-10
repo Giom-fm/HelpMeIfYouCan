@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.utils;
+package de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;

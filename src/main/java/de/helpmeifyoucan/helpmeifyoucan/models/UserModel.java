@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
@@ -44,10 +46,14 @@ public class UserModel extends AbstractEntity {
 
     protected boolean verified;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> helpRequests;
 
+    @JsonSerialize(converter = ListObjectIdMapping.class)
     protected List<ObjectId> helpOffers;
 
+
+    @JsonSerialize(using = ListApplicationSerializer.class)
     protected List<HelpModelApplication> applications;
 
 

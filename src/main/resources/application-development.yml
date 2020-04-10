@@ -5,22 +5,22 @@ spring:
     lazy-initialization: false
 server:
   port: 8080
-  error.include-stacktrace: always
+  error:
+    include-stacktrace: always
 logging:
   level:
     .: error
     org.springframework: INFO
     org.zalando.logbook: TRACE
-    org.apache.tomcat: INFO
     org.mongodb.driver:
       .: INFO
       cluster: OFF
+    de.helpmeifyoucan:
+      .: DEBUG
 database:
-  protocol: mongodb+srv
-  host: "helpme-1rsgf.mongodb.net/test?retryWrites=true&w=majority"
+  protocol: mongodb
+  host: localhost
   name: helpmeifyoucan
-  user: dbUser
-  password: ${DATABASE_PASSWORD}
 jwt:
   secret: me9ohjeicheich7abuchie7eiK9reeTaek3Oowaeyie1aip8keepai7paivi1Eig
   expiration: 864000000
