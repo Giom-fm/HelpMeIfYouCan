@@ -4,8 +4,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,8 +31,6 @@ public class ApiErrorHandler {
     @Autowired
     ErrorController errorController;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-  
     @ExceptionHandler({NotFoundException.class ,NoHandlerFoundException.class})
     public final ResponseEntity<Map<String, Object>> handleNotFoundExceptions(HttpServletRequest request) {
         return errorController.handleException(request, HttpStatus.NOT_FOUND);

@@ -1,16 +1,19 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 
 @Component
 public class EmbeddedCoordsMapper extends StdSerializer<Coordinates> {
 
+    private static final long serialVersionUID = -397508863117016407L;
 
     public EmbeddedCoordsMapper() {
         this(null);
