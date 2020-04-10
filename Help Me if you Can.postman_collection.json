@@ -35,7 +35,8 @@
 								"auth",
 								"signup"
 							]
-						}
+						},
+						"description": "* email (required)\n* password (required)\n* name (required)\n* lastName (required)"
 					},
 					"response": []
 				},
@@ -66,7 +67,8 @@
 								"auth",
 								"signin"
 							]
-						}
+						},
+						"description": "* email (required)\n* password (required)"
 					},
 					"response": []
 				}
@@ -81,21 +83,9 @@
 					"item": [
 						{
 							"name": "Me",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
 							"request": {
 								"method": "GET",
 								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
 								"url": {
 									"raw": "{{HOST}}:{{PORT}}/user/me",
 									"host": [
@@ -123,7 +113,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"currentPassword\" : \"password1\"\n}",
+									"raw": "{\n\t\"email\": \"mail@domain.de\",\n\t\"password\": \"password1\",\n\t\"name\": \"newName\",\n\t\"lastName\" : \"newLastName\",\n\t\"phoneNr\" : \"012098398\",\n\t\"currentPassword\" : \"password1\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -141,7 +131,7 @@
 										"me"
 									]
 								},
-								"description": "* email\n* password\n* name\n* lastName\n* phoneNr\n* currentPassword (required)"
+								"description": "* email (optional)\n* password (optional)\n* name (optional)\n* lastName (optional)\n* phoneNr (optional)\n* currentPassword (required)"
 							},
 							"response": []
 						},
@@ -167,6 +157,42 @@
 										"me"
 									]
 								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User Address",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"street\" : \"myStreet\",\n\t\"district\" : \"myDistrict\",\n\t\"zipCode\" : \"22175\",\n\t\"country\" : \"myCountry\",\n\t\"houseNumber\" : \"112\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=true",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"user",
+										"me",
+										"address"
+									],
+									"query": [
+										{
+											"key": "lazy",
+											"value": "true"
+										}
+									]
+								},
+								"description": "* street (required)\n* district (required)\n* zipCode (required)\n* country (required)\n* houseNumber (required)"
 							},
 							"response": []
 						}
@@ -239,6 +265,10 @@
 							"request": {
 								"method": "PATCH",
 								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
 								"url": {
 									"raw": "{{HOST}}:{{PORT}}/user/:id",
 									"host": [
@@ -313,7 +343,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "123213213213213"
+									"value": "5e90d926626b9d0497996430"
 								}
 							]
 						}
@@ -347,11 +377,11 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "123124234123213"
+									"value": "5e90d926626b9d0497996430"
 								}
 							]
 						},
-						"description": "* street\n* district\n* houseNumber\n* zipCode\n* country"
+						"description": "* street (optional)\n* district (optional)\n* houseNumber (optional)\n* zipCode (optional)\n* country (optional)"
 					},
 					"response": []
 				},
@@ -373,7 +403,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "123123213213"
+									"value": "5e90dbee9f142420e77f931f"
 								}
 							]
 						}
@@ -418,7 +448,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"20\"\n    },\n    \"description\": \"this is a test\"\n}",
+							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"20\"\n    },\n    \"description\": \"this is a test\",\n    \"categories\" : [\"Errands\", \"PersonalAssistance\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -435,7 +465,7 @@
 								"offers"
 							]
 						},
-						"description": "* description\n* coordinates\n  * latitude\n  * longitude"
+						"description": "* description (required)\n* coordinates (required)\n  * latitude\n  * longitude\n* categories: [Errands, PersonalAssistance, SpendingFreeTime, Other] (one required)"
 					},
 					"response": []
 				},
@@ -446,7 +476,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\" : \"Edit Description\"\n}",
+							"raw": "{\n    \"description\": \"Edit Description\",\n    \"status\": \"ACTIVE\",\n    \"categories\": [\"PersonalAssistance\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -466,11 +496,11 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "90a7ds0987sa90d87"
+									"value": "5e90dd4d9f142420e77f9322"
 								}
 							]
 						},
-						"description": "* description"
+						"description": "* status: ACTIVE || INACTIVE (optional)\n* description (optional) \n* categories (optional)"
 					},
 					"response": []
 				},
@@ -481,7 +511,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"latitude\" : \"50\"\n\t\"longitude\" : \"10\"\n}",
+							"raw": "{\n\t\"latitude\" : \"50\",\n\t\"longitude\" : \"110\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -502,16 +532,16 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "90a7ds0987sa90d87"
+									"value": "5e90dd4d9f142420e77f9322"
 								}
 							]
 						},
-						"description": "* latitude\n* longitude"
+						"description": "* latitude (optional)\n* longitude (optional)"
 					},
 					"response": []
 				},
 				{
-					"name": "Delete",
+					"name": "Delete - BROKEN",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -528,7 +558,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "908asd0987as980d7"
+									"value": "5e90dcba9f142420e77f9320"
 								}
 							]
 						}
@@ -563,11 +593,11 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "908asd0987as980d7"
+									"value": "5e90e15d3b62fb0d2844c145"
 								}
 							]
 						},
-						"description": "* message"
+						"description": "* message (required)"
 					},
 					"response": []
 				},
@@ -577,24 +607,19 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/offers/:requestId/:applicationId/unapply",
+							"raw": "{{HOST}}:{{PORT}}/offers/:id/unapply",
 							"host": [
 								"{{HOST}}"
 							],
 							"port": "{{PORT}}",
 							"path": [
 								"offers",
-								":requestId",
-								":applicationId",
+								":id",
 								"unapply"
 							],
 							"variable": [
 								{
-									"key": "requestId",
-									"value": ""
-								},
-								{
-									"key": "applicationId",
+									"key": "id",
 									"value": ""
 								}
 							]
@@ -603,30 +628,30 @@
 					"response": []
 				},
 				{
-					"name": "Accept",
+					"name": "Accept - BROKEN",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/offers/:requestId/:applicationId/accept",
+							"raw": "{{HOST}}:{{PORT}}/offers/:offerId/:applicationId/accept",
 							"host": [
 								"{{HOST}}"
 							],
 							"port": "{{PORT}}",
 							"path": [
 								"offers",
-								":requestId",
+								":offerId",
 								":applicationId",
 								"accept"
 							],
 							"variable": [
 								{
-									"key": "requestId",
-									"value": "908as7d90a8s7d"
+									"key": "offerId",
+									"value": "5e90e15d3b62fb0d2844c145"
 								},
 								{
 									"key": "applicationId",
-									"value": "9087asd908a7sd"
+									"value": "5e90dfa59f142420e77f9326"
 								}
 							]
 						}
@@ -657,7 +682,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "9087a9sd790a87sd0"
+									"value": "5e90e3363b62fb0d2844c147"
 								}
 							]
 						}
@@ -671,7 +696,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"20\"\n    },\n    \"description\": \"this is a test\",\n    \"dateDue\": \"2004-06-14T23:34:30\"\n}",
+							"raw": "{\n    \"coordinates\": {\n        \"latitude\": \"10\",\n        \"longitude\": \"22\"\n    },\n    \"description\": \"this is a test\",\n    \"dateDue\": \"2004-06-14T23:34:30\",\n    \"category\": \"Errands\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -688,7 +713,7 @@
 								"requests"
 							]
 						},
-						"description": "* description\n* coordinates\n  * latitude\n  * longitude\n* dateDue (ISO 8601 Format)"
+						"description": "* description (required)\n* coordinates (required)\n  * latitude\n  * longitude\n* dateDue (required) (ISO 8601 Format)\n* category"
 					},
 					"response": []
 				},
@@ -699,7 +724,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\" : \"Edit Description\",\n\t \"dateDue\": \"2004-06-14T23:34:30\"\n\t\n}",
+							"raw": "{\n    \"description\": \"this is a test\",\n    \"dateDue\": \"2004-06-14T23:34:30\",\n    \"category\": \"Errands\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -719,7 +744,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "90a7ds0987sa90d87"
+									"value": "5e90e3363b62fb0d2844c147"
 								}
 							]
 						},
@@ -734,7 +759,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"latitude\" : \"50\"\n\t\"longitude\" : \"10\"\n}",
+							"raw": "{\n\t\"latitude\" : \"50\",\n\t\"longitude\" : \"1011\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -742,7 +767,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/requests/:id/updateCoords",
+							"raw": "{{HOST}}:{{PORT}}/requests/:id/updateCoords/",
 							"host": [
 								"{{HOST}}"
 							],
@@ -750,12 +775,13 @@
 							"path": [
 								"requests",
 								":id",
-								"updateCoords"
+								"updateCoords",
+								""
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "90a7ds0987sa90d87"
+									"value": "5e90e3363b62fb0d2844c147"
 								}
 							]
 						},
@@ -764,7 +790,7 @@
 					"response": []
 				},
 				{
-					"name": "Delete",
+					"name": "Delete - BROKEN",
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -781,7 +807,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "90a8s7d908as7d"
+									"value": "5e90e70b055f9868fcc6afc5"
 								}
 							]
 						}
@@ -816,7 +842,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "908asd0987as980d7"
+									"value": "5e90e82f0e31e80795c9f147"
 								}
 							]
 						},
@@ -830,25 +856,20 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/unapply",
+							"raw": "{{HOST}}:{{PORT}}/requests/::id/unapply",
 							"host": [
 								"{{HOST}}"
 							],
 							"port": "{{PORT}}",
 							"path": [
 								"requests",
-								":requestId",
-								":applicationId",
+								"::id",
 								"unapply"
 							],
 							"variable": [
 								{
-									"key": "requestId",
-									"value": ""
-								},
-								{
-									"key": "applicationId",
-									"value": ""
+									"key": ":id",
+									"value": "5e90e7e90e31e80795c9f144"
 								}
 							]
 						}
@@ -856,9 +877,9 @@
 					"response": []
 				},
 				{
-					"name": "Accept",
+					"name": "Accept - BROKEN",
 					"request": {
-						"method": "POST",
+						"method": "PATCH",
 						"header": [],
 						"url": {
 							"raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/accept",
@@ -875,11 +896,11 @@
 							"variable": [
 								{
 									"key": "requestId",
-									"value": "908as7d90a8s7d"
+									"value": "5e90e82f0e31e80795c9f147"
 								},
 								{
 									"key": "applicationId",
-									"value": "9087asd908a7sd"
+									"value": "5e90e8340e31e80795c9f148"
 								}
 							]
 						}
@@ -920,7 +941,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/coordinates/requests/?longitude&latitude=50&radius=2",
+							"raw": "{{HOST}}:{{PORT}}/coordinates/requests/?longitude=22&latitude=10&radius=20",
 							"host": [
 								"{{HOST}}"
 							],
@@ -933,15 +954,15 @@
 							"query": [
 								{
 									"key": "longitude",
-									"value": null
+									"value": "22"
 								},
 								{
 									"key": "latitude",
-									"value": "50"
+									"value": "10"
 								},
 								{
 									"key": "radius",
-									"value": "2"
+									"value": "20"
 								}
 							]
 						}
@@ -988,18 +1009,19 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/:id",
+							"raw": "{{HOST}}:{{PORT}}/coordinates/:id",
 							"host": [
 								"{{HOST}}"
 							],
 							"port": "{{PORT}}",
 							"path": [
+								"coordinates",
 								":id"
 							],
 							"variable": [
 								{
 									"key": "id",
-									"value": "9087asd0987asd"
+									"value": ""
 								}
 							]
 						}
@@ -1015,7 +1037,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTg3OTcwMmRmNzg3YzM1YThhNjc2ODUiLCJpYXQiOjE1ODU5NDcwNTIsImV4cCI6MTU4NjgxMTA1Miwicm9sZXMiOlsiUk9MRV9VU0VSIl19.DZnc4EQpFz1AyI-A2yvzkM1UHWv6xv4TiRoagTF_a58",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkwZDg1YmY5MGE1NzI4ZjRkMmUzNmQiLCJpYXQiOjE1ODY1NTA4NzgsImV4cCI6MTU4NzQxNDg3OCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.iTXtM4f83kcUnQvErfDLPBJgJ7Jg642yjL-3-wryl7gynX2LI97YA2smb70bO-2ccmylL_FiROn8rKJhqZSo-Q",
 				"type": "string"
 			}
 		]
@@ -1044,13 +1066,13 @@
 	],
 	"variable": [
 		{
-			"id": "9421d970-1366-48f1-ac0f-0ee813c512bd",
+			"id": "3a7120b5-21ef-46c4-8468-3507069cb0b5",
 			"key": "HOST",
 			"value": "localhost",
 			"type": "string"
 		},
 		{
-			"id": "86922939-c43f-4b04-adc7-1b063da49f94",
+			"id": "688848a8-d412-47b8-9718-1a6110b80206",
 			"key": "PORT",
 			"value": "8080",
 			"type": "string"
