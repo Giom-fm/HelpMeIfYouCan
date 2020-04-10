@@ -53,19 +53,20 @@ public class UserController {
         return this.userModelController.update(user, id);
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
-    @PostMapping(path = "/addaddress/{lazy}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Secured({Role.ROLE_NAME_USER})
+    @PostMapping(path = "/me/address/{lazy}", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel addUserAddress(@Valid @RequestBody AddressModel address, @PathVariable boolean lazy) {
         return this.userModelController.handleUserAddressAddRequest(getIdFromContext(), address, lazy);
     }
 
     @Secured({Role.ROLE_NAME_USER})
-    @PostMapping(path = "/updateaddress/{lazy}")
+    @PostMapping(path = "me/updateaddress/{lazy}")
     public UserModel updateUserAddress(@Valid @RequestBody AddressUpdate update, @PathVariable boolean lazy) {
         return this.userModelController.handleUserAddressUpdateRequest(getIdFromContext(), update, lazy);
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(path = "/deleteaddress/", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {

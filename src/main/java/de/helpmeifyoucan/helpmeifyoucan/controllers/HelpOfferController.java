@@ -58,12 +58,10 @@ public class HelpOfferController {
         return this.helpOfferModelService.getAllById(ids);
     }
 
-
     @PostMapping(path = "/{requestId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
         return this.helpOfferModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
-
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{requestId}/{applicationId}/unapply")

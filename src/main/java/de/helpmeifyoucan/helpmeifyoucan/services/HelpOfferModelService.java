@@ -172,7 +172,6 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
         this.updateEmbeddedCoordinates(deletedCoords);
 
         return deletedOffer;
-
     }
 
     /**
