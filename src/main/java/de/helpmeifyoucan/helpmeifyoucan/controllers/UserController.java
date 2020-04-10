@@ -31,7 +31,7 @@ public class UserController {
     }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @GetMapping("/me")
     public UserModel getMe() {
         var id = this.getIdFromContext();
@@ -39,14 +39,14 @@ public class UserController {
 
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
         this.userModelController.deleteById(this.getIdFromContext());
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @PatchMapping("/me")
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
@@ -69,26 +69,26 @@ public class UserController {
 
     @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.OK)
-    @DeleteMapping(path = "/deleteaddress", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(path = "/me/address", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
         return this.userModelController.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
     }
 
     // ADMIN ENDPOINTS --------------------------------
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@Valid @RequestBody UserModel user) {
         this.userModelController.save(user);
     }
 
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
         return this.userModelController.update(user, id);
     }
 
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable ObjectId id) {
@@ -96,13 +96,13 @@ public class UserController {
     }
 
     // REVIEW
-    @ExceptionHandler(value = { MongoWriteException.class })
+    @ExceptionHandler(value = {MongoWriteException.class})
     protected ResponseEntity<String> handleConflict(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "Email already taken!";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = { MongoCommandException.class })
+    @ExceptionHandler(value = {MongoCommandException.class})
     protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getLocalizedMessage();
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);

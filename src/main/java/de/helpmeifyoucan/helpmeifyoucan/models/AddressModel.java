@@ -2,28 +2,14 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.types.ObjectId;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import org.bson.types.ObjectId;
-
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidCountry;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidDistrict;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidHouseNumber;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidStreet;
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidZipCode;
 
 public class AddressModel extends AbstractEntity {
 
@@ -42,7 +28,7 @@ public class AddressModel extends AbstractEntity {
     @ValidHouseNumber
     protected String houseNumber;
 
-    @JsonSerialize(converter = ListObjectIdMapping.class)
+    @JsonIgnore
     protected List<ObjectId> users;
 
     @JsonIgnore

@@ -62,7 +62,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
     public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {
 
-        application.generateId();
+        application.setHelpModelId(helpRequest).generateId();
         var savingUser = this.userService.handleApplicationAdd(user, application);
         application.addUserDetails(savingUser);
 
@@ -76,11 +76,11 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
     public void deleteApplication(ObjectId helpRequest, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpRequest), or(elemMatch("applications", eq("user",
-                deletingUser)), elemMatch("acceptedApplications", eq("user",
+                deletingUser)), elemMatch("acceptedApplication", eq("user",
                 deletingUser))));
 
         var pullApplication = pull("applications", in("user", deletingUser));
-        var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
+        var pullAcceptedApplication = pull("acceptedApplication", in("user", deletingUser));
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
@@ -98,7 +98,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
         var acceptedApplication = offer.acceptApplication(application);
 
-        var addApplicationToAccepted = push("acceptedApplication", acceptedApplication);
+        var addApplicationToAccepted = set("acceptedApplication", acceptedApplication);
 
         var removeApplicationFromApplications = pull("applications", eq(application));
 
@@ -145,7 +145,7 @@ public class HelpRequestModelService extends AbstractService<HelpRequestModel> {
 
         this.updateEmbeddedCoordinates(updatedCoordinates);
 
-        return requestToUpdate.setCoordinates(updatedCoordinates);
+        return this.updateExistingFields(eq(requestId), set("coordinates", updatedCoordinates));
     }
 
     /**
