@@ -10,8 +10,11 @@ server:
 logging:
   level:
     .: error
-    org.springframework: INFO
+    org.springframework:
+      .: INFO
+      security.web.FilterChainProxy: DEBUG
     org.zalando.logbook: TRACE
+    
     org.mongodb.driver:
       .: INFO
       cluster: OFF

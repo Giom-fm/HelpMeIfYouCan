@@ -15,8 +15,8 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
@@ -25,13 +25,13 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.NotFound
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserAlreadyTakenException;
 
-@ControllerAdvice
-public class ApiErrorHandler {
+@RestControllerAdvice
+public class ApiErrorHandler  {
 
     @Autowired
     ErrorController errorController;
 
-    @ExceptionHandler({NotFoundException.class ,NoHandlerFoundException.class})
+    @ExceptionHandler({NotFoundException.class, NoHandlerFoundException.class})
     public final ResponseEntity<Map<String, Object>> handleNotFoundExceptions(HttpServletRequest request) {
         return errorController.handleException(request, HttpStatus.NOT_FOUND);
     }
