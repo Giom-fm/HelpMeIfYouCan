@@ -64,7 +64,7 @@ public class HelpOfferController {
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/{requestId}/{applicationId}/unapply")
+    @DeleteMapping(path = "/{requestId}/unapply")
     public void unApplyFromRequest(@PathVariable ObjectId requestId) {
         this.helpOfferModelService.deleteApplication(requestId, getIdFromContext());
     }
