@@ -35,7 +35,7 @@ public class UserController {
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel getMe() {
         var id = this.getIdFromContext();
-        return this.userService.get(id);
+        return this.userService.getById(id);
 
     }
 

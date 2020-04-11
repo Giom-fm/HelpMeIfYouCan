@@ -78,7 +78,7 @@ public class UserServiceTest {
 
         this.userService.handleUserAddressAddRequest(testUser.getId(), addedAddress, false);
 
-        assertEquals(this.userService.get(testUser.getId()).getUserAddress(), existingAddress.getId());
+        assertEquals(this.userService.getById(testUser.getId()).getUserAddress(), existingAddress.getId());
 
     }
 
@@ -88,13 +88,13 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel savedUser = userService.get(testUser.getId());
+        UserModel savedUser = userService.getById(testUser.getId());
         assertEquals(savedUser, testUser);
     }
 
     @Test(expected = UserNotFoundException.class)
     public void givenNotExistingObjectId_NotFoundShouldBeThrown() {
-        this.userService.get(new ObjectId());
+        this.userService.getById(new ObjectId());
     }
 
     @Test
@@ -236,7 +236,7 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.handleUserAddressDeleteRequest(this.userService.get(testUser.getId()).getId(), address.getId());
+        UserModel updatedUser = this.userService.handleUserAddressDeleteRequest(this.userService.getById(testUser.getId()).getId(), address.getId());
 
         assertTrue(updatedUser.noAddressReference());
 
