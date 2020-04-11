@@ -9,7 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
@@ -30,7 +29,6 @@ public class UserModel extends AbstractEntity {
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId userAddress;
 
-    @BsonIgnore
     protected AddressModel fullAddress;
 
     @ValidPhone
@@ -198,7 +196,6 @@ public class UserModel extends AbstractEntity {
 
     public UserModel setFullAddress(AddressModel address) {
         this.fullAddress = address;
-        this.userAddress = address.getId();
         return this;
     }
 

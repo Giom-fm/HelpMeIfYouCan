@@ -12,7 +12,7 @@ logging:
     .: error
     org.springframework:
       .: INFO
-      security.web.FilterChainProxy: DEBUG
+      security.web.FilterChainProxy: INFO
     org.zalando.logbook: TRACE
     
     org.mongodb.driver:

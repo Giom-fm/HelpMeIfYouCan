@@ -276,7 +276,6 @@ public class UserServiceTest {
     @Before
     public void clearCollection() {
         clear.clearDb();
-
     }
 
 
