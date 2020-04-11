@@ -29,7 +29,6 @@ public class UserModel extends AbstractEntity {
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId userAddress;
 
-    @BsonIgnore
     protected AddressModel fullAddress;
 
     @ValidPhone
@@ -197,7 +196,6 @@ public class UserModel extends AbstractEntity {
 
     public UserModel setFullAddress(AddressModel address) {
         this.fullAddress = address;
-        this.userAddress = address.getId();
         return this;
     }
 

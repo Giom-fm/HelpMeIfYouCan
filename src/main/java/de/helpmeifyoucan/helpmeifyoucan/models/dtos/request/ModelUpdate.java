@@ -47,7 +47,6 @@ public class ModelUpdate {
             }
         });
 
-
         return combine(filter);
     }
 
