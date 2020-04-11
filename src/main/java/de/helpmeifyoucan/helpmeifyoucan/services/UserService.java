@@ -43,16 +43,19 @@ public class UserService extends AbstractService<UserModel> {
         super.createIndex(Indexes.ascending("email"), options);
     }
 
-
     public UserModel get(ObjectId id) {
-
         return Optional.ofNullable(super.getById(id)).orElseThrow(() -> new UserExceptions.UserNotFoundException(id));
-
     }
 
     public UserModel getByEmail(String email) {
         var filter = Filters.eq("email", email);
-        return Optional.ofNullable(super.getByFilter(filter)).orElseThrow(() -> new UserExceptions.UserNotFoundByEmailException(email));
+        return Optional.ofNullable(super.getByFilter(filter))
+                .orElseThrow(() -> new UserExceptions.UserNotFoundByEmailException(email));
+    }
+
+    public AddressModel getUserAddress(ObjectId id) {
+        var addressId = this.get(id).getUserAddress();
+        return this.addressService.getById(addressId);
     }
 
     /**
@@ -80,7 +83,6 @@ public class UserService extends AbstractService<UserModel> {
         return super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
     }
-
 
     /**
      * The user requests to add a new address to his addresses, as we dont want to
@@ -130,11 +132,13 @@ public class UserService extends AbstractService<UserModel> {
         return this.deleteAddressFromUser(this.get(userId), addressId);
     }
 
-    public UserModel handleHelpModelAdd(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId, ObjectId userId) {
+    public UserModel handleHelpModelAdd(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
+            ObjectId userId) {
         return this.addHelpModel(userId, modelId, modelClass);
     }
 
-    public UserModel handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId, ObjectId userId) {
+    public UserModel handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
+            ObjectId userId) {
         return this.deleteHelpModel(userId, modelId, modelClass);
     }
 
@@ -142,8 +146,7 @@ public class UserService extends AbstractService<UserModel> {
         return this.addApplication(userId, application);
     }
 
-    public UserModel handleApplicationAccept(HelpModelApplication application,
-                                             ObjectId acceptingUser) {
+    public UserModel handleApplicationAccept(HelpModelApplication application, ObjectId acceptingUser) {
         return this.acceptApplication(application.getUser(), application, acceptingUser);
     }
 
@@ -205,18 +208,22 @@ public class UserService extends AbstractService<UserModel> {
 
         var filter = Filters.eq("_id", user.getId());
 
-        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields)).orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+        return Optional.ofNullable(super.updateExistingFields(filter, updatedFields))
+                .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
 
     }
 
     private UserModel addHelpModel(ObjectId userId, ObjectId modelId, Class<? extends AbstractHelpModel> model) {
         var idFilter = eq(userId);
-        return model.equals(HelpOfferModel.class) ? super.updateExistingFields(idFilter, push("helpOffers", modelId)) : super.updateExistingFields(idFilter, push("helpRequests", modelId));
+        return model.equals(HelpOfferModel.class) ? super.updateExistingFields(idFilter, push("helpOffers", modelId))
+                : super.updateExistingFields(idFilter, push("helpRequests", modelId));
     }
 
     private UserModel deleteHelpModel(ObjectId userId, ObjectId modelId, Class<? extends AbstractHelpModel> model) {
         var idFilter = eq(userId);
-        return model.equals(HelpOfferModel.class) ? super.updateExistingFields(idFilter, pull("helpOffers", eq(modelId))) : super.updateExistingFields(idFilter, pull("helpRequests", eq(modelId)));
+        return model.equals(HelpOfferModel.class)
+                ? super.updateExistingFields(idFilter, pull("helpOffers", eq(modelId)))
+                : super.updateExistingFields(idFilter, pull("helpRequests", eq(modelId)));
 
     }
 
@@ -227,27 +234,23 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     private UserModel acceptApplication(ObjectId acceptedUser, HelpModelApplication application,
-                                        ObjectId acceptingUser) {
+            ObjectId acceptingUser) {
         var acceptingUserModel = this.getById(acceptingUser);
 
         application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
 
-        var pullApplicationFilter = pull("applications", in("requestId",
-                application.getHelpModelId()));
+        var pullApplicationFilter = pull("applications", in("requestId", application.getHelpModelId()));
 
         var pushAcceptedApplication = push("acceptedApplications", application);
 
-
         var idFilter = eq(acceptedUser);
-        return this.updateExistingFields(idFilter, combine(pullApplicationFilter,
-                pushAcceptedApplication));
+        return this.updateExistingFields(idFilter, combine(pullApplicationFilter, pushAcceptedApplication));
     }
 
     private UserModel deleteApplication(ObjectId userId, ObjectId requestId) {
         var idFilter = eq(userId);
 
-        return this.updateExistingFields(idFilter, pull("applications", in(
-                "requestId", requestId)));
+        return this.updateExistingFields(idFilter, pull("applications", in("requestId", requestId)));
     }
 
     @Autowired

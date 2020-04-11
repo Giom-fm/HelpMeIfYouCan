@@ -2,6 +2,11 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import org.bson.codecs.pojo.annotations.BsonIgnore;
+import org.bson.types.ObjectId;
+
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.Role;

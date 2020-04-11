@@ -17,7 +17,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
@@ -32,12 +31,11 @@ public class AuthenticationProcessingFilter extends AbstractAuthenticationProces
     private JwtAuthenticationProvider jwtAuthentificationProvider;
 
     public AuthenticationProcessingFilter(AuthenticationManager authenticationManager,
-            JwtAuthenticationProvider jwtAuthentificationProvider, AuthenticationFailureHandler failureHandler) {
+            JwtAuthenticationProvider jwtAuthentificationProvider) {
 
         super(new AntPathRequestMatcher("/auth/signin", HttpMethod.POST.name()));
         this.authenticationManager = authenticationManager;
         this.jwtAuthentificationProvider = jwtAuthentificationProvider;
-        this.setAuthenticationFailureHandler(failureHandler);
     }
 
     @Override
