@@ -1,6 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.ApiException;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.BadRequestException;
 
 public class ValidationExceptions {
 
@@ -8,7 +8,7 @@ public class ValidationExceptions {
     // Email
     // -------------------------------------------------------------------------
 
-    public static class EmailNotSetException extends ApiException {
+    public static class EmailNotSetException extends BadRequestException {
 
         private static final long serialVersionUID = -3172984630237070428L;
         private static ErrorCode error = ErrorCode.EMAIL_NOT_SET;
@@ -18,7 +18,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class EmailPatternException extends ApiException {
+    public static class EmailPatternException extends BadRequestException {
 
         private static final long serialVersionUID = -6331924738483294846L;
         private static ErrorCode error = ErrorCode.EMAIL_PATTERN;
@@ -32,7 +32,7 @@ public class ValidationExceptions {
     // Password
     // -------------------------------------------------------------------------
 
-    public static class PasswordNotSetException extends ApiException {
+    public static class PasswordNotSetException extends BadRequestException {
         private static final long serialVersionUID = -5353045296336114156L;
         private static ErrorCode error = ErrorCode.PASSWORD_NOT_SET;
 
@@ -41,7 +41,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class PasswordLengthException extends ApiException {
+    public static class PasswordLengthException extends BadRequestException {
 
         private static final long serialVersionUID = -7494105551864856390L;
         private static ErrorCode error = ErrorCode.PASSWORD_LENGTH;
@@ -51,7 +51,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class PasswordNumericException extends ApiException {
+    public static class PasswordNumericException extends BadRequestException {
 
         private static final long serialVersionUID = 1057657194607606595L;
         private static ErrorCode error = ErrorCode.PASSWORD_NUMERIC;
@@ -61,7 +61,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class PasswordAlphabeticException extends ApiException {
+    public static class PasswordAlphabeticException extends BadRequestException {
 
         private static final long serialVersionUID = 6956942502657110107L;
         private static ErrorCode error = ErrorCode.PASSWORD_ALPHABETIC;
@@ -75,7 +75,7 @@ public class ValidationExceptions {
     // Name
     // -------------------------------------------------------------------------
 
-    public static class NameNotSetException extends ApiException {
+    public static class NameNotSetException extends BadRequestException {
         private static final long serialVersionUID = 3359601043972354459L;
         private static ErrorCode error = ErrorCode.NAME_NOT_SET;
 
@@ -84,7 +84,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class NamePatternException extends ApiException {
+    public static class NamePatternException extends BadRequestException {
         private static final long serialVersionUID = 6834858514021347703L;
         private static ErrorCode error = ErrorCode.NAME_PATTERN;
 
@@ -97,7 +97,7 @@ public class ValidationExceptions {
     // Phone
     // -------------------------------------------------------------------------
 
-    public static class PhoneNotSetException extends ApiException {
+    public static class PhoneNotSetException extends BadRequestException {
         private static final long serialVersionUID = 373301589877299045L;
         private static ErrorCode error = ErrorCode.PHONE_NOT_SET;
 
@@ -106,7 +106,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class PhonePatternException extends ApiException {
+    public static class PhonePatternException extends BadRequestException {
         private static final long serialVersionUID = -7180458561889614227L;
         private static ErrorCode error = ErrorCode.PHONE_PATTERN;
 
@@ -119,7 +119,7 @@ public class ValidationExceptions {
     // Street
     // -------------------------------------------------------------------------
 
-    public static class StreetNotSetException extends ApiException {
+    public static class StreetNotSetException extends BadRequestException {
         private static final long serialVersionUID = -6497746717167473335L;
         private static ErrorCode error = ErrorCode.STREET_NOT_SET;
 
@@ -128,7 +128,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class StreetPatternException extends ApiException {
+    public static class StreetPatternException extends BadRequestException {
         private static final long serialVersionUID = 1L;
         private static ErrorCode error = ErrorCode.STREET_PATTERN;
 
@@ -141,7 +141,7 @@ public class ValidationExceptions {
     // District
     // -------------------------------------------------------------------------
 
-    public static class DistrictNotSetException extends ApiException {
+    public static class DistrictNotSetException extends BadRequestException {
         private static final long serialVersionUID = 1439620932606773910L;
         private static ErrorCode error = ErrorCode.DISTRICT_NOT_SET;
 
@@ -150,7 +150,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class DistrictPatternException extends ApiException {
+    public static class DistrictPatternException extends BadRequestException {
         private static final long serialVersionUID = -1934984870811366793L;
         private static ErrorCode error = ErrorCode.DISTRICT_PATTERN;
 
@@ -163,7 +163,7 @@ public class ValidationExceptions {
     // Housenumber
     // -------------------------------------------------------------------------
 
-    public static class HousenumberNotSetException extends ApiException {
+    public static class HousenumberNotSetException extends BadRequestException {
         private static final long serialVersionUID = -6462397022132931425L;
         private static ErrorCode error = ErrorCode.HOUSENUMBER_NOT_SET;
 
@@ -172,7 +172,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class HousenumberPatternException extends ApiException {
+    public static class HousenumberPatternException extends BadRequestException {
         private static final long serialVersionUID = 3695911556177084350L;
         private static ErrorCode error = ErrorCode.HOUSENUMBER_PATTERN;
 
@@ -185,7 +185,7 @@ public class ValidationExceptions {
     // Zipcode
     // -------------------------------------------------------------------------
 
-    public static class ZipcodeNotSetException extends ApiException {
+    public static class ZipcodeNotSetException extends BadRequestException {
         private static final long serialVersionUID = 511180654106367902L;
         private static ErrorCode error = ErrorCode.ZIPCODE_NOT_SET;
 
@@ -194,7 +194,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class ZipcodePatternException extends ApiException {
+    public static class ZipcodePatternException extends BadRequestException {
         private static final long serialVersionUID = -7400300661057679412L;
         private static ErrorCode error = ErrorCode.ZIPCODE_PATTERN;
 
@@ -207,7 +207,7 @@ public class ValidationExceptions {
     // Country
     // -------------------------------------------------------------------------
 
-    public static class CountryNotSetException extends ApiException {
+    public static class CountryNotSetException extends BadRequestException {
         private static final long serialVersionUID = 8529832163963998377L;
         private static ErrorCode error = ErrorCode.COUNTRY_NOT_SET;
 
@@ -216,7 +216,7 @@ public class ValidationExceptions {
         }
     }
 
-    public static class CountryPatternException extends ApiException {
+    public static class CountryPatternException extends BadRequestException {
         private static final long serialVersionUID = 2893879540551575616L;
         private static ErrorCode error = ErrorCode.COUNTRY_PATTERN;
 

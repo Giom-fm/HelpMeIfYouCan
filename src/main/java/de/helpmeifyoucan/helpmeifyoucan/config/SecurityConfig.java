@@ -9,14 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import de.helpmeifyoucan.helpmeifyoucan.handlers.ApiErrorHandler;
 import de.helpmeifyoucan.helpmeifyoucan.security.filters.AuthenticationProcessingFilter;
 import de.helpmeifyoucan.helpmeifyoucan.security.filters.JwtAuthorizationFilter;
 import de.helpmeifyoucan.helpmeifyoucan.security.providers.EmailPasswordAuthenticationProvider;
@@ -28,18 +26,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         private JwtAuthenticationProvider jwtAuthenticationProvider;
         private EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider;
-        private ApiErrorHandler errorHandler;
+   
 
-        private AuthenticationFailureHandler failureHandler;
 
         @Autowired
         public SecurityConfig(JwtAuthenticationProvider jwtAuthenticationProvider,
-                        EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider,
-                        ApiErrorHandler errorHandler, AuthenticationFailureHandler failureHandler) {
+                        EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider) {
                 this.jwtAuthenticationProvider = jwtAuthenticationProvider;
                 this.emailPasswordAuthenticationProvider = emailPasswordAuthenticationProvider;
-                this.errorHandler = errorHandler;
-                this.failureHandler = failureHandler;
+            
+           
         }
 
         @Override
@@ -74,12 +70,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         }
 
         JwtAuthorizationFilter jwtAuthorizationFilter() throws Exception {
-                return new JwtAuthorizationFilter(this.authenticationManager(), this.errorHandler);
+                return new JwtAuthorizationFilter(this.authenticationManager());
         }
 
         AuthenticationProcessingFilter authenticationProcessingFilter() throws Exception {
-                return new AuthenticationProcessingFilter(this.authenticationManager(), this.jwtAuthenticationProvider,
-                                this.failureHandler);
+                return new AuthenticationProcessingFilter(this.authenticationManager(), this.jwtAuthenticationProvider);
         }
 
 }
