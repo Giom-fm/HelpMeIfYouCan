@@ -6,7 +6,7 @@ import org.bson.conversions.Bson;
 
 import java.util.List;
 
-public class HelpOfferUpdate extends ModelUpdate {
+public class HelpOfferUpdate extends AbstractHelpModelUpdate {
 
     public PostStatusEnum status;
 
@@ -29,6 +29,7 @@ public class HelpOfferUpdate extends ModelUpdate {
         return this;
     }
 
+    @Override
     public Bson toFilter() {
         return super.toFilter(this);
     }

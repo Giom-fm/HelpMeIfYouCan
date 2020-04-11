@@ -5,7 +5,6 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpOfferUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,23 +35,6 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
         return HelpOfferModel.class;
     }
 
-    /**
-     * We want to update a offer, we do so by first checking if the updating user has permission to do so, if yes we directly update the offer in the db
-     *
-     * @param offerToUpdate the offer to update
-     * @param update        the update to perform
-     * @param updatingUser  the user performing the update
-     * @return the updated offer
-     */
-    public HelpOfferModel update(ObjectId offerToUpdate, HelpOfferUpdate update, ObjectId updatingUser) {
-
-        var updateFilter = and(eq(offerToUpdate), in("user", updatingUser));
-
-
-        return Optional.ofNullable(super.updateExistingFields(updateFilter, update.toFilter())).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(offerToUpdate));
-    }
-
-
     public void deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpOffer), or(elemMatch("applications", eq("user",
@@ -64,11 +46,15 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
-        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
-
         this.userService.handleApplicationDelete(deletingUser, helpOffer);
 
+
+        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter,
+                deleteApplicationUpdate).getApplications()).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(helpOffer));
+
+
     }
+
 
     public HelpModelApplication acceptApplication(ObjectId helpOffer, ObjectId application, ObjectId acceptingUser) {
 

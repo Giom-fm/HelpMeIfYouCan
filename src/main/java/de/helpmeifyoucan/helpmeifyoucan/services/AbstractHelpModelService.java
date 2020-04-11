@@ -4,6 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractHelpModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
@@ -40,6 +41,29 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     protected abstract void createIndex();
 
     protected abstract Class<T> getModel();
+
+    public abstract void deleteApplication(ObjectId modelId, ObjectId deletingUser);
+
+    /**
+     * We want to update a request, we do so by first checking if the updating user has permission to do so, if yes we directly update the request in the db
+     *
+     * @param requestToUpdate the request to update
+     * @param update          the update to perform
+     * @param updatingUser    the user performing the updating
+     * @return the updated request
+     */
+
+    public T update(ObjectId requestToUpdate, AbstractHelpModelUpdate update,
+                    ObjectId updatingUser) {
+
+        var updateFilter = and(eq(requestToUpdate), in("user", updatingUser));
+
+        return Optional.ofNullable(super.updateExistingFields(updateFilter, update.toFilter())).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(requestToUpdate));
+
+    }
+
+    public abstract HelpModelApplication acceptApplication(ObjectId modelId, ObjectId applicationId,
+                                                           ObjectId acceptingUser);
 
 
     public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {

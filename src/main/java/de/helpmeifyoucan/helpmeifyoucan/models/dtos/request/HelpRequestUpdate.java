@@ -6,7 +6,7 @@ import org.bson.conversions.Bson;
 
 import java.util.Date;
 
-public class HelpRequestUpdate extends ModelUpdate {
+public class HelpRequestUpdate extends AbstractHelpModelUpdate {
 
     public Date dateDue;
 
