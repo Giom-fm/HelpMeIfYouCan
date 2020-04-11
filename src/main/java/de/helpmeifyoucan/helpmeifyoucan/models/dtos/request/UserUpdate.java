@@ -1,13 +1,12 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-import javax.validation.constraints.NotNull;
-
-import org.bson.conversions.Bson;
-
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
+import org.bson.conversions.Bson;
+
+import javax.validation.constraints.NotNull;
 
 public class UserUpdate extends ModelUpdate {
 
@@ -15,14 +14,14 @@ public class UserUpdate extends ModelUpdate {
     protected String email;
     @ValidPassword(canBeNull = true)
     protected String password;
-    @NotNull
-    private String currentPassword;
     @ValidName(canBeNull = true)
     protected String name;
     @ValidName(canBeNull = true)
     protected String lastName;
     @ValidPhone(canBeNull = true)
     protected String phoneNr;
+    @NotNull
+    private String currentPassword;
 
     public UserUpdate() {
 
@@ -57,6 +56,8 @@ public class UserUpdate extends ModelUpdate {
     }
 
     public Bson toFilter() {
+
+        this.currentPassword = null;
         return super.toFilter(this);
     }
 

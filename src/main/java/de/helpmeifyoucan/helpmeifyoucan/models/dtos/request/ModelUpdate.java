@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions;
 import org.bson.conversions.Bson;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -47,7 +48,11 @@ public class ModelUpdate {
             }
         });
 
+        if (filter.isEmpty()) {
+            throw new ValidationExceptions.NameNotSetException();
+        }
         return combine(filter);
+
     }
 
 }

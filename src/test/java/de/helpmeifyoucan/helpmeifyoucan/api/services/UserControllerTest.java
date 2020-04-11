@@ -1,14 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.api.services;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.LinkedList;
-
-import org.junit.Ignore;
+import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +15,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.LinkedList;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -83,7 +81,6 @@ public class UserControllerTest extends AbstractControllerTest {
         assertEquals(HttpStatus.UNSUPPORTED_MEDIA_TYPE, response.getStatusCode());
     }
 
-    @Ignore
     @Test
     public void PatchMe_AllFieldsAtOnce() throws URISyntaxException {
         String token = super.LoginAndGetToken(testUser.getEmail(), this.password);
