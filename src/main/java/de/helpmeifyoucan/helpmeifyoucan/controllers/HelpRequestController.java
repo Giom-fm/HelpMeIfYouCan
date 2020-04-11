@@ -31,7 +31,7 @@ public class HelpRequestController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel save(@RequestBody HelpRequestModel request) {
-        return this.helpRequestModelService.saveNewRequest(request, getIdFromContext());
+        return this.helpRequestModelService.saveNewModel(request, getIdFromContext());
     }
 
 
@@ -47,7 +47,7 @@ public class HelpRequestController {
 
     @DeleteMapping(path = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel delete(@PathVariable ObjectId requestId) {
-        return this.helpRequestModelService.deleteRequest(requestId, getIdFromContext());
+        return this.helpRequestModelService.deleteModel(requestId, getIdFromContext());
     }
 
     @GetMapping(path = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)

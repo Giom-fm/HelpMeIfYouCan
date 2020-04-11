@@ -29,7 +29,7 @@ public class HelpOfferController {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpOfferModel save(@RequestBody HelpOfferModel request) {
-        return this.helpOfferModelService.saveNewOffer(request, getIdFromContext());
+        return this.helpOfferModelService.saveNewModel(request, getIdFromContext());
     }
 
 
@@ -50,7 +50,7 @@ public class HelpOfferController {
 
     @DeleteMapping(path = "/{offerId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpOfferModel delete(@PathVariable ObjectId offerId) {
-        return this.helpOfferModelService.deleteRequest(offerId, getIdFromContext());
+        return this.helpOfferModelService.deleteModel(offerId, getIdFromContext());
     }
 
     @GetMapping(path = "/{offerId}", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -92,7 +92,8 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return Optional.ofNullable(getByFilter(filter));
     }
 
-    protected void createCollection(String collectionName, Class<T> collectionClass) {
+    protected void createCollection(String collectionName,
+                                    Class<T> collectionClass) {
         this.collection = database.getCollection(collectionName, collectionClass).withWriteConcern(WriteConcern.W1);
     }
 

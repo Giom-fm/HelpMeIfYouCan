@@ -49,13 +49,13 @@ public class CoordinatesService extends AbstractService<Coordinates> {
 
     public List<Coordinates> getAllRequests(double longitude, double latitude, double radius) {
         var requestFilter = and(where("this.helpRequests.length > 0"), geoWithinCenterSphere(
-                "location", longitude, latitude, radius));
+                "location", longitude, latitude, radius / 6371));
         return getAllByFilter(requestFilter);
     }
 
     public List<Coordinates> getAllOffers(double longitude, double latitude, double radius) {
         var offerFilter = and(where("this.helpOffers.length > 0"), geoWithinCenterSphere(
-                "location", longitude, latitude, radius));
+                "location", longitude, latitude, radius / 6371));
         return getAllByFilter(offerFilter);
     }
 

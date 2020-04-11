@@ -54,14 +54,14 @@ public class HelpRequestServiceTest {
 
     @Test
     public void givenOfferToSave_offerShouldBeSavedAndBeRetrieved() {
-        this.requestService.saveNewRequest(testRequest, testUser.getId());
+        this.requestService.saveNewModel(testRequest, testUser.getId());
 
         assertEquals(testRequest, this.requestService.getById(testRequest.getId()));
     }
 
     @Test
     public void givenOfferAndUpdateToPerform_offerShouldBeUpdatedAccordingly() {
-        this.requestService.saveNewRequest(testRequest, testUser.getId());
+        this.requestService.saveNewModel(testRequest, testUser.getId());
 
         HelpRequestUpdate requestUpdate = new HelpRequestUpdate().setStatus(PostStatusEnum.INACTIVE).setCategory(HelpCategoryEnum.Errands).setDateDue(new Date());
 
@@ -74,11 +74,11 @@ public class HelpRequestServiceTest {
 
     @Test
     public void givenTwoObjectsMatchingTheFilter_updateManyShouldUpdateTwo() {
-        this.requestService.saveNewRequest(testRequest, testUser.getId());
+        this.requestService.saveNewModel(testRequest, testUser.getId());
 
         var newRequest = new HelpRequestModel().setUser(new ObjectId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
-        this.requestService.saveNewRequest(newRequest, newRequest.getUser());
+        this.requestService.saveNewModel(newRequest, newRequest.getUser());
 
         long updatedOffers = this.requestService.updateEmbeddedCoordinates(testCoordinates.setLatitude(25.00));
 
@@ -87,11 +87,11 @@ public class HelpRequestServiceTest {
 
     @Test
     public void savedTwoObjects_getAllByIdShouldReturnBoth() {
-        this.requestService.saveNewRequest(testRequest, testUser.getId());
+        this.requestService.saveNewModel(testRequest, testUser.getId());
 
         var newRequest = new HelpRequestModel().setUser(new ObjectId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
-        this.requestService.saveNewRequest(newRequest, newRequest.getUser());
+        this.requestService.saveNewModel(newRequest, newRequest.getUser());
 
         List<ObjectId> ids = new ArrayList<>();
         ids.add(testRequest.getId());
@@ -101,6 +101,5 @@ public class HelpRequestServiceTest {
         assertEquals(list.size(), 2);
 
     }
-
 
 }

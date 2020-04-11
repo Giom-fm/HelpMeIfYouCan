@@ -59,14 +59,14 @@ public class HelpOfferModelServiceTest {
 
     @Test
     public void givenOfferToSave_offerShouldBeSavedAndBeRetrieved() {
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
         assertEquals(testOffer, this.helpService.getById(testOffer.getId()));
     }
 
     @Test
     public void givenOfferAndUpdateToPerform_offerShouldBeUpdatedAccordingly() {
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
 
         List<HelpCategoryEnum> newCategories = new LinkedList<>();
@@ -83,11 +83,11 @@ public class HelpOfferModelServiceTest {
 
     @Test
     public void givenTwoObjectsMatchingTheFilter_updateManyShouldUpdateTwo() {
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
         var newOffer = new HelpOfferModel().setUser(new ObjectId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
-        this.helpService.saveNewOffer(newOffer, newOffer.getUser());
+        this.helpService.saveNewModel(newOffer, newOffer.getUser());
 
         long updatedOffers = this.helpService.updateEmbeddedCoordinates(testCoordinates.setLatitude(25.00));
 
@@ -98,7 +98,7 @@ public class HelpOfferModelServiceTest {
     @Test
     public void givenApplicationsToSave_itShouldBeSaved() {
 
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
@@ -114,7 +114,7 @@ public class HelpOfferModelServiceTest {
     @Test
     public void givenApplicationToDelete_itShouldBeRemoved() {
 
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
@@ -128,7 +128,7 @@ public class HelpOfferModelServiceTest {
 
     @Test
     public void givenApplicationToAccept_itShouldBeAcceptedCorrectly() {
-        this.helpService.saveNewOffer(testOffer, testUser.getId());
+        this.helpService.saveNewModel(testOffer, testUser.getId());
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 

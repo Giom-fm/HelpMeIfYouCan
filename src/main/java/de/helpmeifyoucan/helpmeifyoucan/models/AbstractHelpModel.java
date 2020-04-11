@@ -29,6 +29,14 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     protected Date datePublished;
 
 
+    public abstract <T extends AbstractHelpModel> T setUser(ObjectId user);
+
+    public abstract <T extends AbstractHelpModel> T setStatus(PostStatusEnum status);
+
+    public abstract <T extends AbstractHelpModel> T generateId();
+
+    public abstract <T extends AbstractHelpModel> T setCoordinates(Coordinates coordinates);
+
     public ObjectId getUser() {
         return user;
     }
