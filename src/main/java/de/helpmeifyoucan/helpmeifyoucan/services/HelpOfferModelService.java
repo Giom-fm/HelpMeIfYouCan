@@ -60,7 +60,7 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
 
     public HelpModelApplication saveNewApplication(ObjectId helpOffer, HelpModelApplication application, ObjectId user) {
-        application.setRequestId(helpOffer).generateId();
+        application.setHelpModelId(helpOffer).generateId();
 
         var savingUser = this.userService.handleApplicationAdd(user, application);
         application.addUserDetails(savingUser);
@@ -145,7 +145,7 @@ public class HelpOfferModelService extends AbstractService<HelpOfferModel> {
 
         this.updateEmbeddedCoordinates(updatedCoordinates);
 
-        return offerToUpdate.setCoordinates(updatedCoordinates);
+        return this.updateExistingFields(eq(offerId), set("coordinates", updatedCoordinates));
 
     }
 

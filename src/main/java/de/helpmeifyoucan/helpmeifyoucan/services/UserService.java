@@ -233,7 +233,7 @@ public class UserService extends AbstractService<UserModel> {
         application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
 
         var pullApplicationFilter = pull("applications", in("requestId",
-                application.getRequestId()));
+                application.getHelpModelId()));
 
         var pushAcceptedApplication = push("acceptedApplications", application);
 

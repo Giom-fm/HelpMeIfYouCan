@@ -15,21 +15,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/requests")
 public class HelpRequestController {
 
     private HelpRequestModelService helpRequestModelService;
 
+
     @Autowired
     public HelpRequestController(HelpRequestModelService helpRequestModelService, UserService userService) {
         this.helpRequestModelService = helpRequestModelService;
     }
 
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel save(@RequestBody HelpRequestModel request) {
         return this.helpRequestModelService.saveNewRequest(request, getIdFromContext());
     }
+
 
     @PatchMapping(path = "/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public HelpRequestModel update(@PathVariable ObjectId requestId, @RequestBody HelpRequestUpdate update) {
@@ -62,6 +66,7 @@ public class HelpRequestController {
         return this.helpRequestModelService.saveNewApplication(requestId, application, getIdFromContext());
     }
 
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{requestId}/unapply")
     public void unApplyFromRequest(@PathVariable ObjectId requestId) {
@@ -70,12 +75,14 @@ public class HelpRequestController {
 
     @PatchMapping(path = "/{requestId}/{applicationId}/accept")
     public HelpModelApplication acceptApplication(@PathVariable ObjectId requestId,
-            @PathVariable ObjectId applicationId) {
+                                                  @PathVariable ObjectId applicationId) {
         return this.helpRequestModelService.acceptApplication(requestId, applicationId, getIdFromContext());
     }
 
-    // TODO get by user
-    // TODO get by status
+
+    //TODO get by user
+
+    //TODO get by status
 
     private ObjectId getIdFromContext() {
         return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

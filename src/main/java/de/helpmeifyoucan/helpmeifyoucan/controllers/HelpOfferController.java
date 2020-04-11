@@ -33,24 +33,29 @@ public class HelpOfferController {
     }
 
 
-    @PatchMapping(path = "/{requestId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpOfferModel update(@PathVariable ObjectId requestId, @RequestBody HelpOfferUpdate update) {
-        return this.helpOfferModelService.update(requestId, update, getIdFromContext());
+    @PatchMapping(path = "/{offerId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    public HelpOfferModel update(@PathVariable ObjectId offerId,
+                                 @RequestBody HelpOfferUpdate update) {
+        return this.helpOfferModelService.update(offerId, update, getIdFromContext());
     }
 
-    @PatchMapping(path = "/{requestId}/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpOfferModel updateCoords(@PathVariable ObjectId requestId, @RequestBody CoordinatesUpdate update) {
-        return this.helpOfferModelService.handleCoordinatesUpdate(requestId, update, getIdFromContext());
+    @PatchMapping(path = "/{offerId}/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public HelpOfferModel updateCoords(@PathVariable ObjectId offerId,
+                                       @RequestBody CoordinatesUpdate update) {
+        return this.helpOfferModelService.handleCoordinatesUpdate(offerId, update,
+                getIdFromContext());
     }
 
-    @DeleteMapping(path = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpOfferModel delete(@PathVariable ObjectId requestId) {
-        return this.helpOfferModelService.deleteRequest(requestId, getIdFromContext());
+    @DeleteMapping(path = "/{offerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HelpOfferModel delete(@PathVariable ObjectId offerId) {
+        return this.helpOfferModelService.deleteRequest(offerId, getIdFromContext());
     }
 
-    @GetMapping(path = "/{requestId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpOfferModel get(@PathVariable ObjectId requestId) {
-        return this.helpOfferModelService.getById(requestId);
+    @GetMapping(path = "/{offerId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public HelpOfferModel get(@PathVariable ObjectId offerId) {
+        return this.helpOfferModelService.getById(offerId);
     }
 
     @GetMapping(path = "/getall", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -58,20 +63,25 @@ public class HelpOfferController {
         return this.helpOfferModelService.getAllById(ids);
     }
 
-    @PostMapping(path = "/{requestId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public HelpModelApplication applyToRequest(@PathVariable ObjectId requestId, @RequestBody HelpModelApplication application) {
-        return this.helpOfferModelService.saveNewApplication(requestId, application, getIdFromContext());
+    @PostMapping(path = "/{offerId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
+            MediaType.APPLICATION_JSON_VALUE)
+    public HelpModelApplication applyToRequest(@PathVariable ObjectId offerId,
+                                               @RequestBody HelpModelApplication application) {
+        return this.helpOfferModelService.saveNewApplication(offerId, application,
+                getIdFromContext());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(path = "/{requestId}/unapply")
-    public void unApplyFromRequest(@PathVariable ObjectId requestId) {
-        this.helpOfferModelService.deleteApplication(requestId, getIdFromContext());
+    @DeleteMapping(path = "/{offerId}/unapply")
+    public void unApplyFromRequest(@PathVariable ObjectId offerId) {
+        this.helpOfferModelService.deleteApplication(offerId, getIdFromContext());
     }
 
-    @PatchMapping(path = "/{requestId}/{applicationId}/accept")
-    public HelpModelApplication acceptApplication(@PathVariable ObjectId requestId, @PathVariable ObjectId applicationId) {
-        return this.helpOfferModelService.acceptApplication(requestId, applicationId, getIdFromContext());
+    @PatchMapping(path = "/{offerId}/{applicationId}/accept")
+    public HelpModelApplication acceptApplication(@PathVariable ObjectId offerId,
+                                                  @PathVariable ObjectId applicationId) {
+        return this.helpOfferModelService.acceptApplication(offerId, applicationId,
+                getIdFromContext());
     }
 
 
