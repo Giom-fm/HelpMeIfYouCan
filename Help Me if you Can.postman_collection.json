@@ -1,9 +1,9 @@
 {
 	"info": {
-      "_postman_id": "bc898858-6b51-4cbf-bc84-0dec148974f1",
-      "name": "Help Me if you Can",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
+		"_postman_id": "f374ab0a-1aed-40e0-a792-610f83c6730c",
+		"name": "Help Me if you Can",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
 	"item": [
 		{
 			"name": "Auth",
@@ -185,78 +185,78 @@
 										"me",
 										"address"
 									],
-                                  "query": [
-                                    {
-                                      "key": "lazy",
-                                      "value": "true"
-                                    }
-                                  ]
-                                },
-                              "description": "* street (required)\n* district (required)\n* zipCode (required)\n* country (required)\n* houseNumber (required)"
-                            },
-                          "response": []
-                        },
-                      {
-                        "name": "Delete User Address",
-                        "request": {
-                          "method": "DELETE",
-                          "header": [],
-                          "url": {
-                            "raw": "{{HOST}}:{{PORT}}/address/:id",
-                            "host": [
-                              "{{HOST}}"
-                            ],
-                            "port": "{{PORT}}",
-                            "path": [
-                              "address",
-                              ":id"
-                            ],
-                            "variable": [
-                              {
-                                "key": "id",
-                                "value": "5e90dbee9f142420e77f931f"
-                              }
-                            ]
-                          }
-                        },
-                        "response": []
-                      },
-                      {
-                        "name": "Update UserAddress",
-                        "request": {
-                          "method": "PATCH",
-                          "header": [],
-                          "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66666,\n    \"country\": \"newCountry\"\n}",
-                            "options": {
-                              "raw": {
-                                "language": "json"
-                              }
-                            }
-                          },
-                          "url": {
-                            "raw": "{{HOST}}:{{PORT}}/address/:id",
-                            "host": [
-                              "{{HOST}}"
-                            ],
-                            "port": "{{PORT}}",
-                            "path": [
-                              "address",
-                              ":id"
-                            ],
-                            "variable": [
-                              {
-                                "key": "id",
-                                "value": "5e90d926626b9d0497996430"
-                              }
-                            ]
-                          },
-                          "description": "* street (optional)\n* district (optional)\n* houseNumber (optional)\n* zipCode (optional)\n* country (optional)"
-                        },
-                        "response": []
-                      }
-                    ],
+									"query": [
+										{
+											"key": "lazy",
+											"value": "true"
+										}
+									]
+								},
+								"description": "* street (required)\n* district (required)\n* zipCode (required)\n* country (required)\n* houseNumber (required)"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User Address",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{HOST}}:{{PORT}}/address/:id",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"address",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5e90dbee9f142420e77f931f"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update UserAddress",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66666,\n    \"country\": \"newCountry\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{HOST}}:{{PORT}}/address/:id",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"address",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5e90d926626b9d0497996430"
+										}
+									]
+								},
+								"description": "* street (optional)\n* district (optional)\n* houseNumber (optional)\n* zipCode (optional)\n* country (optional)"
+							},
+							"response": []
+						}
+					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				},
@@ -540,18 +540,18 @@
 					},
 					"response": []
 				},
-              {
-                "name": "Delete",
-                "request": {
-                  "method": "DELETE",
-                  "header": [],
-                  "url": {
-                    "raw": "{{HOST}}:{{PORT}}/offers/:id",
-                    "host": [
-                      "{{HOST}}"
-                    ],
-                    "port": "{{PORT}}",
-                    "path": [
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
 								"offers",
 								":id"
 							],
@@ -627,18 +627,18 @@
 					},
 					"response": []
 				},
-              {
-                "name": "Accept",
-                "request": {
-                  "method": "PATCH",
-                  "header": [],
-                  "url": {
-                    "raw": "{{HOST}}:{{PORT}}/offers/:offerId/:applicationId/accept",
-                    "host": [
-                      "{{HOST}}"
-                    ],
-                    "port": "{{PORT}}",
-                    "path": [
+				{
+					"name": "Accept",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/offers/:offerId/:applicationId/accept",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
 								"offers",
 								":offerId",
 								":applicationId",
@@ -789,18 +789,18 @@
 					},
 					"response": []
 				},
-              {
-                "name": "Delete",
-                "request": {
-                  "method": "DELETE",
-                  "header": [],
-                  "url": {
-                    "raw": "{{HOST}}:{{PORT}}/requests/:id",
-                    "host": [
-                      "{{HOST}}"
-                    ],
-                    "port": "{{PORT}}",
-                    "path": [
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:id",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
 								"requests",
 								":id"
 							],
@@ -876,18 +876,18 @@
 					},
 					"response": []
 				},
-              {
-                "name": "Accept",
-                "request": {
-                  "method": "PATCH",
-                  "header": [],
-                  "url": {
-                    "raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/accept",
-                    "host": [
-                      "{{HOST}}"
-                    ],
-                    "port": "{{PORT}}",
-                    "path": [
+				{
+					"name": "Accept",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}:{{PORT}}/requests/:requestId/:applicationId/accept",
+							"host": [
+								"{{HOST}}"
+							],
+							"port": "{{PORT}}",
+							"path": [
 								"requests",
 								":requestId",
 								":applicationId",
@@ -1035,11 +1035,11 @@
 	"auth": {
 		"type": "bearer",
 		"bearer": [
-          {
-            "key": "token",
-            "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkwZjdjOTcxZjM1YjVjMmJiNDg5OTgiLCJpYXQiOjE1ODY1NTg5MjUsImV4cCI6MTU4NzQyMjkyNSwicm9sZXMiOlsiUk9MRV9VU0VSIl19.3k_lGeFnz4ZngJxTkEi6QW9EGKAq8BmjespbkptuY5k80FSk-STo-4M9KkSwbKvDdKH7uScqKA1ybOYSMs_8dQ",
-            "type": "string"
-          }
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkyMDk1MjgzZTIyYjM5YTI3OTllYzkiLCJpYXQiOjE1ODY2OTc0MDgsImV4cCI6MTU4NzU2MTQwOCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.erekNHou00q-5iNqRTaIFo-cgdJ5N1I9wON7EiNRIqaWPJKmUsYgKad0r72gQO6v7wPXFIL8arv5IDEYL_rjCA",
+				"type": "string"
+			}
 		]
 	},
 	"event": [
@@ -1065,18 +1065,18 @@
 		}
 	],
 	"variable": [
-      {
-        "id": "24c5dd57-e98f-46ff-a627-b39550b8357e",
-        "key": "HOST",
-        "value": "localhost",
-        "type": "string"
-      },
-      {
-        "id": "779c7679-6147-498f-bbdd-64298b7d0d8b",
-        "key": "PORT",
-        "value": "8080",
-        "type": "string"
-      }
+		{
+			"id": "acc12599-2970-4e67-b5c5-9cddee98ac2d",
+			"key": "HOST",
+			"value": "localhost",
+			"type": "string"
+		},
+		{
+			"id": "89f6b1a7-b377-4543-9f6d-9f359a28e83b",
+			"key": "PORT",
+			"value": "8080",
+			"type": "string"
+		}
 	],
 	"protocolProfileBehavior": {}
 }
