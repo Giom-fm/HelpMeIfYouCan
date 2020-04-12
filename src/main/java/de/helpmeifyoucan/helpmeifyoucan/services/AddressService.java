@@ -20,7 +20,6 @@ import static com.mongodb.client.model.Updates.set;
 @Service
 public class AddressService extends AbstractService<AddressModel> {
 
-
     @Autowired
     public AddressService(MongoDatabase dataBase) {
         super(dataBase);
@@ -35,10 +34,15 @@ public class AddressService extends AbstractService<AddressModel> {
         super.createIndex(Indexes.ascending("street", "zipCode", "country", "district", "houseNumber"), options);
     }
 
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // CRUD
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+
     public AddressModel save(AddressModel address) {
         return super.save(address.calculateHash());
     }
-
 
     /**
      * When changes to User references occur, wen want the db model to change
@@ -55,6 +59,11 @@ public class AddressService extends AbstractService<AddressModel> {
         return super.updateExistingFields(idFilter, updatedFields);
     }
 
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // HANDLER
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
     /**
      * We want to add a user to addresses user references and do so by updating the
@@ -67,7 +76,6 @@ public class AddressService extends AbstractService<AddressModel> {
     public AddressModel addUserToAddress(AddressModel address, ObjectId userId) {
         return this.updateUserField(address.addUserAddress(userId));
     }
-
 
     private AddressModel addNewAddress(AddressModel addressToAdd, ObjectId userId) {
 
@@ -87,9 +95,9 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     /**
-     * The UserController wants to update a Address, so we first
-     * check if the user has the permission to do so, by query the db for an
-     * address with the given id and a ref to the given user, if sucessfull we will continue the flow
+     * The UserController wants to update a Address, so we first check if the user
+     * has the permission to do so, by query the db for an address with the given id
+     * and a ref to the given user, if sucessfull we will continue the flow
      *
      * @param addressToUpdate the addresses id
      * @param update          the update to perform
@@ -97,18 +105,18 @@ public class AddressService extends AbstractService<AddressModel> {
      * @return the updated address
      */
 
-    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update, ObjectId userId) {
+    public AddressModel handleUserServiceAddressUpdate(ObjectId addressToUpdate, AddressUpdate update,
+            ObjectId userId) {
 
         var userHasPermission = this.userHasPermissionToUpdateAddress(addressToUpdate, userId);
 
         return this.updateAddress(userHasPermission, update, userId);
     }
 
-
     /**
-     * The UserController wants to delete a Address, so we first
-     * check if the user has the permission to do so, by query the db for an
-     * address with the given id and a ref to the given user, if sucessfull we will continue the flow
+     * The UserController wants to delete a Address, so we first check if the user
+     * has the permission to do so, by query the db for an address with the given id
+     * and a ref to the given user, if sucessfull we will continue the flow
      *
      * @param userId the User who held the address
      */
@@ -120,6 +128,11 @@ public class AddressService extends AbstractService<AddressModel> {
 
     }
 
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // HELPER
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
     /**
      * We want to delete a User from a Addresses references and insert it back into
@@ -136,13 +149,13 @@ public class AddressService extends AbstractService<AddressModel> {
 
         if (addressWithUserRemoved.noUserReferences()) {
 
-            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId())).orElseThrow(() -> new AddressExceptions.AddressNotFoundException(address.getId()));
+            return Optional.ofNullable(super.deleteById(addressWithUserRemoved.getId()))
+                    .orElseThrow(() -> new AddressExceptions.AddressNotFoundException(address.getId()));
 
         } else {
             return this.updateUserField(addressWithUserRemoved);
         }
     }
-
 
     /**
      * When updating a address we need to take care of the following cases: the
@@ -158,7 +171,6 @@ public class AddressService extends AbstractService<AddressModel> {
      * @return the new or updated address
      */
     private AddressModel updateAddress(AddressModel addressToUpdate, AddressUpdate addressUpdate, ObjectId userId) {
-
 
         if (addressToUpdate.noUserReferences() || (addressToUpdate.getUsers().size() == 1)) {
 
@@ -180,7 +192,8 @@ public class AddressService extends AbstractService<AddressModel> {
      * @param userId          the user
      * @return the Updated /saved address
      */
-    private AddressModel updateAddressWithOtherReferences(AddressModel addressToUpdate, AddressUpdate update, ObjectId userId) {
+    private AddressModel updateAddressWithOtherReferences(AddressModel addressToUpdate, AddressUpdate update,
+            ObjectId userId) {
 
         this.deleteUserFromAddress(addressToUpdate, userId);
         var potentialExistingAddress = this.mergeAddressWithUpdateAndCheckDbForMatchingAddress(addressToUpdate, update);
@@ -202,9 +215,11 @@ public class AddressService extends AbstractService<AddressModel> {
      * @return the updated address
      */
 
-    private AddressModel updateAddressWithNoOtherReferences(AddressModel addressToUpdate, AddressUpdate addressUpdate, ObjectId userId) {
+    private AddressModel updateAddressWithNoOtherReferences(AddressModel addressToUpdate, AddressUpdate addressUpdate,
+            ObjectId userId) {
 
-        var potentialExistingAddress = this.mergeAddressWithUpdateAndCheckDbForMatchingAddress(addressToUpdate, addressUpdate);
+        var potentialExistingAddress = this.mergeAddressWithUpdateAndCheckDbForMatchingAddress(addressToUpdate,
+                addressUpdate);
 
         if (potentialExistingAddress.isPresent()) {
             this.deleteUserFromAddress(addressToUpdate, userId);
@@ -218,11 +233,12 @@ public class AddressService extends AbstractService<AddressModel> {
 
         Optional.ofNullable(addressId).orElseThrow(() -> new AddressExceptions.AddressNotFoundException("null"));
         var addressIdAndUserIdFilter = and(eq(addressId), in("users", userId));
-        return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter)).orElseThrow(() -> new AddressExceptions.AddressNotFoundException(addressId));
+        return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter))
+                .orElseThrow(() -> new AddressExceptions.AddressNotFoundException(addressId));
     }
 
-
-    private Optional<AddressModel> mergeAddressWithUpdateAndCheckDbForMatchingAddress(AddressModel addressToMerge, AddressUpdate update) {
+    private Optional<AddressModel> mergeAddressWithUpdateAndCheckDbForMatchingAddress(AddressModel addressToMerge,
+            AddressUpdate update) {
         var mergeWithAddressUpdate = addressToMerge.mergeWithAddressUpdate(update);
         var filter = eq("hashCode", mergeWithAddressUpdate.getHashCode());
         return this.getOptional(filter);

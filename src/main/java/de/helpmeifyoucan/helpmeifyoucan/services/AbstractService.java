@@ -24,37 +24,64 @@ public abstract class AbstractService<T extends AbstractEntity> {
     private MongoDatabase database;
     private MongoCollection<T> collection;
 
-
     @Autowired
     public AbstractService(MongoDatabase database) {
         this.database = database;
     }
+
+    protected void createIndex(Bson indexes, IndexOptions options) {
+        this.collection.createIndex(indexes, options);
+    }
+
+    protected void createCollection(String collectionName, Class<T> collectionClass) {
+        this.collection = database.getCollection(collectionName, collectionClass).withWriteConcern(WriteConcern.W1);
+    }
+
+    public MongoCollection<T> getCollection() {
+        return this.collection;
+    }
+
+    public Optional<T> getOptional(Bson filter) {
+        return Optional.ofNullable(getByFilter(filter));
+    }
+
+    public void resetDB() {
+        this.collection.deleteMany(Filters.exists("_id", true));
+    }
+
+    // -----------------------------------------------------------------------
+    // SAVE
+    // -----------------------------------------------------------------------
 
     public T save(T entity) {
         this.collection.insertOne(entity);
         return entity;
     }
 
+    // -----------------------------------------------------------------------
+    // GET
+    // -----------------------------------------------------------------------
 
     public List<T> getAllByFilter(Bson filter) {
         return this.collection.find(filter).into(new LinkedList<>());
-
     }
 
     public List<T> getAllById(List<ObjectId> ids) {
         return this.getAllByFilter(in("_id", ids));
     }
 
+    // TODO Mark as Protected
     public T getById(ObjectId id) {
         var filter = Filters.eq("_id", id);
         return collection.find(filter).first();
-
     }
 
+    // -----------------------------------------------------------------------
+    // FIND
+    // -----------------------------------------------------------------------
 
     public T deleteById(ObjectId id) {
         var filter = eq("_id", id);
-
         return this.findOneAndDelete(filter);
     }
 
@@ -70,11 +97,9 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.find(filter).first();
     }
 
-    protected T replaceExisting(Bson filter, T entity) {
-        var findRepOptions = new FindOneAndReplaceOptions();
-        findRepOptions.returnDocument(ReturnDocument.AFTER);
-        return this.collection.findOneAndReplace(filter, entity, findRepOptions);
-    }
+    // -----------------------------------------------------------------------
+    // UPDATE
+    // -----------------------------------------------------------------------
 
     protected UpdateResult updateMany(Bson filter, Bson fieldsToUpdate) {
         var updateOptions = new UpdateOptions();
@@ -88,24 +113,10 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
-    public Optional<T> getOptional(Bson filter) {
-        return Optional.ofNullable(getByFilter(filter));
+    protected T replaceExisting(Bson filter, T entity) {
+        var findRepOptions = new FindOneAndReplaceOptions();
+        findRepOptions.returnDocument(ReturnDocument.AFTER);
+        return this.collection.findOneAndReplace(filter, entity, findRepOptions);
     }
 
-    protected void createCollection(String collectionName,
-                                    Class<T> collectionClass) {
-        this.collection = database.getCollection(collectionName, collectionClass).withWriteConcern(WriteConcern.W1);
-    }
-
-    public void resetDB() {
-        this.collection.deleteMany(Filters.exists("_id", true));
-    }
-
-    protected void createIndex(Bson indexes, IndexOptions options) {
-        this.collection.createIndex(indexes, options);
-    }
-
-    public MongoCollection<T> getCollection() {
-        return this.collection;
-    }
 }

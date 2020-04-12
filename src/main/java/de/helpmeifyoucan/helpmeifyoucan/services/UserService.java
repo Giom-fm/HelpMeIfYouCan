@@ -43,8 +43,14 @@ public class UserService extends AbstractService<UserModel> {
         super.createIndex(Indexes.ascending("email"), options);
     }
 
-    public UserModel get(ObjectId id) {
 
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // CRUD
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+
+    public UserModel getById(ObjectId id) {
         return Optional.ofNullable(super.getById(id)).orElseThrow(() -> new UserExceptions.UserNotFoundException(id));
 
 
@@ -98,6 +104,12 @@ public class UserService extends AbstractService<UserModel> {
 
     }
 
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // HANDLER
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+
     /**
      * The user requests to add a new address to his addresses, as we dont want to
      * have redundant addresses in our db, we first calculate the new addresses
@@ -112,18 +124,16 @@ public class UserService extends AbstractService<UserModel> {
 
     public UserModel handleUserAddressAddRequest(ObjectId userId, AddressModel address, boolean lazy) {
 
-        var user = this.get(userId);
-
         var addedAddress = this.addressService.handleUserServiceAddressAdd(address, userId);
 
-        var updatedUser = this.addAddressToUser(user.getId(), addedAddress);
+        var updatedUser = this.addAddressToUser(userId, addedAddress);
 
         return lazy ? updatedUser : updatedUser.setFullAddress(addedAddress);
 
     }
 
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
-        var updatingUser = this.get(userId);
+        var updatingUser = this.getById(userId);
 
         var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update,
                 userId);
@@ -142,7 +152,7 @@ public class UserService extends AbstractService<UserModel> {
      * @return the edited User
      */
     public UserModel handleUserAddressDeleteRequest(ObjectId userId) {
-        var userToUpdate = this.get(userId);
+        var userToUpdate = this.getById(userId);
         return this.deleteAddressFromUser(userToUpdate, userToUpdate.getUserAddress());
     }
 
@@ -168,7 +178,11 @@ public class UserService extends AbstractService<UserModel> {
         return this.deleteApplication(userId, modelId);
     }
 
-    // user address operations
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
+    // HELPER
+    // -----------------------------------------------------------------------
+    // -----------------------------------------------------------------------
 
     /**
      * We want to add a User to the Addresses user References and vice versa, we to
@@ -247,8 +261,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     private UserModel acceptApplication(ObjectId acceptedUser, HelpModelApplication application,
-                                        ObjectId acceptingUser) {
-        var acceptingUserModel = this.get(acceptingUser);
+            ObjectId acceptingUser) {
+        var acceptingUserModel = this.getById(acceptingUser);
 
         application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
 
@@ -271,8 +285,5 @@ public class UserService extends AbstractService<UserModel> {
         this.addressService = addressModelController;
     }
 
-    @Autowired
-    public void setPasswordEncoder(BCryptPasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
+
 }

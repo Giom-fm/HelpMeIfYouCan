@@ -31,7 +31,7 @@ public class UserController {
     }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({Role.ROLE_NAME_USER})
+    @Secured({ Role.ROLE_NAME_USER })
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel getMe(@RequestParam boolean lazy) {
         return this.userService.getWithAddress(getIdFromContext(), lazy);
