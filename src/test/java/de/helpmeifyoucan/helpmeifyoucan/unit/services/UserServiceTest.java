@@ -95,7 +95,7 @@ public class UserServiceTest {
 
     @Test(expected = UserNotFoundException.class)
     public void givenNotExistingObjectId_NotFoundShouldBeThrown() {
-        this.userService.get(new ObjectId());
+        this.userService.getById(new ObjectId());
     }
 
     @Test

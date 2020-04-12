@@ -53,17 +53,14 @@ public class UserService extends AbstractService<UserModel> {
     public UserModel getById(ObjectId id) {
         return Optional.ofNullable(super.getById(id)).orElseThrow(() -> new UserExceptions.UserNotFoundException(id));
 
-
     }
 
     public UserModel getWithAddress(ObjectId userId, boolean lazy) {
 
         var user = this.getById(userId);
 
-
         return !lazy && Optional.ofNullable(user.getUserAddress()).isPresent() ?
                 user.setFullAddress(this.addressService.getById(user.getUserAddress())) : user;
-
     }
 
     public UserModel getByEmail(String email) {
