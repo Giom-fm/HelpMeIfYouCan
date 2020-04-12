@@ -78,7 +78,8 @@ public class UserServiceTest {
 
         this.userService.handleUserAddressAddRequest(testUser.getId(), addedAddress, false);
 
-        assertEquals(this.userService.get(testUser.getId()).getUserAddress(), existingAddress.getId());
+        assertEquals(this.userService.getById(testUser.getId()).getUserAddress(),
+                existingAddress.getId());
 
     }
 
@@ -88,7 +89,7 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel savedUser = userService.get(testUser.getId());
+        UserModel savedUser = userService.getById(testUser.getId());
         assertEquals(savedUser, testUser);
     }
 
@@ -202,7 +203,7 @@ public class UserServiceTest {
         this.userService.save(testUser);
 
         this.userService.handleUserAddressAddRequest(testUser.getId(), address, false);
-        userService.handleUserAddressDeleteRequest(testUser.getId(), address.getId());
+        userService.handleUserAddressDeleteRequest(testUser.getId());
 
         assertTrue(testUser.noAddressReference());
     }
@@ -212,7 +213,8 @@ public class UserServiceTest {
         this.userService.save(testUser);
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
 
-        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(), address.generateId(), false);
+        UserModel updatedUser = this.userService.handleUserAddressAddRequest(testUser.getId(),
+                address.generateId(), true);
 
         assertEquals(updatedUser.getUserAddress(), address.getId());
     }
@@ -236,7 +238,8 @@ public class UserServiceTest {
 
         this.userService.save(testUser);
 
-        UserModel updatedUser = this.userService.handleUserAddressDeleteRequest(this.userService.get(testUser.getId()).getId(), address.getId());
+        UserModel updatedUser =
+                this.userService.handleUserAddressDeleteRequest(this.userService.getById(testUser.getId()).getId());
 
         assertTrue(updatedUser.noAddressReference());
 
@@ -248,11 +251,10 @@ public class UserServiceTest {
         AddressModel address = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13").generateId();
         this.addressService.save(address.addUserAddress(testUser.getId()));
 
-        testUser.setUserAddress(address.getId());
 
         this.userService.save(testUser);
 
-        this.userService.handleUserAddressDeleteRequest(testUser.getId(), new ObjectId());
+        this.userService.handleUserAddressDeleteRequest(testUser.getId());
     }
 
 

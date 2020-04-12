@@ -1,8 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.utils.errors;
 
-import org.bson.types.ObjectId;
-
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AbstractExceptions.NotFoundException;
+import org.bson.types.ObjectId;
 
 public final class  AddressExceptions {
 
@@ -18,6 +17,7 @@ public final class  AddressExceptions {
         public AddressNotFoundException(String address) {
             super(String.format(error.getMessage(), address), error.getCode());
         }
+
 
     }
 }

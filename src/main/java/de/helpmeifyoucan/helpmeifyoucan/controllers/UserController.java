@@ -31,11 +31,10 @@ public class UserController {
     }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserModel getMe() {
-        var id = this.getIdFromContext();
-        return this.userService.get(id);
+    public UserModel getMe(@RequestParam boolean lazy) {
+        return this.userService.getWithAddress(getIdFromContext(), lazy);
 
     }
 
@@ -74,11 +73,11 @@ public class UserController {
         return this.userService.handleUserAddressUpdateRequest(getIdFromContext(), update, lazy);
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping(path = "/me/address", produces = MediaType.APPLICATION_JSON_VALUE)
-    public UserModel deleteUserAddress(@PathVariable ObjectId addressId) {
-        return this.userService.handleUserAddressDeleteRequest(getIdFromContext(), addressId);
+    public UserModel deleteUserAddress() {
+        return this.userService.handleUserAddressDeleteRequest(getIdFromContext());
     }
 
     // ADMIN ENDPOINTS --------------------------------

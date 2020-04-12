@@ -44,7 +44,20 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     public UserModel get(ObjectId id) {
+
         return Optional.ofNullable(super.getById(id)).orElseThrow(() -> new UserExceptions.UserNotFoundException(id));
+
+
+    }
+
+    public UserModel getWithAddress(ObjectId userId, boolean lazy) {
+
+        var user = this.getById(userId);
+
+
+        return !lazy && Optional.ofNullable(user.getUserAddress()).isPresent() ?
+                user.setFullAddress(this.addressService.getById(user.getUserAddress())) : user;
+
     }
 
     public UserModel getByEmail(String email) {
@@ -54,7 +67,7 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     public AddressModel getUserAddress(ObjectId id) {
-        var addressId = this.get(id).getUserAddress();
+        var addressId = this.getById(id).getUserAddress();
         return this.addressService.getById(addressId);
     }
 
@@ -73,7 +86,8 @@ public class UserService extends AbstractService<UserModel> {
         // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
         // wird dann
         // nur aufgerufen wenn es kein Auth exception gab.
-        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(), this.get(id).getPassword());
+        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(),
+                this.getById(id).getPassword());
         if (!hashedPassword) {
             throw new PasswordMismatchException();
         }
@@ -102,9 +116,9 @@ public class UserService extends AbstractService<UserModel> {
 
         var addedAddress = this.addressService.handleUserServiceAddressAdd(address, userId);
 
-        this.addAddressToUser(user, addedAddress);
+        var updatedUser = this.addAddressToUser(user.getId(), addedAddress);
 
-        return lazy ? user.setUserAddress(addedAddress.getId()) : user.setFullAddress(addedAddress);
+        return lazy ? updatedUser : updatedUser.setFullAddress(addedAddress);
 
     }
 
@@ -124,21 +138,21 @@ public class UserService extends AbstractService<UserModel> {
      * We want to get the User Model of the calling user, so we fetch it from db and
      * delegate deleting to another method
      *
-     * @param userId    User to delete address from
-     * @param addressId Address to delete
+     * @param userId User to delete address from
      * @return the edited User
      */
-    public UserModel handleUserAddressDeleteRequest(ObjectId userId, ObjectId addressId) {
-        return this.deleteAddressFromUser(this.get(userId), addressId);
+    public UserModel handleUserAddressDeleteRequest(ObjectId userId) {
+        var userToUpdate = this.get(userId);
+        return this.deleteAddressFromUser(userToUpdate, userToUpdate.getUserAddress());
     }
 
     public UserModel handleHelpModelAdd(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
-            ObjectId userId) {
+                                        ObjectId userId) {
         return this.addHelpModel(userId, modelId, modelClass);
     }
 
     public UserModel handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
-            ObjectId userId) {
+                                           ObjectId userId) {
         return this.deleteHelpModel(userId, modelId, modelClass);
     }
 
@@ -164,9 +178,9 @@ public class UserService extends AbstractService<UserModel> {
      * @param address Address to add
      * @return the updated user
      */
-    private UserModel addAddressToUser(UserModel user, AddressModel address) {
+    private UserModel addAddressToUser(ObjectId user, AddressModel address) {
 
-        return this.updateUserAddressField(user.setUserAddress(address.getId()));
+        return this.updateUserAddressField(user, address.getId());
 
     }
 
@@ -178,8 +192,7 @@ public class UserService extends AbstractService<UserModel> {
      */
 
     private UserModel exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
-        var user = this.get(userId);
-        return this.updateUserAddressField(user.setUserAddress(addressToAdd));
+        return this.updateUserAddressField(userId, addressToAdd);
 
     }
 
@@ -193,7 +206,7 @@ public class UserService extends AbstractService<UserModel> {
      */
     private UserModel deleteAddressFromUser(UserModel user, ObjectId addressId) {
         addressService.handleUserServiceAddressDelete(addressId, user.getId());
-        return this.updateUserAddressField(user.setUserAddress(null));
+        return this.updateUserAddressField(user.getId(), null);
     }
 
     /**
@@ -203,13 +216,13 @@ public class UserService extends AbstractService<UserModel> {
      * @param user the user to update
      * @return the updated user
      */
-    private UserModel updateUserAddressField(UserModel user) {
-        Bson updatedFields = set("userAddress", user.getUserAddress());
+    private UserModel updateUserAddressField(ObjectId user, ObjectId address) {
+        Bson updatedFields = set("userAddress", address);
 
-        var filter = Filters.eq("_id", user.getId());
+        var filter = Filters.eq(user);
 
         return Optional.ofNullable(super.updateExistingFields(filter, updatedFields))
-                .orElseThrow(() -> new UserNotFoundException(user.getEmail()));
+                .orElseThrow(() -> new UserNotFoundException(user));
 
     }
 
@@ -234,8 +247,8 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     private UserModel acceptApplication(ObjectId acceptedUser, HelpModelApplication application,
-            ObjectId acceptingUser) {
-        var acceptingUserModel = this.getById(acceptingUser);
+                                        ObjectId acceptingUser) {
+        var acceptingUserModel = this.get(acceptingUser);
 
         application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
 

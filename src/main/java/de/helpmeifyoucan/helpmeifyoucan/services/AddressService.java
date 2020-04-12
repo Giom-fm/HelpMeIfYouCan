@@ -215,6 +215,8 @@ public class AddressService extends AbstractService<AddressModel> {
     }
 
     private AddressModel userHasPermissionToUpdateAddress(ObjectId addressId, ObjectId userId) {
+
+        Optional.ofNullable(addressId).orElseThrow(() -> new AddressExceptions.AddressNotFoundException("null"));
         var addressIdAndUserIdFilter = and(eq(addressId), in("users", userId));
         return Optional.ofNullable(this.getByFilter(addressIdAndUserIdFilter)).orElseThrow(() -> new AddressExceptions.AddressNotFoundException(addressId));
     }
