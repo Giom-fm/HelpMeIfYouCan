@@ -7,10 +7,12 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSer
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public abstract class AbstractHelpModel extends AbstractEntity {
+
 
 
     @JsonSerialize(converter = ObjectIdMapping.class)
@@ -28,6 +30,10 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     protected Date datePublished;
 
+
+    public AbstractHelpModel() {
+        this.applications = new LinkedList<>();
+    }
 
     public abstract <T extends AbstractHelpModel> T setUser(ObjectId user);
 
