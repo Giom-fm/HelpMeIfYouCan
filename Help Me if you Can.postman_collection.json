@@ -87,7 +87,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{HOST}}:{{PORT}}/user/me",
+									"raw": "{{HOST}}:{{PORT}}/user/me?lazy=false",
 									"host": [
 										"{{HOST}}"
 									],
@@ -95,6 +95,12 @@
 									"path": [
 										"user",
 										"me"
+									],
+									"query": [
+										{
+											"key": "lazy",
+											"value": "false"
+										}
 									]
 								}
 							},
@@ -236,19 +242,20 @@
 									}
 								},
 								"url": {
-									"raw": "{{HOST}}:{{PORT}}/address/:id",
+									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=true",
 									"host": [
 										"{{HOST}}"
 									],
 									"port": "{{PORT}}",
 									"path": [
-										"address",
-										":id"
+										"user",
+										"me",
+										"address"
 									],
-									"variable": [
+									"query": [
 										{
-											"key": "id",
-											"value": "5e90d926626b9d0497996430"
+											"key": "lazy",
+											"value": "true"
 										}
 									]
 								},
@@ -1037,7 +1044,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkyMDk1MjgzZTIyYjM5YTI3OTllYzkiLCJpYXQiOjE1ODY2OTc0MDgsImV4cCI6MTU4NzU2MTQwOCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.erekNHou00q-5iNqRTaIFo-cgdJ5N1I9wON7EiNRIqaWPJKmUsYgKad0r72gQO6v7wPXFIL8arv5IDEYL_rjCA",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkzMjczMzUwMDgyZjBmMWUxMzk5MTUiLCJpYXQiOjE1ODY3MDIxMzMsImV4cCI6MTU4NzU2NjEzMywicm9sZXMiOlsiUk9MRV9VU0VSIl19.DeHaXYZRVvAE2zsciTC2y00WOR96VNk1DG1PUUp4SNLePaN0cIl5E9QnteJhVW31XG05Q8tL-CuBAaSLE8RVCA",
 				"type": "string"
 			}
 		]
@@ -1066,13 +1073,13 @@
 	],
 	"variable": [
 		{
-			"id": "acc12599-2970-4e67-b5c5-9cddee98ac2d",
+			"id": "c0af89f8-e657-49d7-a395-f5a91bfd9e3c",
 			"key": "HOST",
 			"value": "localhost",
 			"type": "string"
 		},
 		{
-			"id": "89f6b1a7-b377-4543-9f6d-9f359a28e83b",
+			"id": "a0ed2f4b-2903-48f1-aeae-13ceb0651063",
 			"key": "PORT",
 			"value": "8080",
 			"type": "string"
