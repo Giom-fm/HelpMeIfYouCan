@@ -2,6 +2,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressCoordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.types.ObjectId;
@@ -30,7 +31,7 @@ public class AddressModel extends AbstractEntity {
     @JsonIgnore
     protected List<ObjectId> users;
 
-    protected Coordinates coordinates;
+    protected AddressCoordinates coordinates;
 
     @JsonIgnore
     protected int hashCode;
@@ -41,11 +42,11 @@ public class AddressModel extends AbstractEntity {
     }
 
 
-    public Coordinates getCoordinates() {
+    public AddressCoordinates getCoordinates() {
         return coordinates;
     }
 
-    public AddressModel setCoordinates(Coordinates coordinates) {
+    public AddressModel setCoordinates(AddressCoordinates coordinates) {
         this.coordinates = coordinates;
         return this;
     }

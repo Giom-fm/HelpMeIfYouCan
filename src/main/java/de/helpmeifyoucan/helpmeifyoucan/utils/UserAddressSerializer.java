@@ -29,10 +29,7 @@ public class UserAddressSerializer extends StdSerializer<AddressModel> {
         jsonGenerator.writeStringField("zipCode", addressModel.getZipCode());
         jsonGenerator.writeStringField("houseNumber", addressModel.getHouseNumber());
         jsonGenerator.writeStringField("country", addressModel.getCountry());
-        jsonGenerator.writeObjectFieldStart("coordinates");
-        jsonGenerator.writeNumberField("latitude", addressModel.getCoordinates().getLatitude());
-        jsonGenerator.writeNumberField("longitude", addressModel.getCoordinates().getLongitude());
-        jsonGenerator.writeEndObject();
+        jsonGenerator.writeObjectField("coordinates", addressModel.getCoordinates());
         jsonGenerator.writeEndObject();
 
 
