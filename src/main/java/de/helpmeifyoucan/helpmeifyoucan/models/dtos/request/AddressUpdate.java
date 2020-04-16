@@ -1,5 +1,6 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.AddressCoordinates;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.conversions.Bson;
 
@@ -15,6 +16,13 @@ public class AddressUpdate extends AbstractModelUpdate {
     public String zipCode;
     @ValidCountry(canBeNull = true)
     public String country;
+
+    public AddressCoordinates coordinates;
+
+    public AddressUpdate setCoordinates(AddressCoordinates coordinates) {
+        this.coordinates = coordinates;
+        return this;
+    }
 
     public AddressUpdate setStreet(String street) {
         this.street = street;

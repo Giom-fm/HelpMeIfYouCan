@@ -228,14 +228,14 @@
 								"method": "PATCH",
 								"header": [],
 								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66541,\n    \"country\": \"newCountry\",\n    \"currentPassword\" : \"password2\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
+                                  "mode": "raw",
+                                  "raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66541,\n    \"country\": \"newCountry\",\n    \"coordinates\" : {\"latitude\" : \"50\", \n    \"longitude\" : \"100\"},\n    \"currentPassword\" : \"password1\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "language": "json"
+                                    }
+                                  }
+                                },
 								"url": {
 									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=false",
 									"host": [
@@ -1036,11 +1036,11 @@
 	"auth": {
 		"type": "bearer",
 		"bearer": [
-			{
-				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTk4ODAwZGNhNTJjODZlYWVhZDVjZTMiLCJpYXQiOjE1ODcwNTI1NTksImV4cCI6MTU4NzkxNjU1OSwicm9sZXMiOlsiUk9MRV9VU0VSIl19.Hczg1kOhLKREBmZ3QVoO8gPI-t31pPdwyXhYgPvNDOpb0Ekw_vJjKjMxO7DTe4TA0h1BHiHkipgNBsoE5iK5oQ",
-				"type": "string"
-			}
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTk4ODcyOWJmZDg1MTQ4ZWIxYzZmN2YiLCJpYXQiOjE1ODcwNTQzNzgsImV4cCI6MTU4NzkxODM3OCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.XzpHoth4HVhauOPbK44d0KAyFV-7SBA25GK85OGVPtxpj2GK5bs_IA9AB-9xV0MHZbR365YEL6Rnh0cFj9j-KA",
+            "type": "string"
+          }
 		]
 	},
 	"event": [
@@ -1066,18 +1066,18 @@
 		}
 	],
 	"variable": [
-		{
-			"id": "77cd0270-d7d5-4cbc-9e11-267fc6b7d605",
-			"key": "HOST",
-			"value": "localhost",
-			"type": "string"
-		},
-		{
-			"id": "9b84573c-1e2b-48aa-aeca-eae66f722b40",
-			"key": "PORT",
-			"value": "8080",
-			"type": "string"
-		}
+      {
+        "id": "068407f0-9482-4c5b-80c3-f9fc89e7f93c",
+        "key": "HOST",
+        "value": "localhost",
+        "type": "string"
+      },
+      {
+        "id": "1379a0b8-3d80-468b-b25f-681b75434ab6",
+        "key": "PORT",
+        "value": "8080",
+        "type": "string"
+      }
 	],
 	"protocolProfileBehavior": {}
 }
