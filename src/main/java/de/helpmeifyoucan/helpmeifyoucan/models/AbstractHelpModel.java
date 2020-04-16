@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
 import org.bson.types.ObjectId;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,16 +15,18 @@ import java.util.Objects;
 public abstract class AbstractHelpModel extends AbstractEntity {
 
 
-
     @JsonSerialize(converter = ObjectIdMapping.class)
     protected ObjectId user;
+
+    protected String userName;
 
     @JsonSerialize(using = ListApplicationSerializer.class)
     protected List<HelpModelApplication> applications;
 
-
+    @NotNull
     protected Coordinates coordinates;
 
+    @NotNull
     protected String description;
 
     protected PostStatusEnum status;
@@ -35,17 +38,25 @@ public abstract class AbstractHelpModel extends AbstractEntity {
         this.applications = new LinkedList<>();
     }
 
-    public abstract <T extends AbstractHelpModel> T setUser(ObjectId user);
+    public String getUserName() {
+        return this.userName;
+    }
 
-    public abstract <T extends AbstractHelpModel> T setStatus(PostStatusEnum status);
+    public abstract AbstractHelpModel setUserName(String userName);
 
-    public abstract <T extends AbstractHelpModel> T generateId();
+    public abstract AbstractHelpModel setStatus(PostStatusEnum status);
+
+    public abstract AbstractHelpModel generateId();
 
     public abstract <T extends AbstractHelpModel> T setCoordinates(Coordinates coordinates);
+
+    public abstract AbstractHelpModel setUser(ObjectId userId);
+
 
     public ObjectId getUser() {
         return user;
     }
+
 
     public Coordinates getCoordinates() {
         return coordinates;

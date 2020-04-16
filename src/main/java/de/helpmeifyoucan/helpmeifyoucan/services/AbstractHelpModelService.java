@@ -4,6 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractHelpModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
@@ -88,10 +89,13 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
      * @param savingUser the saving user
      * @return the saved request
      */
-    public T saveNewModel(T model, ObjectId savingUser) {
-        model.setUser(savingUser).setStatus(PostStatusEnum.ACTIVE).generateId();
+    public T saveNewModel(AbstractHelpModel model, ObjectId savingUser) {
+        model.setStatus(PostStatusEnum.ACTIVE).generateId();
 
-        this.userService.handleHelpModelAdd(model.getClass(), model.getId(), savingUser);
+        UserModel userModel = this.userService.handleHelpModelAdd(model.getClass(), model.getId(),
+                savingUser);
+
+        model.setUserName(userModel.getName()).setUser(userModel.getId());
 
         var addedCords = this.coordinatesService.handleHelpModelCoordinateAdd(model);
 

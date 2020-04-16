@@ -3,7 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.conversions.Bson;
 
-public class AddressUpdate extends ModelUpdate {
+public class AddressUpdate extends AbstractModelUpdate {
 
     @ValidStreet(canBeNull = true)
     public String street;
@@ -44,5 +44,6 @@ public class AddressUpdate extends ModelUpdate {
     public Bson toFilter() {
         return super.toFilter(this);
     }
+
 
 }

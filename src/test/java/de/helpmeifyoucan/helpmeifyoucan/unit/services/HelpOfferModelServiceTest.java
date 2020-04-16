@@ -10,7 +10,6 @@ import de.helpmeifyoucan.helpmeifyoucan.services.HelpOfferModelService;
 import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
-import org.bson.types.ObjectId;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,7 +84,8 @@ public class HelpOfferModelServiceTest {
     public void givenTwoObjectsMatchingTheFilter_updateManyShouldUpdateTwo() {
         this.helpService.saveNewModel(testOffer, testUser.getId());
 
-        var newOffer = new HelpOfferModel().setUser(new ObjectId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+        var newOffer =
+                new HelpOfferModel().setUser(testUser.getId()).setCoordinates(testCoordinates).addCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
         this.helpService.saveNewModel(newOffer, newOffer.getUser());
 

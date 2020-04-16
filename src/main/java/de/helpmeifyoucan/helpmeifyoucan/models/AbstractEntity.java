@@ -1,7 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.ModelUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
@@ -25,7 +25,7 @@ public abstract class AbstractEntity {
     }
 
 
-    protected <T extends AbstractEntity> void mergeWithUpdate(ModelUpdate update, T subClass) {
+    protected <T extends AbstractEntity> void mergeWithUpdate(AbstractModelUpdate update, T subClass) {
         Field[] updateRuntimeFields = update.getClass().getDeclaredFields();
 
 

@@ -8,7 +8,7 @@ import org.bson.conversions.Bson;
 
 import javax.validation.constraints.NotNull;
 
-public class UserUpdate extends ModelUpdate {
+public class UserUpdate extends AbstractModelUpdate {
 
     @ValidEmail(canBeNull = true)
     protected String email;

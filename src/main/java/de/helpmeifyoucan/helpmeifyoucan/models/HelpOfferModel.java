@@ -23,6 +23,12 @@ public class HelpOfferModel extends AbstractHelpModel {
         this.acceptedApplications = new LinkedList<>();
     }
 
+    @Override
+    public HelpOfferModel setUserName(String userName) {
+        this.userName = userName;
+        return this;
+    }
+
 
     public HelpOfferModel setApplications(List<HelpModelApplication> applications) {
         this.applications = applications;

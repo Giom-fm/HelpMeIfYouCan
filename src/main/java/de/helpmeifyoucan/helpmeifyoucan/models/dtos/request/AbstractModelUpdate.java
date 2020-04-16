@@ -4,6 +4,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ValidationExceptions;
 import org.bson.conversions.Bson;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -14,8 +15,18 @@ import java.util.Optional;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
-public class ModelUpdate {
+public class AbstractModelUpdate {
 
+    @NotNull
+    private String currentPassword;
+
+    public String getCurrentPassword() {
+        return this.currentPassword;
+    }
+
+    public void setCurrentPassword(String currentPassword) {
+        this.currentPassword = currentPassword;
+    }
 
     protected Bson toFilter(Object obj) {
 

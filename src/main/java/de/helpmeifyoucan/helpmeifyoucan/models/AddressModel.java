@@ -6,7 +6,6 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.*;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -31,12 +30,24 @@ public class AddressModel extends AbstractEntity {
     @JsonIgnore
     protected List<ObjectId> users;
 
+    protected Coordinates coordinates;
+
     @JsonIgnore
     protected int hashCode;
 
 
     public AddressModel() {
         this.users = new LinkedList<>();
+    }
+
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public AddressModel setCoordinates(Coordinates coordinates) {
+        this.coordinates = coordinates;
+        return this;
     }
 
     public List<ObjectId> getUsers() {
@@ -49,14 +60,9 @@ public class AddressModel extends AbstractEntity {
     }
 
     public AddressModel addUserAddress(ObjectId user) {
-        if (this.users != null) {
             this.users.add(user);
             return this;
-        }
 
-        List<ObjectId> users = new ArrayList<>();
-        users.add(user);
-        return this.setUsers(users);
     }
 
     public AddressModel removeUserAddress(ObjectId user) {
@@ -129,9 +135,7 @@ public class AddressModel extends AbstractEntity {
     }
 
     public boolean containsUser(ObjectId user) {
-        if (this.users == null) {
-            return false;
-        }
+
         return this.users.contains(user);
     }
 

@@ -51,7 +51,6 @@ public class UserServiceTest {
 
     }
 
-
     @Test
     public void withTwoUsersSavedInCollection_TheOnesMatchingTheFilterShouldBeReturned() {
         this.userService.save(new UserModel().setName("Name").setLastName("Jaeger").setEmail("abc@mail.de"));
@@ -65,7 +64,6 @@ public class UserServiceTest {
 
 
     }
-
 
     @Test
     public void userTryingToSaveAlreadyExistingAddress_existingAddressShouldBeAdded() {
@@ -82,7 +80,6 @@ public class UserServiceTest {
                 existingAddress.getId());
 
     }
-
 
     @Test
     public void givenValidUserToSave_RetrievedUserShouldBeEqualToSavedUser() {
@@ -108,7 +105,6 @@ public class UserServiceTest {
     public void givenNotExistingId_ExistsShouldBeFalse() {
         assertFalse(this.userService.exists(eq(new ObjectId())));
     }
-
 
     @Test
     public void afterSavingUserAndDeletingUser_UserShouldNotExistAnymore() {
@@ -158,6 +154,34 @@ public class UserServiceTest {
 
         this.userService.update(wrongUpdate, testUser.getId());
 
+    }
+
+    @Test(expected = PasswordMismatchException.class)
+    public void givenWordForUserAddressUpdate_WrongPasswordShouldBeThrown() {
+        this.userService.save(testUser);
+
+        AddressUpdate wrongUpdate = new AddressUpdate();
+
+        wrongUpdate.setCurrentPassword("wrongPassword");
+
+        this.userService.handleUserAddressUpdateRequest(testUser.getId(), wrongUpdate, false);
+    }
+
+    @Test
+    public void givenUserAddressUpdateWithCorrectPassword_UserAddressShouldBeUpdated() {
+
+        this.userService.save(testUser);
+        AddressModel existingAddress = new AddressModel().setCountry("Germany").setDistrict("Hamburg").setStreet("testStreet").setZipCode("22391").setHouseNumber("13");
+        this.userService.handleUserAddressAddRequest(testUser.getId(), existingAddress, false);
+
+        AddressUpdate addressUpdate = new AddressUpdate().setHouseNumber("88");
+
+        addressUpdate.setCurrentPassword("password1");
+
+        var updatedAddress = this.userService.handleUserAddressUpdateRequest(testUser.getId(),
+                addressUpdate, false);
+
+        assertEquals(updatedAddress.getFullAddress().getHouseNumber(), addressUpdate.houseNumber);
     }
 
     @Test
@@ -256,7 +280,6 @@ public class UserServiceTest {
 
         this.userService.handleUserAddressDeleteRequest(testUser.getId());
     }
-
 
 
     @Test(expected = UserNotFoundException.class)

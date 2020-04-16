@@ -7,6 +7,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpRequestUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.HelpRequestModelService;
+import de.helpmeifyoucan.helpmeifyoucan.services.UserService;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
@@ -36,6 +37,9 @@ public class HelpRequestServiceTest {
     @Autowired
     private HelpRequestModelService requestService;
 
+    @Autowired
+    private UserService userService;
+
     private HelpRequestModel testRequest;
 
     private UserModel testUser;
@@ -46,8 +50,10 @@ public class HelpRequestServiceTest {
     public void setUpTest() {
         clear.clearDb();
         testCoordinates = new Coordinates().setLatitude(50.00).setLongitude(20.00);
-        testUser = new UserModel();
-        testUser.setId(new ObjectId());
+        testUser = new UserModel().setName("peter").setLastName("Stender").setEmail("moinPeter" +
+                "@email.de").setPhoneNr("2718000");
+
+        userService.save(testUser);
         testRequest = new HelpRequestModel().setUser(testUser.getId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
     }
@@ -76,7 +82,7 @@ public class HelpRequestServiceTest {
     public void givenTwoObjectsMatchingTheFilter_updateManyShouldUpdateTwo() {
         this.requestService.saveNewModel(testRequest, testUser.getId());
 
-        var newRequest = new HelpRequestModel().setUser(new ObjectId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+        var newRequest = new HelpRequestModel().setUser(testUser.getId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
         this.requestService.saveNewModel(newRequest, newRequest.getUser());
 
@@ -89,7 +95,9 @@ public class HelpRequestServiceTest {
     public void savedTwoObjects_getAllByIdShouldReturnBoth() {
         this.requestService.saveNewModel(testRequest, testUser.getId());
 
-        var newRequest = new HelpRequestModel().setUser(new ObjectId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
+
+        var newRequest =
+                new HelpRequestModel().setUser(testUser.getId()).setCoordinates(testCoordinates).setCategory(HelpCategoryEnum.PersonalAssistance).setStatus(PostStatusEnum.ACTIVE).setDescription("Delphine sind schwule haie");
 
         this.requestService.saveNewModel(newRequest, newRequest.getUser());
 

@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 public abstract class AbstractHelpModelController<T extends AbstractHelpModel> {
@@ -25,12 +26,12 @@ public abstract class AbstractHelpModelController<T extends AbstractHelpModel> {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public T save(@RequestBody T request) {
+    public T save(@Valid @RequestBody T request) {
         return this.modelService.saveNewModel(request, getIdFromContext());
     }
 
 
-    @PatchMapping(path = "/{modelId}/updateCoords/", consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PatchMapping(path = "/{modelId}/updateCoords", consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public T updateCoords(@PathVariable ObjectId modelId, @RequestBody CoordinatesUpdate update) {
         return this.modelService.handleCoordinatesUpdate(modelId, update, getIdFromContext());

@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import static com.mongodb.client.model.Updates.combine;
 import static com.mongodb.client.model.Updates.set;
 
-public class CoordinatesUpdate extends ModelUpdate {
+public class CoordinatesUpdate extends AbstractModelUpdate {
 
     @NotNull
     public double latitude;

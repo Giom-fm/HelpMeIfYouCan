@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.*;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
@@ -80,22 +81,15 @@ public class UserService extends AbstractService<UserModel> {
      * we then update the user and return the updated user
      *
      * @param updatedFields the fields to update
-     * @param id            the user id to update
+     * @param userId        the user userId to update
      * @return the updated User
      */
 
-    public UserModel update(UserUpdate updatedFields, ObjectId id) {
+    public UserModel update(UserUpdate updatedFields, ObjectId userId) {
 
-        // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
-        // wird dann
-        // nur aufgerufen wenn es kein Auth exception gab.
-        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(),
-                this.getById(id).getPassword());
-        if (!hashedPassword) {
-            throw new PasswordMismatchException();
-        }
+        this.checkPasswordAndGetUser(userId, updatedFields);
 
-        var updateFilter = eq(id);
+        var updateFilter = eq(userId);
 
         return super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
@@ -130,7 +124,7 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
-        var updatingUser = this.getById(userId);
+        var updatingUser = this.checkPasswordAndGetUser(userId, update);
 
         var updatedAddress = this.addressService.handleUserServiceAddressUpdate(updatingUser.getUserAddress(), update,
                 userId);
@@ -258,7 +252,7 @@ public class UserService extends AbstractService<UserModel> {
     }
 
     private UserModel acceptApplication(ObjectId acceptedUser, HelpModelApplication application,
-            ObjectId acceptingUser) {
+                                        ObjectId acceptingUser) {
         var acceptingUserModel = this.getById(acceptingUser);
 
         application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
@@ -275,6 +269,19 @@ public class UserService extends AbstractService<UserModel> {
         var idFilter = eq(userId);
 
         return this.updateExistingFields(idFilter, pull("applications", in("requestId", requestId)));
+    }
+
+    private UserModel checkPasswordAndGetUser(ObjectId userId, AbstractModelUpdate updatedFields) {
+        // FIXME soll in Zukunft vom Authmanager übernommen werden -> Endpunkt update
+        // wird dann
+        // nur aufgerufen wenn es kein Auth exception gab.
+        var updatingUser = this.getById(userId);
+        var hashedPassword = passwordEncoder.matches(updatedFields.getCurrentPassword(),
+                updatingUser.getPassword());
+        if (!hashedPassword) {
+            throw new PasswordMismatchException();
+        }
+        return updatingUser;
     }
 
     @Autowired

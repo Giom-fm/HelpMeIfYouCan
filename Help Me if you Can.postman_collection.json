@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "f374ab0a-1aed-40e0-a792-610f83c6730c",
+		"_postman_id": "1446de60-6d27-4e10-95f7-dbfd718835c2",
 		"name": "Help Me if you Can",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -173,7 +173,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"street\" : \"myStreet\",\n\t\"district\" : \"myDistrict\",\n\t\"zipCode\" : \"22175\",\n\t\"country\" : \"myCountry\",\n\t\"houseNumber\" : \"112\"\n}",
+									"raw": "{\n\t\"street\" : \"myStreet\",\n\t\"district\" : \"myDistrict\",\n\t\"zipCode\" : \"22175\",\n\t\"country\" : \"myCountry\",\n\t\"houseNumber\" : \"112\",\n\t\"coordinates\" : {\"latitude\" : \"10\",\n\t\"longitude\" : \"12\"}\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -181,7 +181,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=true",
+									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=false",
 									"host": [
 										"{{HOST}}"
 									],
@@ -194,7 +194,7 @@
 									"query": [
 										{
 											"key": "lazy",
-											"value": "true"
+											"value": "false"
 										}
 									]
 								},
@@ -208,20 +208,15 @@
 								"method": "DELETE",
 								"header": [],
 								"url": {
-									"raw": "{{HOST}}:{{PORT}}/address/:id",
+									"raw": "{{HOST}}:{{PORT}}/user/me/address",
 									"host": [
 										"{{HOST}}"
 									],
 									"port": "{{PORT}}",
 									"path": [
-										"address",
-										":id"
-									],
-									"variable": [
-										{
-											"key": "id",
-											"value": "5e90dbee9f142420e77f931f"
-										}
+										"user",
+										"me",
+										"address"
 									]
 								}
 							},
@@ -234,7 +229,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66666,\n    \"country\": \"newCountry\"\n}",
+									"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66541,\n    \"country\": \"newCountry\",\n    \"currentPassword\" : \"password2\"\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -242,7 +237,7 @@
 									}
 								},
 								"url": {
-									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=true",
+									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=false",
 									"host": [
 										"{{HOST}}"
 									],
@@ -255,7 +250,7 @@
 									"query": [
 										{
 											"key": "lazy",
-											"value": "true"
+											"value": "false"
 										}
 									]
 								},
@@ -539,7 +534,7 @@
 							"variable": [
 								{
 									"key": "id",
-									"value": "5e90dd4d9f142420e77f9322"
+									"value": "5e98545df39d213977dd9002"
 								}
 							]
 						},
@@ -774,7 +769,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{HOST}}:{{PORT}}/requests/:id/updateCoords/",
+							"raw": "{{HOST}}:{{PORT}}/requests/:id/updateCoords",
 							"host": [
 								"{{HOST}}"
 							],
@@ -782,8 +777,7 @@
 							"path": [
 								"requests",
 								":id",
-								"updateCoords",
-								""
+								"updateCoords"
 							],
 							"variable": [
 								{
@@ -1044,7 +1038,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTkzMjczMzUwMDgyZjBmMWUxMzk5MTUiLCJpYXQiOjE1ODY3MDIxMzMsImV4cCI6MTU4NzU2NjEzMywicm9sZXMiOlsiUk9MRV9VU0VSIl19.DeHaXYZRVvAE2zsciTC2y00WOR96VNk1DG1PUUp4SNLePaN0cIl5E9QnteJhVW31XG05Q8tL-CuBAaSLE8RVCA",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTk4ODAwZGNhNTJjODZlYWVhZDVjZTMiLCJpYXQiOjE1ODcwNTI1NTksImV4cCI6MTU4NzkxNjU1OSwicm9sZXMiOlsiUk9MRV9VU0VSIl19.Hczg1kOhLKREBmZ3QVoO8gPI-t31pPdwyXhYgPvNDOpb0Ekw_vJjKjMxO7DTe4TA0h1BHiHkipgNBsoE5iK5oQ",
 				"type": "string"
 			}
 		]
@@ -1073,13 +1067,13 @@
 	],
 	"variable": [
 		{
-			"id": "c0af89f8-e657-49d7-a395-f5a91bfd9e3c",
+			"id": "77cd0270-d7d5-4cbc-9e11-267fc6b7d605",
 			"key": "HOST",
 			"value": "localhost",
 			"type": "string"
 		},
 		{
-			"id": "a0ed2f4b-2903-48f1-aeae-13ceb0651063",
+			"id": "9b84573c-1e2b-48aa-aeca-eae66f722b40",
 			"key": "PORT",
 			"value": "8080",
 			"type": "string"

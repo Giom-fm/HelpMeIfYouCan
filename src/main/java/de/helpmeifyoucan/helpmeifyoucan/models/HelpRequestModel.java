@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import org.bson.types.ObjectId;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -17,6 +18,7 @@ public class HelpRequestModel extends AbstractHelpModel {
 
     protected Date dateDue;
 
+    @NotNull
     protected HelpCategoryEnum category;
 
 
@@ -41,6 +43,12 @@ public class HelpRequestModel extends AbstractHelpModel {
 
     public HelpRequestModel setUser(ObjectId user) {
         this.user = user;
+        return this;
+    }
+
+
+    public HelpRequestModel setUserName(String userName) {
+        this.userName = userName;
         return this;
     }
 
