@@ -27,6 +27,7 @@ public class UserApplicationsSerializer extends StdSerializer<List<HelpModelAppl
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("id", x.getId().toString());
                 jsonGenerator.writeStringField("message", x.getMessage());
+                jsonGenerator.writeStringField("request", x.getHelpModelId().toString());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();

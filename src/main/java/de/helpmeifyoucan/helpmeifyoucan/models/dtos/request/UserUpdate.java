@@ -6,8 +6,6 @@ import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPassword;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 import org.bson.conversions.Bson;
 
-import javax.validation.constraints.NotNull;
-
 public class UserUpdate extends AbstractModelUpdate {
 
     @ValidEmail(canBeNull = true)
@@ -20,19 +18,10 @@ public class UserUpdate extends AbstractModelUpdate {
     protected String lastName;
     @ValidPhone(canBeNull = true)
     protected String phoneNr;
-    @NotNull
-    private String currentPassword;
+
 
     public UserUpdate() {
 
-    }
-
-    public String getCurrentPassword() {
-        return this.currentPassword;
-    }
-
-    public void setCurrentPassword(String currentPassword) {
-        this.currentPassword = currentPassword;
     }
 
     public void setName(String name) {
@@ -56,8 +45,6 @@ public class UserUpdate extends AbstractModelUpdate {
     }
 
     public Bson toFilter() {
-
-        this.currentPassword = null;
         return super.toFilter(this);
     }
 
