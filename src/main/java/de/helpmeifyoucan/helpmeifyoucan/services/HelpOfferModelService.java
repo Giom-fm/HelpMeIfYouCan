@@ -60,7 +60,8 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
 
         var idFilter = and(eq(helpOffer), eq("user", acceptingUser), elemMatch("applications", eq(application)));
 
-        var offer = Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow();
+        var offer =
+                Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(helpOffer));
 
         var acceptedApplication = offer.acceptApplication(application);
 

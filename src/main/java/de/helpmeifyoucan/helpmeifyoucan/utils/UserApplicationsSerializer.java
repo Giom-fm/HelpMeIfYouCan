@@ -4,13 +4,18 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
-public class UserApplicationsSerializer extends StdSerializer<List<HelpModelApplication>> {
+@Component
+public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
+        List<HelpModelApplication>>> {
+    private JsonGenerator jsonGenerator;
 
-    protected UserApplicationsSerializer(Class<List<HelpModelApplication>> t) {
+    protected UserApplicationsSerializer(Class<HashMap<String, List<HelpModelApplication>>> t) {
         super(t);
     }
 
@@ -19,21 +24,56 @@ public class UserApplicationsSerializer extends StdSerializer<List<HelpModelAppl
     }
 
     @Override
-    public void serialize(List<HelpModelApplication> helpModelApplications, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeStartArray();
+    public void serialize(HashMap<String, List<HelpModelApplication>> helpModelApplications,
+                          JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
 
-        helpModelApplications.forEach(x -> {
+        this.jsonGenerator = jsonGenerator;
+
+        jsonGenerator.writeStartObject();
+
+        jsonGenerator.writeFieldName("received");
+        writeApplicationReceived(helpModelApplications.get("received"));
+
+        jsonGenerator.writeFieldName("send");
+        writeApplicationSend(helpModelApplications.get("send"));
+        jsonGenerator.writeEndObject();
+
+    }
+
+    private void writeApplicationReceived(List<HelpModelApplication> applications) throws IOException {
+        jsonGenerator.writeStartArray();
+        applications.forEach(x -> {
             try {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("id", x.getId().toString());
+                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
+                jsonGenerator.writeStringField("name", x.getName());
                 jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("request", x.getHelpModelId().toString());
+                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         });
-
         jsonGenerator.writeEndArray();
+
+    }
+
+    private void writeApplicationSend(List<HelpModelApplication> applications) throws IOException {
+        jsonGenerator.writeStartArray();
+        applications.forEach(x -> {
+            try {
+                jsonGenerator.writeStartObject();
+                jsonGenerator.writeStringField("id", x.getId().toString());
+                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
+                jsonGenerator.writeStringField("message", x.getMessage());
+                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                jsonGenerator.writeEndObject();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        jsonGenerator.writeEndArray();
+
     }
 }

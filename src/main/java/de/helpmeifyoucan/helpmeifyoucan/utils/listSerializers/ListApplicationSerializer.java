@@ -28,8 +28,8 @@ public class ListApplicationSerializer extends StdSerializer<List<HelpModelAppli
             try {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("id", x.getId().toString());
+                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
                 jsonGenerator.writeStringField("name", x.getName());
-                jsonGenerator.writeStringField("lastName", x.getLastName());
                 jsonGenerator.writeStringField("message", x.getMessage());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {

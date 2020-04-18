@@ -67,15 +67,19 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
                                                            ObjectId acceptingUser);
 
 
-    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId user) {
+    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId savingUser) {
 
-        application.setHelpModelId(helpRequest).generateId();
-        var savingUser = this.userService.handleApplicationAdd(user, application);
-        application.addUserDetails(savingUser);
+        application.setModelId(helpRequest).setHelpModelType(this.getModel().getSimpleName()).generateId();
+        var savingUserModel = this.userService.handleApplicationAdd(savingUser, application);
+        application.addUserDetails(savingUserModel);
 
         var idFilter = eq(helpRequest);
         var addApplicationsUpdate = push("applications", application);
-        super.updateExistingFields(idFilter, addApplicationsUpdate);
+
+        var updatedModel = Optional.ofNullable(super.updateExistingFields(idFilter,
+                addApplicationsUpdate)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
+
+        this.userService.handleApplicationReceived(updatedModel.getUser(), application);
 
         return application;
     }

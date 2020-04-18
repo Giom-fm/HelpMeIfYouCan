@@ -42,7 +42,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
-        this.userService.deleteById(this.getIdFromContext());
+        this.userService.handleUserMeDelete(this.getIdFromContext());
     }
 
     @Secured({ Role.ROLE_NAME_USER })

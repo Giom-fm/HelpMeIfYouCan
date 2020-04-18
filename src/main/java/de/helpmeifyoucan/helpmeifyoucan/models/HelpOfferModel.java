@@ -3,7 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
-import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListAcceptedApplicationSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListAcceptedApplicationsSerializer;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
@@ -12,7 +12,7 @@ import java.util.List;
 
 public class HelpOfferModel extends AbstractHelpModel {
 
-    @JsonSerialize(using = ListAcceptedApplicationSerializer.class)
+    @JsonSerialize(using = ListAcceptedApplicationsSerializer.class)
     protected List<HelpModelApplication> acceptedApplications;
 
     protected List<HelpCategoryEnum> categories;

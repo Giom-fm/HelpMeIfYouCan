@@ -3,10 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
-import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
-import de.helpmeifyoucan.helpmeifyoucan.utils.UserAddressSerializer;
-import de.helpmeifyoucan.helpmeifyoucan.utils.UserApplicationsSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.*;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
@@ -14,6 +11,7 @@ import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -60,30 +58,36 @@ public class UserModel extends AbstractEntity {
 
 
     @JsonSerialize(using = UserApplicationsSerializer.class)
-    protected List<HelpModelApplication> applications;
+    protected HashMap<String, List<HelpModelApplication>> applications;
 
 
-    protected List<HelpModelApplication> acceptedApplications;
+    @JsonSerialize(using = UserAcceptedApplicationSerializer.class)
+    protected HashMap<String, List<HelpModelApplication>> acceptedApplications;
 
 
     public UserModel() {
 
         helpOffers = new LinkedList<>();
         helpRequests = new LinkedList<>();
+        applications = new HashMap<>();
 
-        applications = new LinkedList<>();
-        acceptedApplications = new LinkedList<>();
+        applications.put("received", new LinkedList<>());
+        applications.put("send", new LinkedList<>());
+
+        acceptedApplications = new HashMap<>();
+        acceptedApplications.put("received", new LinkedList<>());
+        acceptedApplications.put("send", new LinkedList<>());
+
 
         roles = new LinkedList<>();
-
     }
 
 
-    public List<HelpModelApplication> getAcceptedApplications() {
+    public HashMap<String, List<HelpModelApplication>> getAcceptedApplications() {
         return acceptedApplications;
     }
 
-    public UserModel setAcceptedApplications(List<HelpModelApplication> acceptedApplications) {
+    public UserModel setAcceptedApplications(HashMap<String, List<HelpModelApplication>> acceptedApplications) {
         this.acceptedApplications = acceptedApplications;
         return this;
     }
@@ -106,17 +110,12 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
-    public List<HelpModelApplication> getApplications() {
+    public HashMap<String, List<HelpModelApplication>> getApplications() {
         return applications;
     }
 
-    public UserModel setApplications(List<HelpModelApplication> applications) {
+    public UserModel setApplications(HashMap<String, List<HelpModelApplication>> applications) {
         this.applications = applications;
-        return this;
-    }
-
-    public UserModel setName(String name) {
-        this.name = name;
         return this;
     }
 
@@ -124,12 +123,17 @@ public class UserModel extends AbstractEntity {
         return enabled;
     }
 
+    public UserModel setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        return this;
+    }
+
     public boolean isVerified() {
         return verified;
     }
 
-    public UserModel setRoles(List<Role> roles) {
-        this.roles = roles;
+    public UserModel setVerified(boolean verified) {
+        this.verified = verified;
         return this;
     }
 
@@ -137,13 +141,8 @@ public class UserModel extends AbstractEntity {
         return roles;
     }
 
-    public UserModel setEnabled(boolean enabled) {
-        this.enabled = enabled;
-        return this;
-    }
-
-    public UserModel setVerified(boolean verified) {
-        this.verified = verified;
+    public UserModel setRoles(List<Role> roles) {
+        this.roles = roles;
         return this;
     }
 
@@ -160,6 +159,11 @@ public class UserModel extends AbstractEntity {
         return name;
     }
 
+    public UserModel setName(String name) {
+        this.name = name;
+        return this;
+    }
+
     public String getLastName() {
         return lastName;
     }
@@ -169,13 +173,13 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
+    public String getPhoneNr() {
+        return phoneNr;
+    }
+
     public UserModel setPhoneNr(String phoneNr) {
         this.phoneNr = phoneNr;
         return this;
-    }
-
-    public String getPhoneNr() {
-        return phoneNr;
     }
 
     public String getPayPal() {
@@ -192,29 +196,27 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
-    public UserModel setUserAddress(ObjectId userAddress) {
-        this.userAddress = userAddress;
-        return this;
-    }
-
-
     public boolean noAddressReference() {
         return this.userAddress == null;
 
-    }
-
-
-    public UserModel setFullAddress(AddressModel address) {
-        this.fullAddress = address;
-        return this;
     }
 
     public AddressModel getFullAddress() {
         return fullAddress;
     }
 
+    public UserModel setFullAddress(AddressModel address) {
+        this.fullAddress = address;
+        return this;
+    }
+
     public ObjectId getUserAddress() {
         return this.userAddress;
+    }
+
+    public UserModel setUserAddress(ObjectId userAddress) {
+        this.userAddress = userAddress;
+        return this;
     }
 
     @Override

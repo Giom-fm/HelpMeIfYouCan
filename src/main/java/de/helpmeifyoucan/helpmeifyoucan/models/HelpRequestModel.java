@@ -36,6 +36,7 @@ public class HelpRequestModel extends AbstractHelpModel {
         return this;
     }
 
+    @SuppressWarnings("unchecked")
     public HelpRequestModel setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
         return this;

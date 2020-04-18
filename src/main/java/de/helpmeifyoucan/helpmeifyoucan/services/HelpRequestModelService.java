@@ -5,6 +5,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -49,7 +50,8 @@ public class HelpRequestModelService extends AbstractHelpModelService<HelpReques
 
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
 
-        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter, deleteApplicationUpdate).getApplications()).orElseThrow();
+        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter,
+                deleteApplicationUpdate).getApplications()).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
 
         super.userService.handleApplicationDelete(deletingUser, helpRequest);
     }
@@ -59,7 +61,8 @@ public class HelpRequestModelService extends AbstractHelpModelService<HelpReques
 
         var idFilter = and(eq(helpRequest), eq("user", acceptingUser), elemMatch("applications", eq(application)));
 
-        var offer = Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow();
+        var offer =
+                Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
 
         var acceptedApplication = offer.acceptApplication(application);
 

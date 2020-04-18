@@ -8,12 +8,13 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import java.io.IOException;
 import java.util.List;
 
-public class ListAcceptedApplicationSerializer extends StdSerializer<List<HelpModelApplication>> {
-    protected ListAcceptedApplicationSerializer(Class<List<HelpModelApplication>> t) {
+public class ListAcceptedApplicationsSerializer extends StdSerializer<List<HelpModelApplication>> {
+
+    protected ListAcceptedApplicationsSerializer(Class<List<HelpModelApplication>> t) {
         super(t);
     }
 
-    protected ListAcceptedApplicationSerializer() {
+    protected ListAcceptedApplicationsSerializer() {
         this(null);
     }
 
@@ -25,11 +26,11 @@ public class ListAcceptedApplicationSerializer extends StdSerializer<List<HelpMo
             try {
                 jsonGenerator.writeStartObject();
                 jsonGenerator.writeStringField("id", x.getId().toString());
+                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
                 jsonGenerator.writeStringField("name", x.getName());
                 jsonGenerator.writeStringField("lastName", x.getLastName());
-                jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("user", x.getUser().toString());
                 jsonGenerator.writeStringField("phoneNr", x.getTelephoneNr());
+                jsonGenerator.writeStringField("message", x.getMessage());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();

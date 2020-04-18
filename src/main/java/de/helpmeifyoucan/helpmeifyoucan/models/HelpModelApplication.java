@@ -20,14 +20,25 @@ public class HelpModelApplication extends AbstractEntity {
     private String telephoneNr;
 
     @JsonSerialize(converter = ObjectIdMapping.class)
-    private ObjectId helpModelId;
+    private ObjectId modelId;
 
-    public ObjectId getHelpModelId() {
-        return helpModelId;
+    private String helpModelType;
+
+    public String getHelpModelType() {
+        return helpModelType;
     }
 
-    public HelpModelApplication setHelpModelId(ObjectId helpModelId) {
-        this.helpModelId = helpModelId;
+    public HelpModelApplication setHelpModelType(String helpModelType) {
+        this.helpModelType = helpModelType;
+        return this;
+    }
+
+    public ObjectId getModelId() {
+        return modelId;
+    }
+
+    public HelpModelApplication setModelId(ObjectId modelId) {
+        this.modelId = modelId;
         return this;
     }
 

@@ -123,6 +123,14 @@ public class UserService extends AbstractService<UserModel> {
 
     }
 
+    public UserModel handleUserMeDelete(ObjectId userId) {
+        var deletedUser = this.getById(userId);
+
+        this.addressService.handleUserServiceAddressDelete(deletedUser.getUserAddress(), userId);
+
+        return deletedUser;
+    }
+
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
         var updatingUser = this.checkPasswordAndGetUser(userId, update);
 
@@ -152,21 +160,31 @@ public class UserService extends AbstractService<UserModel> {
         return this.addHelpModel(userId, modelId, modelClass);
     }
 
-    public UserModel handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
-                                           ObjectId userId) {
-        return this.deleteHelpModel(userId, modelId, modelClass);
+    public void handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
+                                      ObjectId userId) {
+        this.deleteHelpModel(userId, modelId, modelClass);
     }
 
     public UserModel handleApplicationAdd(ObjectId userId, HelpModelApplication application) {
         return this.addApplication(userId, application);
     }
 
-    public UserModel handleApplicationAccept(HelpModelApplication application, ObjectId acceptingUser) {
-        return this.acceptApplication(application.getUser(), application, acceptingUser);
+    public void handleApplicationReceived(ObjectId userId, HelpModelApplication application) {
+
+        this.receiveApplication(userId, application);
     }
 
-    public UserModel handleApplicationDelete(ObjectId userId, ObjectId modelId) {
-        return this.deleteApplication(userId, modelId);
+    public void handleApplicationAccept(HelpModelApplication application,
+                                        ObjectId acceptingUser) {
+
+        var acceptedUser = application.getUser();
+        this.acceptApplicationApplicant(acceptedUser, acceptingUser, application);
+
+        this.acceptApplicationAccepting(acceptedUser, acceptingUser, application);
+    }
+
+    public void handleApplicationDelete(ObjectId userId, ObjectId modelId) {
+        this.deleteApplication(userId, modelId);
     }
 
     // -----------------------------------------------------------------------
@@ -196,8 +214,8 @@ public class UserService extends AbstractService<UserModel> {
      * @param addressToAdd address to add
      */
 
-    private UserModel exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
-        return this.updateUserAddressField(userId, addressToAdd);
+    private void exchangeAddress(ObjectId userId, ObjectId addressToAdd) {
+        this.updateUserAddressField(userId, addressToAdd);
 
     }
 
@@ -248,27 +266,57 @@ public class UserService extends AbstractService<UserModel> {
     private UserModel addApplication(ObjectId userId, HelpModelApplication application) {
         var idFilter = eq(userId);
 
-        return this.updateExistingFields(idFilter, push("applications", application));
+        return this.updateExistingFields(idFilter, push("applications.send", application));
     }
 
-    private UserModel acceptApplication(ObjectId acceptedUser, HelpModelApplication application,
-                                        ObjectId acceptingUser) {
-        var acceptingUserModel = this.getById(acceptingUser);
+    private void acceptApplicationApplicant(ObjectId acceptedUser, ObjectId acceptingUser, HelpModelApplication application) {
 
-        application.addUserDetails(acceptingUserModel).setUser(acceptedUser);
+        var pullApplicationFilter = pull("applications.send", in("modelId",
+                application.getModelId()));
 
-        var pullApplicationFilter = pull("applications", in("requestId", application.getHelpModelId()));
+        var pushAcceptedApplication = push("acceptedApplications.send", application);
 
-        var pushAcceptedApplication = push("acceptedApplications", application);
-
-        var idFilter = eq(acceptedUser);
-        return this.updateExistingFields(idFilter, combine(pullApplicationFilter, pushAcceptedApplication));
+        this.acceptApplicationFilter(acceptingUser, acceptedUser, pullApplicationFilter,
+                pushAcceptedApplication, application);
     }
 
-    private UserModel deleteApplication(ObjectId userId, ObjectId requestId) {
+    private void acceptApplicationAccepting(ObjectId acceptedUser, ObjectId acceptingUser,
+                                            HelpModelApplication application) {
+
+        var pullApplicationFilter = pull("applications.received", in("modelId",
+                application.getModelId()));
+
+        var pushAcceptedApplication = push("acceptedApplications.received", application);
+
+        this.acceptApplicationFilter(acceptedUser, acceptingUser, pullApplicationFilter,
+                pushAcceptedApplication,
+                application);
+    }
+
+    private void acceptApplicationFilter(ObjectId userIdToGetDetailsFrom, ObjectId userToShareDetailsWith,
+                                         Bson pullApplicationFilter,
+                                         Bson pushAcceptedApplication,
+                                         HelpModelApplication application) {
+        var userToSetIntoApplication = this.getById(userIdToGetDetailsFrom);
+
+        application.addUserDetails(userToSetIntoApplication);
+
+        var idFilter = eq(userToShareDetailsWith);
+        this.updateExistingFields(idFilter, combine(pullApplicationFilter, pushAcceptedApplication));
+    }
+
+
+    private void receiveApplication(ObjectId userId, HelpModelApplication application) {
+        var idFilter = eq(userId);
+        var pushApplication = push("applications.received", application);
+
+        this.updateExistingFields(idFilter, pushApplication);
+    }
+
+    private void deleteApplication(ObjectId userId, ObjectId modelId) {
         var idFilter = eq(userId);
 
-        return this.updateExistingFields(idFilter, pull("applications", in("requestId", requestId)));
+        this.updateExistingFields(idFilter, pull("applications.send", in("modelId", modelId)));
     }
 
     private UserModel checkPasswordAndGetUser(ObjectId userId, AbstractModelUpdate updatedFields) {
