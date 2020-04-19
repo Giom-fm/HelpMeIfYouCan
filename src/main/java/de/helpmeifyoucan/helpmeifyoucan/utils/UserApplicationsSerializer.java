@@ -50,6 +50,7 @@ public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
                 jsonGenerator.writeStringField("name", x.getName());
                 jsonGenerator.writeStringField("message", x.getMessage());
                 jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                jsonGenerator.writeBooleanField("read", x.isRead());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();

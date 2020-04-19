@@ -31,21 +31,20 @@ public class UserController {
     }
 
     // USER ENDPOINTS --------------------------------
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @GetMapping(path = "/me", produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel getMe(@RequestParam boolean lazy) {
         return this.userService.getWithAddress(getIdFromContext(), lazy);
-
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/me")
     public void deleteMe() {
         this.userService.handleUserMeDelete(this.getIdFromContext());
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @PatchMapping(path = "/me", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel updateMe(@Valid @RequestBody UserUpdate user) {
         var id = this.getIdFromContext();
@@ -54,19 +53,19 @@ public class UserController {
 
     // ADDRESS ENDPOINTS --------------------------------
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @GetMapping(path = "/me/address", produces = MediaType.APPLICATION_JSON_VALUE)
     public AddressModel getUserAddress() {
         return this.userService.getUserAddress(getIdFromContext());
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @PostMapping(path = "/me/address", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel addUserAddress(@Valid @RequestBody AddressModel address, @RequestParam boolean lazy) {
         return this.userService.handleUserAddressAddRequest(getIdFromContext(), address, lazy);
     }
 
-    @Secured({ Role.ROLE_NAME_USER })
+    @Secured({Role.ROLE_NAME_USER})
     @PatchMapping(path = "me/address", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public UserModel updateUserAddress(@Valid @RequestBody AddressUpdate update, @RequestParam boolean lazy) {
 
@@ -80,21 +79,29 @@ public class UserController {
         return this.userService.handleUserAddressDeleteRequest(getIdFromContext());
     }
 
+
+    @Secured({Role.ROLE_NAME_USER})
+    @PatchMapping(path = "me/applications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public UserModel readApplication(@PathVariable ObjectId id) {
+        return this.userService.handleApplicationRead(getIdFromContext(), id);
+    }
+
+
     // ADMIN ENDPOINTS --------------------------------
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public void create(@Valid @RequestBody UserModel user) {
         this.userService.save(user);
     }
 
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @PatchMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserModel update(@Valid @RequestBody UserUpdate user, @PathVariable ObjectId id) {
         return this.userService.update(user, id);
     }
 
-    @Secured({ Role.ROLE_NAME_ADMIN })
+    @Secured({Role.ROLE_NAME_ADMIN})
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable ObjectId id) {
@@ -102,13 +109,13 @@ public class UserController {
     }
 
     // REVIEW GIOM
-    @ExceptionHandler(value = { MongoWriteException.class })
+    @ExceptionHandler(value = {MongoWriteException.class})
     protected ResponseEntity<String> handleConflict(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = "Email already taken!";
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = { MongoCommandException.class })
+    @ExceptionHandler(value = {MongoCommandException.class})
     protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getLocalizedMessage();
         return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);

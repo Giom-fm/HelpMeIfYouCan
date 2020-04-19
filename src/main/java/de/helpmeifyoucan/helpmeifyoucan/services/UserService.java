@@ -1,9 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
@@ -19,9 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Filters.in;
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
+import static java.util.Collections.singletonList;
 
 @Service
 public class UserService extends AbstractService<UserModel> {
@@ -128,6 +126,8 @@ public class UserService extends AbstractService<UserModel> {
 
         this.addressService.handleUserServiceAddressDelete(deletedUser.getUserAddress(), userId);
 
+        this.deleteById(userId);
+
         return deletedUser;
     }
 
@@ -172,6 +172,12 @@ public class UserService extends AbstractService<UserModel> {
     public void handleApplicationReceived(ObjectId userId, HelpModelApplication application) {
 
         this.receiveApplication(userId, application);
+    }
+
+    public UserModel handleApplicationRead(ObjectId userId, ObjectId applicationId) {
+
+        return this.readApplication(userId, applicationId);
+
     }
 
     public void handleApplicationAccept(HelpModelApplication application,
@@ -311,6 +317,20 @@ public class UserService extends AbstractService<UserModel> {
         var pushApplication = push("applications.received", application);
 
         this.updateExistingFields(idFilter, pushApplication);
+    }
+
+    private UserModel readApplication(ObjectId userId, ObjectId applicationId) {
+        var idFilter = and(eq(userId), or(elemMatch("applications.received", eq(applicationId)),
+                elemMatch("acceptedApplications.received", eq(applicationId))));
+
+        var setApplicationToRead = combine(set("applications.received.$[application].read", true)
+                , set("acceptedApplications.received.$[application].read", true));
+
+        var options =
+                new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).arrayFilters(singletonList(eq("application._id", applicationId)));
+
+        return this.updateArrayFields(idFilter, setApplicationToRead, options);
+
     }
 
     private void deleteApplication(ObjectId userId, ObjectId modelId) {

@@ -113,6 +113,10 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.findOneAndUpdate(filter, fieldsToUpdate, updateOptions);
     }
 
+    protected T updateArrayFields(Bson filter, Bson update, FindOneAndUpdateOptions options) {
+        return this.collection.findOneAndUpdate(filter, update, options);
+    }
+
     protected T replaceExisting(Bson filter, T entity) {
         var findRepOptions = new FindOneAndReplaceOptions();
         findRepOptions.returnDocument(ReturnDocument.AFTER);

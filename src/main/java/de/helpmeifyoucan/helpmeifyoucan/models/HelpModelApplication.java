@@ -24,6 +24,9 @@ public class HelpModelApplication extends AbstractEntity {
 
     private String helpModelType;
 
+    private boolean read;
+
+
     public String getHelpModelType() {
         return helpModelType;
     }
@@ -56,6 +59,15 @@ public class HelpModelApplication extends AbstractEntity {
 
     public HelpModelApplication setName(String name) {
         this.name = name;
+        return this;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public HelpModelApplication setRead(boolean read) {
+        this.read = read;
         return this;
     }
 

@@ -228,14 +228,14 @@
 								"method": "PATCH",
 								"header": [],
 								"body": {
-                                  "mode": "raw",
-                                  "raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66541,\n    \"country\": \"newCountry\",\n    \"coordinates\" : {\"latitude\" : \"50\", \n    \"longitude\" : \"100\"},\n    \"currentPassword\" : \"password1\"\n}",
-                                  "options": {
-                                    "raw": {
-                                      "language": "json"
-                                    }
-                                  }
-                                },
+									"mode": "raw",
+									"raw": "{\n    \"street\": \"newStreet\",\n    \"district\": \"newDistrict\",\n    \"houseNumber\": \"11b\",\n    \"zipCode\": 66541,\n    \"country\": \"newCountry\",\n    \"coordinates\" : {\"latitude\" : \"50\", \n    \"longitude\" : \"100\"},\n    \"currentPassword\" : \"password1\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
 								"url": {
 									"raw": "{{HOST}}:{{PORT}}/user/me/address?lazy=false",
 									"host": [
@@ -255,6 +255,33 @@
 									]
 								},
 								"description": "* street (optional)\n* district (optional)\n* houseNumber (optional)\n* zipCode (optional)\n* country (optional)"
+							},
+							"response": []
+						},
+						{
+							"name": "Application Read",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{HOST}}:{{PORT}}/user/me/applications/:id",
+									"host": [
+										"{{HOST}}"
+									],
+									"port": "{{PORT}}",
+									"path": [
+										"user",
+										"me",
+										"applications",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "5e9c980996c68347f0c345bd"
+										}
+									]
+								}
 							},
 							"response": []
 						}
@@ -1036,11 +1063,11 @@
 	"auth": {
 		"type": "bearer",
 		"bearer": [
-          {
-            "key": "token",
-            "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTk4ODcyOWJmZDg1MTQ4ZWIxYzZmN2YiLCJpYXQiOjE1ODcwNTQzNzgsImV4cCI6MTU4NzkxODM3OCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.XzpHoth4HVhauOPbK44d0KAyFV-7SBA25GK85OGVPtxpj2GK5bs_IA9AB-9xV0MHZbR365YEL6Rnh0cFj9j-KA",
-            "type": "string"
-          }
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZTljOTc4MTk2YzY4MzQ3ZjBjMzQ1YjkiLCJpYXQiOjE1ODczMjA4NjcsImV4cCI6MTU4ODE4NDg2Nywicm9sZXMiOlsiUk9MRV9VU0VSIl19.7bOGCWja1SI0BvBJj8SK1BGl4aQ9qmdOe7yk_Xf6OyQK6nqqy3LocSk6-KHl1E1rngMpSp0AytbEQ4iF6wP00w",
+				"type": "string"
+			}
 		]
 	},
 	"event": [
@@ -1066,18 +1093,18 @@
 		}
 	],
 	"variable": [
-      {
-        "id": "068407f0-9482-4c5b-80c3-f9fc89e7f93c",
-        "key": "HOST",
-        "value": "localhost",
-        "type": "string"
-      },
-      {
-        "id": "1379a0b8-3d80-468b-b25f-681b75434ab6",
-        "key": "PORT",
-        "value": "8080",
-        "type": "string"
-      }
+		{
+			"id": "c8ded2ff-83e0-494f-8461-588e0ab0ad63",
+			"key": "HOST",
+			"value": "localhost",
+			"type": "string"
+		},
+		{
+			"id": "d2dba572-6784-4f17-ace8-0b092b65e5bd",
+			"key": "PORT",
+			"value": "8080",
+			"type": "string"
+		}
 	],
 	"protocolProfileBehavior": {}
 }
