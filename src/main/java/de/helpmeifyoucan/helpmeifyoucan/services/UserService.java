@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions.UserNotFoundException;
@@ -329,7 +330,8 @@ public class UserService extends AbstractService<UserModel> {
         var options =
                 new FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER).arrayFilters(singletonList(eq("application._id", applicationId)));
 
-        return this.updateArrayFields(idFilter, setApplicationToRead, options);
+        return Optional.ofNullable(this.updateArrayFields(idFilter, setApplicationToRead,
+                options)).orElseThrow(() -> new ApplicationExceptions.ApplicationNotFoundException(applicationId));
 
     }
 
