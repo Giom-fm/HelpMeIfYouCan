@@ -45,11 +45,7 @@ public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
         applications.forEach(x -> {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("id", x.getId().toString());
-                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
-                jsonGenerator.writeStringField("name", x.getName());
-                jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                writeCoreApplication(x);
                 jsonGenerator.writeBooleanField("read", x.isRead());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -65,10 +61,7 @@ public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
         applications.forEach(x -> {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("id", x.getId().toString());
-                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
-                jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                writeCoreApplication(x);
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -76,5 +69,12 @@ public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
         });
         jsonGenerator.writeEndArray();
 
+    }
+
+    private void writeCoreApplication(HelpModelApplication application) throws IOException {
+        jsonGenerator.writeStringField("id", application.getId().toString());
+        jsonGenerator.writeStringField("modelId", application.getModelId().toString());
+        jsonGenerator.writeStringField("message", application.getMessage());
+        jsonGenerator.writeStringField("helpModelType", application.getHelpModelType());
     }
 }

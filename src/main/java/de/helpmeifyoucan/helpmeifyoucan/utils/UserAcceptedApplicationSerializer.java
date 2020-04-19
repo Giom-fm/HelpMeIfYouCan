@@ -43,13 +43,7 @@ public class UserAcceptedApplicationSerializer extends StdSerializer<HashMap<Str
         applications.forEach(x -> {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("id", x.getId().toString());
-                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
-                jsonGenerator.writeStringField("name", x.getName());
-                jsonGenerator.writeStringField("lastName", x.getLastName());
-                jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("phoneNr", x.getTelephoneNr());
-                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                writeCoreApplication(x);
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -64,13 +58,7 @@ public class UserAcceptedApplicationSerializer extends StdSerializer<HashMap<Str
         applications.forEach(x -> {
             try {
                 jsonGenerator.writeStartObject();
-                jsonGenerator.writeStringField("id", x.getId().toString());
-                jsonGenerator.writeStringField("modelId", x.getModelId().toString());
-                jsonGenerator.writeStringField("name", x.getName());
-                jsonGenerator.writeStringField("lastName", x.getLastName());
-                jsonGenerator.writeStringField("message", x.getMessage());
-                jsonGenerator.writeStringField("phoneNr", x.getTelephoneNr());
-                jsonGenerator.writeStringField("helpModelType", x.getHelpModelType());
+                writeCoreApplication(x);
                 jsonGenerator.writeBooleanField("read", x.isRead());
                 jsonGenerator.writeEndObject();
             } catch (IOException e) {
@@ -80,4 +68,15 @@ public class UserAcceptedApplicationSerializer extends StdSerializer<HashMap<Str
         jsonGenerator.writeEndArray();
 
     }
+
+    private void writeCoreApplication(HelpModelApplication application) throws IOException {
+        jsonGenerator.writeStringField("id", application.getId().toString());
+        jsonGenerator.writeStringField("modelId", application.getModelId().toString());
+        jsonGenerator.writeStringField("name", application.getName());
+        jsonGenerator.writeStringField("lastName", application.getLastName());
+        jsonGenerator.writeStringField("message", application.getMessage());
+        jsonGenerator.writeStringField("phoneNr", application.getTelephoneNr());
+        jsonGenerator.writeStringField("helpModelType", application.getHelpModelType());
+    }
+
 }
