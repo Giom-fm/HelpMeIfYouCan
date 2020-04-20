@@ -74,6 +74,8 @@ public class UserApplicationsSerializer extends StdSerializer<HashMap<String,
     private void writeCoreApplication(HelpModelApplication application) throws IOException {
         jsonGenerator.writeStringField("id", application.getId().toString());
         jsonGenerator.writeStringField("modelId", application.getModelId().toString());
+        jsonGenerator.writeObjectField("created", application.getCreated());
+        jsonGenerator.writeStringField("name", application.getName());
         jsonGenerator.writeStringField("message", application.getMessage());
         jsonGenerator.writeStringField("helpModelType", application.getHelpModelType());
     }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
+import java.util.Date;
 import java.util.Objects;
 
 public class HelpModelApplication extends AbstractEntity {
@@ -26,6 +27,16 @@ public class HelpModelApplication extends AbstractEntity {
 
     private boolean read;
 
+    protected Date created;
+
+    public Date getCreated() {
+        return created;
+    }
+
+    public HelpModelApplication setCreated(Date created) {
+        this.created = created;
+        return this;
+    }
 
     public String getHelpModelType() {
         return helpModelType;
@@ -109,9 +120,9 @@ public class HelpModelApplication extends AbstractEntity {
 
     public HelpModelApplication generateId() {
         this.setId(new ObjectId());
+        this.setCreated(new Date());
         return this;
     }
-
 
 
     @Override
@@ -119,22 +130,34 @@ public class HelpModelApplication extends AbstractEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HelpModelApplication that = (HelpModelApplication) o;
-        return getUser().equals(that.getUser()) &&
-                getTelephoneNr().equals(that.getTelephoneNr());
+        return isRead() == that.isRead() &&
+                Objects.equals(getMessage(), that.getMessage()) &&
+                Objects.equals(getName(), that.getName()) &&
+                Objects.equals(getLastName(), that.getLastName()) &&
+                Objects.equals(getUser(), that.getUser()) &&
+                Objects.equals(getTelephoneNr(), that.getTelephoneNr()) &&
+                Objects.equals(getModelId(), that.getModelId()) &&
+                Objects.equals(getHelpModelType(), that.getHelpModelType()) &&
+                Objects.equals(getCreated(), that.getCreated());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUser(), getTelephoneNr());
+        return Objects.hash(getMessage(), getName(), getLastName(), getUser(), getTelephoneNr(), getModelId(), getHelpModelType(), isRead(), getCreated());
     }
 
     @Override
     public String toString() {
         return "HelpModelApplication{" +
                 "message='" + message + '\'' +
+                ", name='" + name + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", user=" + user +
                 ", telephoneNr='" + telephoneNr + '\'' +
-                ", id=" + id +
+                ", modelId=" + modelId +
+                ", helpModelType='" + helpModelType + '\'' +
+                ", read=" + read +
+                ", created=" + created +
                 '}';
     }
 }
