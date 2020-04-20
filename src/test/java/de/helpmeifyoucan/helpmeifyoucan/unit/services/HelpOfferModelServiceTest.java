@@ -102,7 +102,7 @@ public class HelpOfferModelServiceTest {
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
+        this.helpService.handleNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         var updateOffer = this.helpService.getById(testOffer.getId());
 
@@ -118,7 +118,7 @@ public class HelpOfferModelServiceTest {
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
+        this.helpService.handleNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         this.helpService.deleteApplication(testOffer.getId(), testUser.getId());
 
@@ -132,7 +132,7 @@ public class HelpOfferModelServiceTest {
 
         var testApplication = new HelpModelApplication().setUser(testUser.getId()).setMessage("testmessage").setTelephoneNr("01231548135");
 
-        this.helpService.saveNewApplication(testOffer.getId(), testApplication, testUser.getId());
+        this.helpService.handleNewApplication(testOffer.getId(), testApplication, testUser.getId());
 
         this.helpService.acceptApplication(testOffer.getId(), testApplication.getId(), testUser.getId());
     }

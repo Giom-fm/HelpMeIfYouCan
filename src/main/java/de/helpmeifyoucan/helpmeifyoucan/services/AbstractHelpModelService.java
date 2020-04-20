@@ -7,9 +7,12 @@ import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractHelpModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.utils.ApplicationExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
+import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +46,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
     protected abstract Class<T> getModel();
 
-    public abstract void deleteApplication(ObjectId modelId, ObjectId deletingUser);
+    public abstract HelpModelApplication deleteApplication(ObjectId modelId, ObjectId deletingUser);
 
     /**
      * We want to update a request, we do so by first checking if the updating user has permission to do so, if yes we directly update the request in the db
@@ -63,21 +66,39 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
     }
 
-    public abstract HelpModelApplication acceptApplication(ObjectId modelId, ObjectId applicationId,
-                                                           ObjectId acceptingUser);
+    public abstract HelpModelApplication acceptApplication(ObjectId modelId, ObjectId applicationId, ObjectId acceptingUser);
+
+    public HelpModelApplication handleNewApplication(ObjectId helpModel,
+                                                     HelpModelApplication application, ObjectId applyingUser) {
+        var model =
+                Optional.ofNullable(this.getById(helpModel)).orElseThrow(() -> new HelpModelExceptions.HelpModelNotFoundException(helpModel));
+
+        if (model.getUser().equals(applyingUser)) {
+            throw new ApplicationExceptions.OwnPostApplicationException(this.getModel());
+        }
+
+        if (model.userHasApplied(applyingUser)) {
+            throw new ApplicationExceptions.DuplicateApplicationException(this.getModel(), helpModel);
+        }
+
+        return saveNewApplication(helpModel, application, applyingUser);
+    }
 
 
-    public HelpModelApplication saveNewApplication(ObjectId helpRequest, HelpModelApplication application, ObjectId savingUser) {
+    private HelpModelApplication saveNewApplication(ObjectId helpOffer,
+                                                    HelpModelApplication application, ObjectId applyingUser) {
 
-        application.setModelId(helpRequest).setHelpModelType(this.getModel().getSimpleName()).generateId();
-        var savingUserModel = this.userService.handleApplicationAdd(savingUser, application);
+
+        application.setModelId(helpOffer).setHelpModelType(this.getModel().getSimpleName()).generateId();
+
+        var savingUserModel = this.userService.handleApplicationAdd(applyingUser, application);
         application.addUserDetails(savingUserModel);
 
-        var idFilter = eq(helpRequest);
+        var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
 
         var updatedModel = Optional.ofNullable(super.updateExistingFields(idFilter,
-                addApplicationsUpdate)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
+                addApplicationsUpdate)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpOffer));
 
         this.userService.handleApplicationReceived(updatedModel.getUser(), application);
 
@@ -171,9 +192,15 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
         return this.updateMany(filter, update).getModifiedCount();
     }
 
+    protected HelpModelApplication filterApplications(T offerModel, ObjectId userId) {
+        return offerModel.getApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new UserExceptions.UserNotFoundException(userId));
+    }
+
     protected T getByModelIdAndUser(ObjectId modelId, ObjectId userId) {
 
         return Optional.ofNullable(getByFilter(and(eq(modelId), in("user", userId)))).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(modelId));
 
     }
+
+
 }

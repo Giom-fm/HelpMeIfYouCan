@@ -107,6 +107,12 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.updateMany(filter, fieldsToUpdate, updateOptions);
     }
 
+    protected UpdateResult updateManyOptions(Bson filter, Bson fieldsToUpdate,
+                                             UpdateOptions updateOptions) {
+
+        return this.collection.updateMany(filter, fieldsToUpdate, updateOptions);
+    }
+
     protected T updateExistingFields(Bson filter, Bson fieldsToUpdate) {
         var updateOptions = new FindOneAndUpdateOptions();
         updateOptions.returnDocument(ReturnDocument.AFTER).upsert(false);

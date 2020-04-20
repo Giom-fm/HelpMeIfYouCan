@@ -3,6 +3,7 @@ package de.helpmeifyoucan.helpmeifyoucan.unit.services;
 
 import de.helpmeifyoucan.helpmeifyoucan.StaticDbClear;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
+import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpRequestUpdate;
@@ -20,10 +21,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
@@ -108,6 +111,15 @@ public class HelpRequestServiceTest {
 
         assertEquals(list.size(), 2);
 
+    }
+
+    @Test
+    public void afterUserHasApplied_userHasAppliedShouldBeTrue() {
+
+        var application = new HelpModelApplication().setUser(testUser.getId());
+        testRequest.setApplications(Collections.singletonList(application));
+
+        assertTrue(testRequest.userHasApplied(testUser.getId()));
     }
 
 }

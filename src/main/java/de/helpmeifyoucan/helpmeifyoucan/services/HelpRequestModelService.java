@@ -1,8 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
@@ -37,9 +39,7 @@ public class HelpRequestModelService extends AbstractHelpModelService<HelpReques
     }
 
 
-
-
-    public void deleteApplication(ObjectId helpRequest, ObjectId deletingUser) {
+    public HelpModelApplication deleteApplication(ObjectId helpRequest, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpRequest), or(elemMatch("applications", eq("user",
                 deletingUser)), elemMatch("acceptedApplication", eq("user",
@@ -47,13 +47,16 @@ public class HelpRequestModelService extends AbstractHelpModelService<HelpReques
 
         var pullApplication = pull("applications", in("user", deletingUser));
         var pullAcceptedApplication = pull("acceptedApplication", in("user", deletingUser));
-
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
+        var updateOptions = new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE);
 
-        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter,
-                deleteApplicationUpdate).getApplications()).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
+        var request = Optional.ofNullable(super.updateArrayFields(idAndApplicationIdFilter,
+                deleteApplicationUpdate, updateOptions)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpRequest));
 
-        super.userService.handleApplicationDelete(deletingUser, helpRequest);
+        var userApplication = this.filterApplications(request, deletingUser);
+
+        return this.userService.handleApplicationDelete(userApplication);
+
     }
 
 

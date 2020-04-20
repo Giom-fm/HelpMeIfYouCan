@@ -7,7 +7,6 @@ import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.services.AbstractHelpModelService;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -56,14 +55,13 @@ public abstract class AbstractHelpModelController<T extends AbstractHelpModel> {
             MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId modelId,
                                                @RequestBody HelpModelApplication application) {
-        return this.modelService.saveNewApplication(modelId, application, getIdFromContext());
+        return this.modelService.handleNewApplication(modelId, application, getIdFromContext());
     }
 
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(path = "/{modelId}/unapply")
-    public void unApplyFromRequest(@PathVariable ObjectId modelId) {
-        this.modelService.deleteApplication(modelId, getIdFromContext());
+    public HelpModelApplication unApplyFromRequest(@PathVariable ObjectId modelId) {
+        return this.modelService.deleteApplication(modelId, getIdFromContext());
     }
 
     @PatchMapping(path = "/{modelId}/{applicationId}/accept")

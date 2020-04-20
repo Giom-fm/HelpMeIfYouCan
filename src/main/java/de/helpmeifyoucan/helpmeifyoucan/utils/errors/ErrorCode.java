@@ -58,6 +58,16 @@ public enum ErrorCode {
 
     HELPREQUEST_NOT_FOUND(204, "HelpRequest \"%s\" not found"),
 
+    // -------------------------------------------------------------------------
+    // HelpModel
+    // -------------------------------------------------------------------------
+
+    /**
+     * {@code 400 - HelpOffer \"%s\" not found}
+     */
+
+    HELPMODEL_NOT_FOUND(204, "HelpModel \"%s\" not found"),
+
 
     // -------------------------------------------------------------------------
     // Application
@@ -69,6 +79,11 @@ public enum ErrorCode {
 
     APPLICATION_NOT_FOUND(204, "Application \"%s\" not found"),
 
+    /**
+     * {@code 403 - Application to own Model not allowed}
+     */
+
+    APPLICATION_NOT_ALLOWED(403, "Application to own Model not allowed"),
 
     // -------------------------------------------------------------------------
     // Authentication

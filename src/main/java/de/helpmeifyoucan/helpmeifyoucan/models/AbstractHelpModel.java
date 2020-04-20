@@ -44,23 +44,23 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     public abstract AbstractHelpModel setUserName(String userName);
 
-    public abstract AbstractHelpModel setStatus(PostStatusEnum status);
-
     public abstract AbstractHelpModel generateId();
-
-    public abstract <T extends AbstractHelpModel> T setCoordinates(Coordinates coordinates);
-
-    public abstract AbstractHelpModel setUser(ObjectId userId);
-
 
     public ObjectId getUser() {
         return user;
     }
 
+    public abstract AbstractHelpModel setUser(ObjectId userId);
+
+    public boolean userHasApplied(ObjectId user) {
+        return this.applications.stream().map(HelpModelApplication::getUser).anyMatch(x -> x.equals(user));
+    }
 
     public Coordinates getCoordinates() {
         return coordinates;
     }
+
+    public abstract <T extends AbstractHelpModel> T setCoordinates(Coordinates coordinates);
 
     public String getDescription() {
         return description;
@@ -69,6 +69,8 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     public PostStatusEnum getStatus() {
         return status;
     }
+
+    public abstract AbstractHelpModel setStatus(PostStatusEnum status);
 
     public Date getDatePublished() {
         return datePublished;

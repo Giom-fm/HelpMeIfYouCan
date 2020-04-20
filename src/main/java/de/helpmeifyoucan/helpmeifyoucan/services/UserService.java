@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
@@ -190,8 +191,19 @@ public class UserService extends AbstractService<UserModel> {
         this.acceptApplicationAccepting(acceptedUser, acceptingUser, application);
     }
 
-    public void handleApplicationDelete(ObjectId userId, ObjectId modelId) {
-        this.deleteApplication(userId, modelId);
+    public HelpModelApplication handleApplicationDelete(HelpModelApplication applicationToDelete) {
+
+        var count = this.deleteApplication(applicationToDelete.getUser(),
+                applicationToDelete.getId());
+
+        System.out.println(count);
+
+        if (count == 0) {
+            throw new UserExceptions.UserNotFoundException(applicationToDelete.getUser());
+        }
+
+        return applicationToDelete;
+
     }
 
     // -----------------------------------------------------------------------
@@ -335,10 +347,24 @@ public class UserService extends AbstractService<UserModel> {
 
     }
 
-    private void deleteApplication(ObjectId userId, ObjectId modelId) {
-        var idFilter = eq(userId);
+    private long deleteApplication(ObjectId userId, ObjectId applicationId) {
 
-        this.updateExistingFields(idFilter, pull("applications.send", in("modelId", modelId)));
+        var idFilter = or(eq(userId), or(elemMatch("applications.received", eq(applicationId)),
+                elemMatch("acceptedApplications.received", eq(applicationId))));
+
+
+        var arrayFilter = new ArrayList<Bson>();
+        arrayFilter.add(eq("application._id", applicationId));
+
+
+        var pullApplication = combine(pull("applications.send",
+                eq(applicationId)), pull(
+                "applications.received", eq(applicationId)), pull(
+                "acceptedApplications.send", eq(applicationId)), pull(
+                "acceptedApplications.received", eq(applicationId)));
+
+        return this.updateMany(idFilter, pullApplication).getModifiedCount();
+
     }
 
     private UserModel checkPasswordAndGetUser(ObjectId userId, AbstractModelUpdate updatedFields) {

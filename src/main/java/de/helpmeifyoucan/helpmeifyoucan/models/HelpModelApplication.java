@@ -29,6 +29,7 @@ public class HelpModelApplication extends AbstractEntity {
 
     protected Date created;
 
+
     public Date getCreated() {
         return created;
     }

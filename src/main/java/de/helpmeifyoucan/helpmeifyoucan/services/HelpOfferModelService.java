@@ -1,8 +1,10 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReturnDocument;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
@@ -35,7 +37,7 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
         return HelpOfferModel.class;
     }
 
-    public void deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
+    public HelpModelApplication deleteApplication(ObjectId helpOffer, ObjectId deletingUser) {
 
         var idAndApplicationIdFilter = and(eq(helpOffer), or(elemMatch("applications", eq("user",
                 deletingUser)), elemMatch("acceptedApplications", eq("user",
@@ -43,16 +45,15 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
 
         var pullApplication = pull("applications", in("user", deletingUser));
         var pullAcceptedApplication = pull("acceptedApplications", in("user", deletingUser));
-
         var deleteApplicationUpdate = combine(pullApplication, pullAcceptedApplication);
+        var updateOptions = new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE);
 
-        this.userService.handleApplicationDelete(deletingUser, helpOffer);
+        var offer = Optional.ofNullable(super.updateArrayFields(idAndApplicationIdFilter,
+                deleteApplicationUpdate, updateOptions)).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(helpOffer));
 
+        var userApplication = this.filterApplications(offer, deletingUser);
 
-        Optional.ofNullable(super.updateExistingFields(idAndApplicationIdFilter,
-                deleteApplicationUpdate).getApplications()).orElseThrow(() -> new HelpOfferModelExceptions.HelpOfferNotFoundException(helpOffer));
-
-
+        return this.userService.handleApplicationDelete(userApplication);
     }
 
 

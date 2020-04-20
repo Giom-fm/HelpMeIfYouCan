@@ -13,8 +13,8 @@ public final class HelpOfferModelExceptions {
             this(id.toString());
         }
 
-        public HelpOfferNotFoundException(String coordinates) {
-            super(String.format(error.getMessage(), coordinates), error.getCode());
+        public HelpOfferNotFoundException(String id) {
+            super(String.format(error.getMessage(), id), error.getCode());
         }
     }
 }
