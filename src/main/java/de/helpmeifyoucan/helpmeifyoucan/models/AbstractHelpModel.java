@@ -52,6 +52,8 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     public abstract AbstractHelpModel setUser(ObjectId userId);
 
+    public abstract HelpModelApplication acceptApplication(ObjectId application);
+
     public boolean userHasApplied(ObjectId user) {
         return this.applications.stream().map(HelpModelApplication::getUser).anyMatch(x -> x.equals(user));
     }
@@ -79,6 +81,8 @@ public abstract class AbstractHelpModel extends AbstractEntity {
     public List<HelpModelApplication> getApplications() {
         return applications;
     }
+
+    public abstract List<HelpModelApplication> getCombinedApplications();
 
 
     @Override

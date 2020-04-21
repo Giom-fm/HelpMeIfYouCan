@@ -193,10 +193,9 @@ public class UserService extends AbstractService<UserModel> {
 
     public HelpModelApplication handleApplicationDelete(HelpModelApplication applicationToDelete) {
 
+        System.out.println(applicationToDelete);
         var count = this.deleteApplication(applicationToDelete.getUser(),
                 applicationToDelete.getId());
-
-        System.out.println(count);
 
         if (count == 0) {
             throw new UserExceptions.UserNotFoundException(applicationToDelete.getUser());

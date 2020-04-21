@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -55,6 +56,14 @@ public class HelpRequestModel extends AbstractHelpModel {
 
     public Date getDatePublished() {
         return datePublished;
+    }
+
+    @Override
+    public List<HelpModelApplication> getCombinedApplications() {
+        var newList = new LinkedList<>(this.applications);
+        newList.add(acceptedApplication);
+
+        return newList;
     }
 
     public HelpRequestModel setDatePublished(Date datePublished) {

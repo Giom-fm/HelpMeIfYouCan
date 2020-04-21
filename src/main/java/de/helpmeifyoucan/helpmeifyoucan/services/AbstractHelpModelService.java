@@ -1,10 +1,9 @@
 package de.helpmeifyoucan.helpmeifyoucan.services;
 
 import com.mongodb.client.MongoDatabase;
-import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
-import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
-import de.helpmeifyoucan.helpmeifyoucan.models.HelpModelApplication;
-import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
+import com.mongodb.client.model.FindOneAndUpdateOptions;
+import com.mongodb.client.model.ReturnDocument;
+import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractHelpModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ApplicationExceptions;
@@ -12,7 +11,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
-import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Updates.push;
-import static com.mongodb.client.model.Updates.set;
+import static com.mongodb.client.model.Updates.*;
 
 @Service
 public abstract class AbstractHelpModelService<T extends AbstractHelpModel> extends AbstractService<T> {
@@ -46,8 +44,6 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
     protected abstract Class<T> getModel();
 
-    public abstract HelpModelApplication deleteApplication(ObjectId modelId, ObjectId deletingUser);
-
     /**
      * We want to update a request, we do so by first checking if the updating user has permission to do so, if yes we directly update the request in the db
      *
@@ -66,7 +62,6 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
     }
 
-    public abstract HelpModelApplication acceptApplication(ObjectId modelId, ObjectId applicationId, ObjectId acceptingUser);
 
     public HelpModelApplication handleNewApplication(ObjectId helpModel,
                                                      HelpModelApplication application, ObjectId applyingUser) {
@@ -105,6 +100,61 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
         return application;
     }
 
+
+    public HelpModelApplication acceptApplication(ObjectId helpModel, ObjectId applicationId,
+                                                  ObjectId acceptingUser) {
+        var idFilter = and(eq(helpModel), eq("user", acceptingUser), elemMatch("applications", eq(applicationId)));
+
+        var offer =
+                Optional.ofNullable(super.getByFilter(idFilter)).orElseThrow(() -> new HelpModelExceptions.HelpModelNotFoundException(helpModel));
+
+        var acceptedApplication = offer.acceptApplication(applicationId);
+
+        this.userService.handleApplicationAccept(acceptedApplication, acceptingUser);
+
+        var removeApplicationFromApplications = pull("applications", eq(applicationId));
+
+        this.updateExistingFields(eq(helpModel), combine(buildAcceptedApplicationUpdate(acceptedApplication),
+                removeApplicationFromApplications));
+
+        return acceptedApplication;
+    }
+
+    private Bson buildAcceptedApplicationUpdate(HelpModelApplication acceptedApplication) {
+        return this.getModel().equals(HelpOfferModel.class) ? push("acceptedApplications",
+                acceptedApplication) : set("acceptedApplication", acceptedApplication);
+    }
+
+
+    public HelpModelApplication deleteApplication(ObjectId helpModel, ObjectId deletingUser) {
+        var idAndApplicationIdFilter = and(eq(helpModel), or(elemMatch("applications", eq("user",
+                deletingUser)), buildIdAndApplicationFilter(deletingUser)));
+
+        var pullApplication = pull("applications", eq("user", deletingUser));
+        var pullAcceptedApplication = buildDeleteApplicationFilter(deletingUser);
+
+        var updateOptions = new FindOneAndUpdateOptions().returnDocument(ReturnDocument.BEFORE);
+
+        var request = Optional.ofNullable(super.updateArrayFields(idAndApplicationIdFilter,
+                combine(pullApplication, pullAcceptedApplication), updateOptions)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpModel));
+
+        var userApplication = this.filterApplications(request, deletingUser);
+
+        return this.userService.handleApplicationDelete(userApplication);
+    }
+
+
+    public Bson buildIdAndApplicationFilter(ObjectId deletingUser) {
+        return this.getModel().equals(HelpOfferModel.class) ? elemMatch("acceptedApplications", eq(
+                "user",
+                deletingUser)) : eq("acceptedApplication.user", deletingUser);
+    }
+
+    public Bson buildDeleteApplicationFilter(ObjectId deletingUser) {
+        return this.getModel().equals(HelpOfferModel.class) ? pull("acceptedApplications", in(
+                "user", deletingUser)) : unset("acceptedApplication");
+
+    }
 
     /**
      * We want to save a new helpModel, so we first generate an id, to then save the embedded
@@ -193,7 +243,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     }
 
     protected HelpModelApplication filterApplications(T offerModel, ObjectId userId) {
-        return offerModel.getApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new UserExceptions.UserNotFoundException(userId));
+        return offerModel.getCombinedApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions.ApplicationNotFoundException(offerModel.getId()));
     }
 
     protected T getByModelIdAndUser(ObjectId modelId, ObjectId userId) {

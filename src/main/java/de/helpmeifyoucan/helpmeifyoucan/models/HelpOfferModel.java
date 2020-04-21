@@ -9,6 +9,8 @@ import org.bson.types.ObjectId;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class HelpOfferModel extends AbstractHelpModel {
 
@@ -63,6 +65,11 @@ public class HelpOfferModel extends AbstractHelpModel {
     public HelpOfferModel setStatus(PostStatusEnum status) {
         this.status = status;
         return this;
+    }
+
+    @Override
+    public List<HelpModelApplication> getCombinedApplications() {
+        return Stream.of(this.applications, this.acceptedApplications).flatMap(x -> x.stream()).collect(Collectors.toList());
     }
 
     public HelpOfferModel setDatePublished(Date date) {
