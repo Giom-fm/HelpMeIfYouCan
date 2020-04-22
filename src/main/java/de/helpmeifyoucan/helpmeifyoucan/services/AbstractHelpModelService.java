@@ -94,8 +94,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
         var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
 
-        Optional.ofNullable(super.updateExistingFields(idFilter,
-                addApplicationsUpdate)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpOffer));
+        super.updateExistingFields(idFilter, addApplicationsUpdate);
 
 
         return application;
