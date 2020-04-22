@@ -167,13 +167,14 @@ public class UserService extends AbstractService<UserModel> {
         this.deleteHelpModel(userId, modelId, modelClass);
     }
 
-    public UserModel handleApplicationAdd(ObjectId userId, HelpModelApplication application) {
-        return this.addApplication(userId, application);
-    }
+    public void handleApplicationAdd(ObjectId userId, HelpModelApplication application,
+                                     AbstractHelpModel model) {
 
-    public void handleApplicationReceived(ObjectId userId, HelpModelApplication application) {
+        application.addUserDetails(this.getById(model.getUser()));
+        var applyingUser = this.addApplication(userId, application);
 
-        this.receiveApplication(userId, application);
+        this.receiveApplication(model.getUser(), application.addUserDetails(applyingUser));
+
     }
 
     public UserModel handleApplicationRead(ObjectId userId, ObjectId applicationId) {
@@ -193,11 +194,8 @@ public class UserService extends AbstractService<UserModel> {
 
     public HelpModelApplication handleApplicationDelete(HelpModelApplication applicationToDelete) {
 
-        System.out.println(applicationToDelete);
-        var count = this.deleteApplication(applicationToDelete.getUser(),
-                applicationToDelete.getId());
-
-        if (count == 0) {
+        if (this.deleteApplication(applicationToDelete.getUser(),
+                applicationToDelete.getId()) == 0) {
             throw new UserExceptions.UserNotFoundException(applicationToDelete.getUser());
         }
 

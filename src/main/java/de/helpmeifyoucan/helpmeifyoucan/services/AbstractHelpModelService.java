@@ -83,19 +83,20 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     private HelpModelApplication saveNewApplication(ObjectId helpOffer,
                                                     HelpModelApplication application, ObjectId applyingUser) {
 
+        var model =
+                Optional.ofNullable(this.getById(helpOffer)).orElseThrow(() -> new HelpModelExceptions.HelpModelNotFoundException(helpOffer));
 
         application.setModelId(helpOffer).setHelpModelType(this.getModel().getSimpleName()).generateId();
 
-        var savingUserModel = this.userService.handleApplicationAdd(applyingUser, application);
-        application.addUserDetails(savingUserModel);
+        this.userService.handleApplicationAdd(applyingUser, application,
+                model);
 
         var idFilter = eq(helpOffer);
         var addApplicationsUpdate = push("applications", application);
 
-        var updatedModel = Optional.ofNullable(super.updateExistingFields(idFilter,
+        Optional.ofNullable(super.updateExistingFields(idFilter,
                 addApplicationsUpdate)).orElseThrow(() -> new HelpRequestModelExceptions.HelpRequestNotFoundException(helpOffer));
 
-        this.userService.handleApplicationReceived(updatedModel.getUser(), application);
 
         return application;
     }
@@ -242,7 +243,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
         return this.updateMany(filter, update).getModifiedCount();
     }
 
-    protected HelpModelApplication filterApplications(T offerModel, ObjectId userId) {
+    private HelpModelApplication filterApplications(T offerModel, ObjectId userId) {
         return offerModel.getCombinedApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions.ApplicationNotFoundException(offerModel.getId()));
     }
 
