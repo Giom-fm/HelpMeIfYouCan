@@ -119,6 +119,17 @@ public class UserModel extends AbstractEntity {
         return this;
     }
 
+    public List<ObjectId> removeHelpOffer(ObjectId offerId) {
+        this.helpOffers.remove(offerId);
+        return this.helpOffers;
+    }
+
+    public List<ObjectId> removeHelpRequest(ObjectId requestId) {
+        this.helpRequests.remove(requestId);
+        return this.helpRequests;
+    }
+
+
     public boolean isEnabled() {
         return enabled;
     }

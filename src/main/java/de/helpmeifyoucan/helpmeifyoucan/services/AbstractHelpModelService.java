@@ -96,7 +96,6 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
         super.updateExistingFields(idFilter, addApplicationsUpdate);
 
-
         return application;
     }
 
@@ -198,7 +197,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
         var deletedCoords = this.coordinatesService.handleHelpModelCoordinateDelete(deletedModel);
 
-        this.userService.handleHelpModelDelete(deletedModel.getClass(), modelToDelete, deletingUser);
+        this.userService.handleHelpModelDelete(deletedModel, deletingUser);
 
         this.updateEmbeddedCoordinates(deletedCoords);
 

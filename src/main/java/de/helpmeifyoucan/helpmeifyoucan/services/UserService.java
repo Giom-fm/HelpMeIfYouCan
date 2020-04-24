@@ -162,9 +162,9 @@ public class UserService extends AbstractService<UserModel> {
         return this.addHelpModel(userId, modelId, modelClass);
     }
 
-    public void handleHelpModelDelete(Class<? extends AbstractHelpModel> modelClass, ObjectId modelId,
+    public void handleHelpModelDelete(AbstractHelpModel modelToDelete,
                                       ObjectId userId) {
-        this.deleteHelpModel(userId, modelId, modelClass);
+        this.deleteHelpModel(userId, modelToDelete.getId(), modelToDelete.getClass());
     }
 
     public void handleApplicationAdd(ObjectId userId, HelpModelApplication application,
@@ -273,9 +273,15 @@ public class UserService extends AbstractService<UserModel> {
 
     private UserModel deleteHelpModel(ObjectId userId, ObjectId modelId, Class<? extends AbstractHelpModel> model) {
         var idFilter = eq(userId);
+
+        var user = this.getById(userId);
+
         return model.equals(HelpOfferModel.class)
-                ? super.updateExistingFields(idFilter, pull("helpOffers", eq(modelId)))
-                : super.updateExistingFields(idFilter, pull("helpRequests", eq(modelId)));
+                ?
+                super.updateExistingFields(idFilter, set("helpOffers",
+                        user.removeHelpOffer(modelId))) :
+                super.updateExistingFields(idFilter, set("helpRequests",
+                        user.removeHelpRequest(modelId)));
 
     }
 
