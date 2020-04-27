@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListAcceptedApplicationsSerializer;
 import org.bson.types.ObjectId;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,8 +69,8 @@ public class HelpOfferModel extends AbstractHelpModel {
     }
 
     @Override
-    public List<HelpModelApplication> getCombinedApplications() {
-        return Stream.of(this.applications, this.acceptedApplications).flatMap(x -> x.stream()).collect(Collectors.toList());
+    public List<HelpModelApplication> combineApplications() {
+        return Stream.of(this.applications, this.acceptedApplications).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public HelpOfferModel setDatePublished(Date date) {

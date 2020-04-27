@@ -16,8 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
@@ -28,6 +29,7 @@ public class UserService extends AbstractService<UserModel> {
 
     private AddressService addressService;
     private BCryptPasswordEncoder passwordEncoder;
+    private ServiceSubject serviceSubject;
 
     @Autowired
     public UserService(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
@@ -35,12 +37,12 @@ public class UserService extends AbstractService<UserModel> {
         super.createCollection("users", UserModel.class);
         this.passwordEncoder = passwordEncoder;
         createIndex();
+        serviceSubject = new ServiceSubject();
     }
 
     private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
-
         super.createIndex(Indexes.ascending("email"), options);
     }
 
@@ -91,8 +93,37 @@ public class UserService extends AbstractService<UserModel> {
 
         var updateFilter = eq(userId);
 
-        return super.updateExistingFields(updateFilter, updatedFields.toFilter());
+        var updatedUser = super.updateExistingFields(updateFilter, updatedFields.toFilter());
 
+        serviceSubject.onUpdate(updatedUser);
+        updateReceivedApplicationsAfterUserUpdate(updatedUser);
+
+        return updatedUser;
+
+    }
+
+    public void updateReceivedApplicationsAfterUserUpdate(UserModel updatedUser) {
+        List<ObjectId> usersReceivedApplicationsFromUpdated =
+                updatedUser.combineSendApplications().stream().map(HelpModelApplication::getUser).collect(Collectors.toList());
+
+        var idFilter = in("_id", usersReceivedApplicationsFromUpdated);
+
+        var arrayFilter = singletonList(eq("application.user", updatedUser.getId()));
+
+        var applicationUpdate = combine(set("applications.received.$[application].name",
+                updatedUser.getName()), set("applications.received.$[application].lastName",
+                updatedUser.getLastName()), set("applications.received.$[application].telephoneNr",
+                updatedUser.getPhoneNr()));
+
+        var acceptedApplicationsUpdate = combine(set("acceptedApplications.received.$[application].name",
+                updatedUser.getName()), set("acceptedApplications.received.$[application].lastName",
+                updatedUser.getLastName()), set("acceptedApplications.received.$[application].telephoneNr",
+                updatedUser.getPhoneNr()));
+
+        var updateOptions = new UpdateOptions().arrayFilters(arrayFilter);
+
+        super.updateManyOptions(idFilter,
+                combine(applicationUpdate, acceptedApplicationsUpdate), updateOptions);
     }
 
     // -----------------------------------------------------------------------
@@ -123,14 +154,18 @@ public class UserService extends AbstractService<UserModel> {
 
     }
 
-    public UserModel handleUserMeDelete(ObjectId userId) {
-        var deletedUser = this.getById(userId);
+    public UserModel handleUserMeDelete(ObjectId userId, UserUpdate update) {
+        var userToDelete = this.checkPasswordAndGetUser(userId, update);
 
-        this.addressService.handleUserServiceAddressDelete(deletedUser.getUserAddress(), userId);
+        if (userToDelete.getUserAddress() != null) {
+            this.addressService.handleUserServiceAddressDelete(userToDelete.getUserAddress(), userId);
+        }
+
+        this.serviceSubject.onDelete(userToDelete);
 
         this.deleteById(userId);
 
-        return deletedUser;
+        return userToDelete;
     }
 
     public UserModel handleUserAddressUpdateRequest(ObjectId userId, AddressUpdate update, boolean lazy) {
@@ -355,11 +390,6 @@ public class UserService extends AbstractService<UserModel> {
         var idFilter = or(eq(userId), or(elemMatch("applications.received", eq(applicationId)),
                 elemMatch("acceptedApplications.received", eq(applicationId))));
 
-
-        var arrayFilter = new ArrayList<Bson>();
-        arrayFilter.add(eq("application._id", applicationId));
-
-
         var pullApplication = combine(pull("applications.send",
                 eq(applicationId)), pull(
                 "applications.received", eq(applicationId)), pull(
@@ -389,4 +419,7 @@ public class UserService extends AbstractService<UserModel> {
     }
 
 
+    public void subscribe(AbstractHelpModelService<? extends AbstractHelpModel> observer) {
+        this.serviceSubject.subscribeActual(observer);
+    }
 }

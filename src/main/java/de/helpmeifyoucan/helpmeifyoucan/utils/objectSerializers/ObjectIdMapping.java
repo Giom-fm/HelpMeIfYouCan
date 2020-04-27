@@ -1,4 +1,4 @@
-package de.helpmeifyoucan.helpmeifyoucan.utils;
+package de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers;
 
 
 import com.fasterxml.jackson.databind.util.StdConverter;

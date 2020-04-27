@@ -1,7 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
 import java.util.Date;

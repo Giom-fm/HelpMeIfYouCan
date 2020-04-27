@@ -3,18 +3,21 @@ package de.helpmeifyoucan.helpmeifyoucan.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
-import de.helpmeifyoucan.helpmeifyoucan.utils.*;
+import de.helpmeifyoucan.helpmeifyoucan.utils.Role;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.UserAcceptedApplicationSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.UserAddressSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.UserApplicationsSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidEmail;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserModel extends AbstractEntity {
 
@@ -228,6 +231,15 @@ public class UserModel extends AbstractEntity {
     public UserModel setUserAddress(ObjectId userAddress) {
         this.userAddress = userAddress;
         return this;
+    }
+
+    public List<HelpModelApplication> combineSendApplications() {
+        return Stream.of(this.applications.get("send"),
+                this.acceptedApplications.get("send")).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    public List<ObjectId> combineModels() {
+        return Stream.of(this.helpOffers, this.helpRequests).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     @Override

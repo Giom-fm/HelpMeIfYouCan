@@ -1,9 +1,9 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.utils.ObjectIdMapping;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
@@ -82,7 +82,7 @@ public abstract class AbstractHelpModel extends AbstractEntity {
         return applications;
     }
 
-    public abstract List<HelpModelApplication> getCombinedApplications();
+    public abstract List<HelpModelApplication> combineApplications();
 
 
     @Override

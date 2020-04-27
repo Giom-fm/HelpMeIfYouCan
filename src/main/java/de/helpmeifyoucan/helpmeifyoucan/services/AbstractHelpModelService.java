@@ -3,26 +3,33 @@ package de.helpmeifyoucan.helpmeifyoucan.services;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReturnDocument;
+import com.mongodb.client.model.UpdateOptions;
 import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractHelpModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.HelpModelApplicationUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.utils.ApplicationExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
 @Service
-public abstract class AbstractHelpModelService<T extends AbstractHelpModel> extends AbstractService<T> {
+public abstract class AbstractHelpModelService<T extends AbstractHelpModel> extends AbstractService<T> implements Observer<AbstractHelpModelService<T>> {
 
 
     protected CoordinatesService coordinatesService;
@@ -38,6 +45,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
         this.createIndex();
         this.coordinatesService = coordinatesService;
         this.userService = userService;
+        this.userService.subscribe(this);
     }
 
     protected abstract void createIndex();
@@ -125,9 +133,47 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     }
 
 
+    protected void updateApplicationByUser(HelpModelApplicationUpdate update,
+                                           List<ObjectId> modelIds, ObjectId updatedUser) {
+
+
+        var findApplicationsFilter = in("_id", modelIds);
+
+        var arrayFilter = Collections.singletonList(eq("application.user", updatedUser));
+
+
+        var updateFilter = combine(set("applications.$[application].name", update.getName()), set(
+                "applications.$[application].lastName", update.getLastName()),
+                buildAcceptedApplicationUpdate(update));
+
+        var updateOptions = new UpdateOptions().arrayFilters(arrayFilter);
+
+        super.updateManyOptions(findApplicationsFilter, updateFilter, updateOptions);
+    }
+
+    private void updateModelUser(UserModel updatedUser, List<ObjectId> modelsToUpdate) {
+        var findModelsFilter = in("_id", modelsToUpdate);
+
+        var update = set("userName", updatedUser.getName());
+
+        super.updateMany(findModelsFilter, update);
+    }
+
+
+    private Bson buildAcceptedApplicationUpdate(HelpModelApplicationUpdate update) {
+        var applicationArray = this.getModel().equals(HelpOfferModel.class) ?
+                "acceptedApplications.$[application]" : "acceptedApplication]";
+
+        return combine(set(applicationArray + ".name", update.getName()), set(applicationArray +
+                ".lastName", update.getLastName()), set(applicationArray + ".telephoneNr",
+                update.getTelephoneNr()));
+
+    }
+
+
     public HelpModelApplication deleteApplication(ObjectId helpModel, ObjectId deletingUser) {
         var idAndApplicationIdFilter = and(eq(helpModel), or(elemMatch("applications", eq("user",
-                deletingUser)), buildIdAndApplicationFilter(deletingUser)));
+                deletingUser)), buildUserIdAndApplicationFilter(deletingUser)));
 
         var pullApplication = pull("applications", eq("user", deletingUser));
         var pullAcceptedApplication = buildDeleteApplicationFilter(deletingUser);
@@ -143,10 +189,10 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     }
 
 
-    public Bson buildIdAndApplicationFilter(ObjectId deletingUser) {
+    public Bson buildUserIdAndApplicationFilter(ObjectId userId) {
         return this.getModel().equals(HelpOfferModel.class) ? elemMatch("acceptedApplications", eq(
                 "user",
-                deletingUser)) : eq("acceptedApplication.user", deletingUser);
+                userId)) : eq("acceptedApplication.user", userId);
     }
 
     public Bson buildDeleteApplicationFilter(ObjectId deletingUser) {
@@ -242,7 +288,7 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     }
 
     private HelpModelApplication filterApplications(T offerModel, ObjectId userId) {
-        return offerModel.getCombinedApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions.ApplicationNotFoundException(offerModel.getId()));
+        return offerModel.combineApplications().stream().filter(x -> x.getUser().equals(userId)).findFirst().orElseThrow(() -> new de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions.ApplicationNotFoundException(offerModel.getId()));
     }
 
     protected T getByModelIdAndUser(ObjectId modelId, ObjectId userId) {
@@ -252,4 +298,45 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
     }
 
 
+    //Observable stuff
+
+
+    public void onUpdate(UserModel updatedUser) {
+
+        var appliedToModelId =
+                updatedUser.combineSendApplications().stream().filter(x -> x.getHelpModelType().equals(this.getModel().getSimpleName())).map(HelpModelApplication::getModelId).collect(Collectors.toList());
+
+        var savedModels = this.getModel().equals(HelpOfferModel.class) ?
+                updatedUser.getHelpOffers() : updatedUser.getHelpRequests();
+
+        this.updateModelUser(updatedUser, savedModels);
+
+        var applicationUpdate = new HelpModelApplicationUpdate().copyUserInformation(updatedUser);
+        var userId = updatedUser.getId();
+
+        this.updateApplicationByUser(applicationUpdate, appliedToModelId, userId);
+
+    }
+
+    @Override
+    public void onSubscribe(Disposable disposable) {
+
+    }
+
+    public abstract void onDelete(UserModel userModel);
+
+    @Override
+    public void onNext(AbstractHelpModelService<T> tAbstractHelpModelService) {
+
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
 }

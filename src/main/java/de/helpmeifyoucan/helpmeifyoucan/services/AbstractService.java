@@ -89,6 +89,10 @@ public abstract class AbstractService<T extends AbstractEntity> {
         return this.collection.findOneAndDelete(filter);
     }
 
+    protected long deleteMany(Bson filter) {
+        return this.collection.deleteMany(filter).getDeletedCount();
+    }
+
     public boolean exists(Bson filter) {
         return this.getOptional(filter).isPresent();
     }

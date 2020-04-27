@@ -14,8 +14,11 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.set;
@@ -34,7 +37,6 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     private void createIndex() {
         IndexOptions options = new IndexOptions();
         options.unique(true);
-
         super.createIndex(Indexes.ascending("location"), options);
     }
 
@@ -51,12 +53,19 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         var requestFilter = and(where("this.helpRequests.length > 0"), geoWithinCenterSphere(
                 "location", longitude, latitude, radius / 6371));
         return getAllByFilter(requestFilter);
+
     }
 
     public List<Coordinates> getAllOffers(double longitude, double latitude, double radius) {
         var offerFilter = and(where("this.helpOffers.length > 0"), geoWithinCenterSphere(
                 "location", longitude, latitude, radius / 6371));
         return getAllByFilter(offerFilter);
+    }
+
+    public List<Coordinates> getAllCombined(double longitude, double latitude, double radius) {
+        return Stream.of(getAllRequests(longitude, latitude, radius), getAllOffers(longitude,
+                latitude,
+                radius)).flatMap(Collection::stream).collect(Collectors.toList());
     }
 
 

@@ -4,6 +4,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpOfferModel;
+import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,4 +29,8 @@ public class HelpOfferModelService extends AbstractHelpModelService<HelpOfferMod
     }
 
 
+    public void onDelete(UserModel deletedUser) {
+        var userId = deletedUser.getId();
+        deletedUser.getHelpOffers().forEach(x -> super.deleteModel(x, userId));
+    }
 }

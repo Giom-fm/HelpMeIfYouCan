@@ -1,7 +1,5 @@
 package de.helpmeifyoucan.helpmeifyoucan.controllers;
 
-import com.mongodb.MongoCommandException;
-import com.mongodb.MongoWriteException;
 import de.helpmeifyoucan.helpmeifyoucan.models.AddressModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.UserModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
@@ -12,11 +10,9 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.Valid;
 
@@ -39,9 +35,9 @@ public class UserController {
 
     @Secured({Role.ROLE_NAME_USER})
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/me")
-    public void deleteMe() {
-        this.userService.handleUserMeDelete(this.getIdFromContext());
+    @DeleteMapping(value = "/me", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void deleteMe(@RequestBody UserUpdate update) {
+        this.userService.handleUserMeDelete(this.getIdFromContext(), update);
     }
 
     @Secured({Role.ROLE_NAME_USER})
@@ -108,18 +104,7 @@ public class UserController {
         this.userService.deleteById(id);
     }
 
-    // REVIEW GIOM
-    @ExceptionHandler(value = {MongoWriteException.class})
-    protected ResponseEntity<String> handleConflict(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = "Email already taken!";
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
-    }
 
-    @ExceptionHandler(value = {MongoCommandException.class})
-    protected ResponseEntity<String> duplicateKey(RuntimeException ex, WebRequest request) {
-        String bodyOfResponse = ex.getLocalizedMessage();
-        return new ResponseEntity<>(bodyOfResponse, HttpStatus.BAD_REQUEST);
-    }
 
     private ObjectId getIdFromContext() {
         return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

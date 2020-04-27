@@ -1,5 +1,6 @@
-package de.helpmeifyoucan.helpmeifyoucan.utils;
+package de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers;
 
+import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import org.bson.BsonReader;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;

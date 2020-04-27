@@ -1,9 +1,9 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.helpmeifyoucan.helpmeifyoucan.utils.AcceptedApplicationSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.HelpCategoryEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.AcceptedApplicationSerializer;
 import org.bson.types.ObjectId;
 
 import javax.validation.constraints.NotNull;
@@ -59,7 +59,7 @@ public class HelpRequestModel extends AbstractHelpModel {
     }
 
     @Override
-    public List<HelpModelApplication> getCombinedApplications() {
+    public List<HelpModelApplication> combineApplications() {
         var newList = new LinkedList<>(this.applications);
         newList.add(acceptedApplication);
 
