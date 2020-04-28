@@ -48,6 +48,7 @@ public class CoordinatesController {
         return this.coordinatesService.getById(id);
     }
 
+    
     @GetMapping(path = "/public", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllPublic(@RequestParam double longitude, @RequestParam double latitude,
                                           @RequestParam double radius) {
