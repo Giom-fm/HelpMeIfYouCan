@@ -1,7 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
-import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations;
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 
 public class Register extends Credentials {
 
@@ -10,7 +10,7 @@ public class Register extends Credentials {
     @ValidName
     private String lastName;
 
-    @Annotations.ValidPhone
+    @ValidPhone
     protected String phoneNr;
 
     public String getName() {

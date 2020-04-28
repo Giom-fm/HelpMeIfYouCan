@@ -17,14 +17,14 @@
 						"method": "POST",
 						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password1\",\n    \"name\": \"Firstname\",\n    \"lastName\": \"Lastname\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
+                          "mode": "raw",
+                          "raw": "{\n    \"email\": \"user1@mail.de\",\n    \"phoneNr\" : \"01724561\",\n    \"password\": \"password1\",\n    \"name\": \"applicatant\",\n    \"lastName\": \"Lastname\"\n}",
+                          "options": {
+                            "raw": {
+                              "language": "json"
+                            }
+                          }
+                        },
 						"url": {
 							"raw": "{{HOST}}:{{PORT}}/auth/signup",
 							"host": [
@@ -1096,11 +1096,11 @@
 	"auth": {
 		"type": "bearer",
 		"bearer": [
-			{
-				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZWE3MGI0NGU3ZTVhMTdkMjkxNzFmZDMiLCJpYXQiOjE1ODgwMDc3MTAsImV4cCI6MTU4ODg3MTcxMCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.nx2FLCjkm3PUi77vX4Ty6jHUC0h05j0Z9fUvWXFQT1N4AduVhgWxUS_ZqY2SQnTJRm6O6GnYXVBojVyQ8ndA1Q",
-				"type": "string"
-			}
+          {
+            "key": "token",
+            "value": "",
+            "type": "string"
+          }
 		]
 	},
 	"event": [
@@ -1126,18 +1126,18 @@
 		}
 	],
 	"variable": [
-		{
-			"id": "1ded2033-cfb9-46cb-bd24-ad6cecb6ef02",
-			"key": "HOST",
-			"value": "localhost",
-			"type": "string"
-		},
-		{
-			"id": "58ce2b90-f615-403a-99ef-939e04d59369",
-			"key": "PORT",
-			"value": "8080",
-			"type": "string"
-		}
+      {
+        "id": "01f624b5-fa6d-4cf3-8c83-aee8e69d0506",
+        "key": "HOST",
+        "value": "localhost",
+        "type": "string"
+      },
+      {
+        "id": "da3e3c83-8628-4621-9034-7f6b708dbf34",
+        "key": "PORT",
+        "value": "8080",
+        "type": "string"
+      }
 	],
 	"protocolProfileBehavior": {}
 }
