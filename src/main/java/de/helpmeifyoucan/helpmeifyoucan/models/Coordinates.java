@@ -11,12 +11,9 @@ import org.bson.types.ObjectId;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 public class Coordinates extends AbstractEntity {
@@ -153,8 +150,11 @@ public class Coordinates extends AbstractEntity {
         return this.calculateHashCode();
     }
 
-    public List<ObjectId> combineModels() {
-        return Stream.of(this.helpOffers, this.helpRequests).flatMap(Collection::stream).collect(Collectors.toList());
+    public List<List<ObjectId>> combineModels() {
+        var resultingList = new LinkedList<List<ObjectId>>();
+        resultingList.add(this.helpOffers);
+        resultingList.add(this.helpRequests);
+        return resultingList;
     }
 
     public String toJson() {

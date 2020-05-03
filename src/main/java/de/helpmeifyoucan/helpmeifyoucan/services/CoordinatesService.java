@@ -28,6 +28,7 @@ import static com.mongodb.client.model.Updates.set;
 public class CoordinatesService extends AbstractService<Coordinates> {
 
     private CoordinatesServiceSubject subject;
+
     @Autowired
     public CoordinatesService(MongoDatabase dataBase) {
         super(dataBase);
@@ -78,7 +79,19 @@ public class CoordinatesService extends AbstractService<Coordinates> {
     private List<Coordinates> filterCoordinatesOfOwnModels(List<Coordinates> coords,
                                                            ObjectId userId) {
         var userModels = this.subject.getModels(userId);
-        return coords.parallelStream().filter(x -> x.combineModels().stream().anyMatch(y -> !userModels.contains(y))).collect(Collectors.toList());
+
+        coords.forEach(c -> {
+            c.setHelpOffers(filterModels(c.getHelpOffers(),
+                    userModels));
+            c.setHelpRequests(filterModels(c.getHelpRequests(), userModels));
+        });
+
+        return coords;
+    }
+
+    private List<ObjectId> filterModels(List<ObjectId> listToFilter,
+                                        List<ObjectId> listToFilterAgainst) {
+        return listToFilter.stream().filter(obj -> !listToFilterAgainst.contains(obj)).collect(Collectors.toList());
     }
 
 
