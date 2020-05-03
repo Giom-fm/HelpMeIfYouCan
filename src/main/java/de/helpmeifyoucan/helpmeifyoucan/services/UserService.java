@@ -6,6 +6,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.*;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AbstractModelUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.AddressUpdate;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.UserUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.observable.subjects.UserServiceSubject;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.ApplicationExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.AuthExceptions.PasswordMismatchException;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.UserExceptions;
@@ -25,19 +26,21 @@ import static com.mongodb.client.model.Updates.*;
 import static java.util.Collections.singletonList;
 
 @Service
-public class UserService extends AbstractService<UserModel> {
+public class UserService extends AbstractObserverService<UserModel> {
 
     private AddressService addressService;
     private BCryptPasswordEncoder passwordEncoder;
-    private ServiceSubject serviceSubject;
+    private UserServiceSubject serviceSubject;
 
     @Autowired
-    public UserService(MongoDatabase database, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(MongoDatabase database, BCryptPasswordEncoder passwordEncoder,
+                       CoordinatesService coordsService) {
         super(database);
         super.createCollection("users", UserModel.class);
         this.passwordEncoder = passwordEncoder;
         createIndex();
-        serviceSubject = new ServiceSubject();
+        serviceSubject = new UserServiceSubject();
+        coordsService.subscribe(this);
     }
 
     private void createIndex() {
@@ -75,6 +78,12 @@ public class UserService extends AbstractService<UserModel> {
     public AddressModel getUserAddress(ObjectId id) {
         var addressId = this.getById(id).getUserAddress();
         return this.addressService.getById(addressId);
+    }
+
+    public List<ObjectId> getModels(ObjectId userId) {
+        var savedUser = this.getById(userId);
+
+        return savedUser.combineModels();
     }
 
     /**
@@ -419,7 +428,7 @@ public class UserService extends AbstractService<UserModel> {
     }
 
 
-    public void subscribe(AbstractHelpModelService<? extends AbstractHelpModel> observer) {
-        this.serviceSubject.subscribeActual(observer);
+    public void subscribe(AbstractHelpModelService<?> observer) {
+        this.serviceSubject.subscribe(observer);
     }
 }

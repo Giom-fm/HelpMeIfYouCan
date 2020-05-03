@@ -249,7 +249,6 @@ public class CoordinatesServiceTest {
 
         this.coordinatesService.save(testCoords);
 
-        System.out.println(this.coordinatesService.getAllOffers(20, 50, 10));
 
     }
 

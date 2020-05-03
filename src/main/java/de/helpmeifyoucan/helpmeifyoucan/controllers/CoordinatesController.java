@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,14 +33,14 @@ public class CoordinatesController {
     @GetMapping(path = "/requests", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllRequests(@RequestParam double longitude, @RequestParam double latitude,
                                             @RequestParam double radius) {
-        return this.coordinatesService.getAllRequests(longitude, latitude, radius);
+        return this.coordinatesService.getAllRequests(longitude, latitude, radius, getIdFromContext());
     }
 
     @Secured({Role.ROLE_NAME_USER})
     @GetMapping(path = "/offers", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllOffers(@RequestParam double longitude, @RequestParam double latitude,
                                           @RequestParam double radius) {
-        return this.coordinatesService.getAllOffers(longitude, latitude, radius);
+        return this.coordinatesService.getAllOffers(longitude, latitude, radius, getIdFromContext());
     }
 
     @Secured({Role.ROLE_NAME_USER})
@@ -51,7 +52,11 @@ public class CoordinatesController {
     @GetMapping(path = "/public", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Coordinates> getAllPublic(@RequestParam double longitude, @RequestParam double latitude,
                                           @RequestParam double radius) {
-        return this.coordinatesService.getAllCombined(longitude, latitude, radius);
+        return this.coordinatesService.getAllCombined(longitude, latitude, radius, getIdFromContext());
+    }
+
+    protected ObjectId getIdFromContext() {
+        return (ObjectId) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
 }
