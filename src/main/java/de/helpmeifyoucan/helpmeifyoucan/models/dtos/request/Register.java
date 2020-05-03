@@ -1,6 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models.dtos.request;
 
 import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidName;
+import de.helpmeifyoucan.helpmeifyoucan.validation.Annotations.ValidPhone;
 
 public class Register extends Credentials {
 
@@ -8,6 +9,9 @@ public class Register extends Credentials {
     private String name;
     @ValidName
     private String lastName;
+
+    @ValidPhone
+    protected String phoneNr;
 
     public String getName() {
         return name;
@@ -23,5 +27,14 @@ public class Register extends Credentials {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhoneNr() {
+        return phoneNr;
+    }
+
+    public Register setPhoneNr(String phoneNr) {
+        this.phoneNr = phoneNr;
+        return this;
     }
 }

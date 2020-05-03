@@ -11,30 +11,30 @@
 				{
 					"name": "Register",
 					"request": {
-						"auth": {
-							"type": "noauth"
-						},
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"email\": \"user@mail.de\",\n    \"password\": \"password1\",\n    \"name\": \"Firstname\",\n    \"lastName\": \"Lastname\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{HOST}}:{{PORT}}/auth/signup",
-							"host": [
-								"{{HOST}}"
-							],
-							"port": "{{PORT}}",
-							"path": [
-								"auth",
-								"signup"
-							]
+                      "auth": {
+                        "type": "noauth"
+                      },
+                      "method": "POST",
+                      "header": [],
+                      "body": {
+                        "mode": "raw",
+                        "raw": "{\n    \"email\": \"user2@mail.de\",\n    \"phoneNr\" : \"01724561\",\n    \"password\": \"password1\",\n    \"name\": \"applicatant\",\n    \"lastName\": \"Lastname\"\n}",
+                        "options": {
+                          "raw": {
+                            "language": "json"
+                          }
+                        }
+                      },
+                      "url": {
+                        "raw": "{{HOST}}:{{PORT}}/auth/signup",
+                        "host": [
+                          "{{HOST}}"
+                        ],
+                        "port": "{{PORT}}",
+                        "path": [
+                          "auth",
+                          "signup"
+                        ]
 						},
 						"description": "* email (required)\n* password (required)\n* name (required)\n* lastName (required)"
 					},
@@ -1096,12 +1096,12 @@
 	"auth": {
 		"type": "bearer",
 		"bearer": [
-			{
-				"key": "token",
-				"value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZWE3MGI0NGU3ZTVhMTdkMjkxNzFmZDMiLCJpYXQiOjE1ODgwMDc3MTAsImV4cCI6MTU4ODg3MTcxMCwicm9sZXMiOlsiUk9MRV9VU0VSIl19.nx2FLCjkm3PUi77vX4Ty6jHUC0h05j0Z9fUvWXFQT1N4AduVhgWxUS_ZqY2SQnTJRm6O6GnYXVBojVyQ8ndA1Q",
-				"type": "string"
-			}
-		]
+          {
+            "key": "token",
+            "value": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1ZWFlYTIzYzViNjIyNDcxNWUyY2M1ZTAiLCJpYXQiOjE1ODg1MDMxMDIsImV4cCI6MTU4OTM2NzEwMiwicm9sZXMiOlsiUk9MRV9VU0VSIl19.yKhwI_BYgloafDzYxXmpyrd8NYuMnp09JWmEMjM6dMcostl0xMnQ9v2A4qLrb_kJ3Gq1bv0UwewvXtzh0RHUIg",
+            "type": "string"
+          }
+        ]
 	},
 	"event": [
 		{
@@ -1126,18 +1126,18 @@
 		}
 	],
 	"variable": [
-		{
-			"id": "1ded2033-cfb9-46cb-bd24-ad6cecb6ef02",
-			"key": "HOST",
-			"value": "localhost",
-			"type": "string"
-		},
-		{
-			"id": "58ce2b90-f615-403a-99ef-939e04d59369",
-			"key": "PORT",
-			"value": "8080",
-			"type": "string"
-		}
-	],
+      {
+        "id": "b7ccd843-21ad-453e-a924-f77122ff5b8a",
+        "key": "HOST",
+        "value": "localhost",
+        "type": "string"
+      },
+      {
+        "id": "76950018-ba40-4656-8451-721907c4c7a6",
+        "key": "PORT",
+        "value": "8080",
+        "type": "string"
+      }
+    ],
 	"protocolProfileBehavior": {}
 }

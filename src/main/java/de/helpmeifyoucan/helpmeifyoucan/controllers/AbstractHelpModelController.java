@@ -60,7 +60,7 @@ public abstract class AbstractHelpModelController<T extends AbstractHelpModel> {
     @PostMapping(path = "/{modelId}/apply", consumes = MediaType.APPLICATION_JSON_VALUE, produces =
             MediaType.APPLICATION_JSON_VALUE)
     public HelpModelApplication applyToRequest(@PathVariable ObjectId modelId,
-                                               @RequestBody HelpModelApplication application) {
+                                               @Valid @RequestBody HelpModelApplication application) {
         return this.modelService.handleNewApplication(modelId, application, getIdFromContext());
     }
 

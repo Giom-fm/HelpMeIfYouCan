@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
 public class HelpModelApplication extends AbstractEntity {
 
+    @NotNull
     private String message;
 
     private String name;
