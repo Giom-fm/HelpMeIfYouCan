@@ -1,22 +1,29 @@
 spring:
   profiles: production
   main:
-    banner-mode: off
+    banner-mode: console
     lazy-initialization: false
 server:
-  port: 80
+  port: 8080
+  error:
+    include-stacktrace: always
 logging:
   level:
     .: error
-    org.springframework: INFO
+    org.springframework:
+      .: INFO
+      security.web.FilterChainProxy: INFO
     org.zalando.logbook: TRACE
+    
     org.mongodb.driver:
       .: INFO
       cluster: OFF
+    de.helpmeifyoucan:
+      .: DEBUG
 database:
-  host: ""
-  user: dbUser
-  password: ${DATABASE_PASSWORD}
+  protocol: mongodb
+  host: database
+  name: helpmeifyoucan
 jwt:
   secret: ${random.value}
   expiration: 864000000
@@ -24,7 +31,7 @@ logbook:
   format.style: http
   filter.enabled: true
   secure-filter.enabled: false
-  strategy: without-body
+  strategy: default
   obfuscate:
     headers:
       - Authorization

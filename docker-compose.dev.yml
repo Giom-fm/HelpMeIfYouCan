@@ -1,13 +1,14 @@
 version: "3.7"
 
-
 networks:
   helpmeifyoucan:
 
 services:
 
-  app:
-    build: .
+  backend:
+    build: 
+      context: .
+      dockerfile: 
     container_name: helpmeifyoucan-app
     environment: 
       - PROFILE=local
