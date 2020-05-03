@@ -18,6 +18,8 @@ services:
   database:
     image: mongo
     container_name: helpmeifyoucan-db
+    volumes:
+      - ./volumes/mongo:/data/db
     networks: 
       - helpmeifyoucan
     ports: 
