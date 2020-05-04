@@ -80,14 +80,13 @@ public class CoordinatesService extends AbstractService<Coordinates> {
                                                            ObjectId userId) {
         var userModels = this.subject.getModels(userId);
 
-        coords.forEach(c -> {
-            c.setHelpOffers(filterModels(c.getHelpOffers(),
-                    userModels));
-            c.setHelpRequests(filterModels(c.getHelpRequests(), userModels));
-        });
+        return coords.parallelStream().map(x -> x.setHelpRequests(filterModels(x.getHelpRequests(),
+                userModels))).map(c -> c.setHelpOffers(filterModels(c.getHelpOffers(),
+                userModels))).filter(Coordinates::hasRefsToModels).collect(Collectors.toList());
 
-        return coords;
+
     }
+
 
     private List<ObjectId> filterModels(List<ObjectId> listToFilter,
                                         List<ObjectId> listToFilterAgainst) {

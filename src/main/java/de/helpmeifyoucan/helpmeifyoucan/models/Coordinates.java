@@ -150,11 +150,9 @@ public class Coordinates extends AbstractEntity {
         return this.calculateHashCode();
     }
 
-    public List<List<ObjectId>> combineModels() {
-        var resultingList = new LinkedList<List<ObjectId>>();
-        resultingList.add(this.helpOffers);
-        resultingList.add(this.helpRequests);
-        return resultingList;
+    public boolean hasRefsToModels() {
+        return !noHelpModelRefs();
+
     }
 
     public String toJson() {
