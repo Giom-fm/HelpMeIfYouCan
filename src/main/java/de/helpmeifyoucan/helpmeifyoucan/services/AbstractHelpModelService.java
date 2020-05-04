@@ -13,8 +13,6 @@ import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpOfferModelExceptions;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.HelpRequestModelExceptions;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,7 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Updates.*;
 
 @Service
-public abstract class AbstractHelpModelService<T extends AbstractHelpModel> extends AbstractService<T> implements Observer<AbstractHelpModelService<T>> {
+public abstract class AbstractHelpModelService<T extends AbstractHelpModel> extends AbstractObserverService<T> {
 
 
     protected CoordinatesService coordinatesService;
@@ -318,25 +316,14 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
     }
 
-    @Override
-    public void onSubscribe(Disposable disposable) {
-
-    }
-
-    public abstract void onDelete(UserModel userModel);
-
-    @Override
-    public void onNext(AbstractHelpModelService<T> tAbstractHelpModelService) {
-
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-
-    }
-
-    @Override
-    public void onComplete() {
-
+    public void onDelete(UserModel deletedUser) {
+        var userId = deletedUser.getId();
+        if (this.getModel().equals(HelpOfferModel.class)) {
+            deletedUser.getHelpOffers().forEach(x -> this.deleteModel(x,
+                    userId));
+        } else {
+            deletedUser.getHelpRequests().forEach(x -> this.deleteModel(x,
+                    userId));
+        }
     }
 }

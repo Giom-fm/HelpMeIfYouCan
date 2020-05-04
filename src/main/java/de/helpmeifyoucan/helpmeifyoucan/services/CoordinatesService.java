@@ -8,6 +8,7 @@ import de.helpmeifyoucan.helpmeifyoucan.models.AbstractHelpModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.Coordinates;
 import de.helpmeifyoucan.helpmeifyoucan.models.HelpRequestModel;
 import de.helpmeifyoucan.helpmeifyoucan.models.dtos.request.CoordinatesUpdate;
+import de.helpmeifyoucan.helpmeifyoucan.services.observable.subjects.CoordinatesServiceSubject;
 import de.helpmeifyoucan.helpmeifyoucan.utils.errors.CoordinatesExceptions;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -26,12 +27,15 @@ import static com.mongodb.client.model.Updates.set;
 @Service
 public class CoordinatesService extends AbstractService<Coordinates> {
 
+    private CoordinatesServiceSubject subject;
+
     @Autowired
     public CoordinatesService(MongoDatabase dataBase) {
         super(dataBase);
 
         super.createCollection("coordinates", Coordinates.class);
         this.createIndex();
+        subject = new CoordinatesServiceSubject();
     }
 
     private void createIndex() {
@@ -49,23 +53,45 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         return super.getAllByFilter(exists);
     }
 
-    public List<Coordinates> getAllRequests(double longitude, double latitude, double radius) {
+    public List<Coordinates> getAllRequests(double longitude, double latitude, double radius,
+                                            ObjectId userId) {
         var requestFilter = and(where("this.helpRequests.length > 0"), geoWithinCenterSphere(
                 "location", longitude, latitude, radius / 6371));
-        return getAllByFilter(requestFilter);
+        return filterCoordinatesOfOwnModels(getAllByFilter(requestFilter), userId);
 
     }
 
-    public List<Coordinates> getAllOffers(double longitude, double latitude, double radius) {
+    public List<Coordinates> getAllOffers(double longitude, double latitude, double radius,
+                                          ObjectId userId) {
         var offerFilter = and(where("this.helpOffers.length > 0"), geoWithinCenterSphere(
                 "location", longitude, latitude, radius / 6371));
-        return getAllByFilter(offerFilter);
+        return filterCoordinatesOfOwnModels(getAllByFilter(offerFilter), userId);
     }
 
-    public List<Coordinates> getAllCombined(double longitude, double latitude, double radius) {
-        return Stream.of(getAllRequests(longitude, latitude, radius), getAllOffers(longitude,
-                latitude,
-                radius)).flatMap(Collection::stream).collect(Collectors.toList());
+    public List<Coordinates> getAllCombined(double longitude, double latitude, double radius,
+                                            ObjectId userId) {
+        return Stream.of(getAllRequests(longitude, latitude, radius, userId),
+                getAllOffers(longitude,
+                        latitude,
+                        radius, userId)).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    private List<Coordinates> filterCoordinatesOfOwnModels(List<Coordinates> coords,
+                                                           ObjectId userId) {
+        var userModels = this.subject.getModels(userId);
+
+        coords.forEach(c -> {
+            c.setHelpOffers(filterModels(c.getHelpOffers(),
+                    userModels));
+            c.setHelpRequests(filterModels(c.getHelpRequests(), userModels));
+        });
+
+        return coords;
+    }
+
+    private List<ObjectId> filterModels(List<ObjectId> listToFilter,
+                                        List<ObjectId> listToFilterAgainst) {
+        return listToFilter.stream().filter(obj -> !listToFilterAgainst.contains(obj)).collect(Collectors.toList());
     }
 
 
@@ -287,5 +313,7 @@ public class CoordinatesService extends AbstractService<Coordinates> {
         return helpModel instanceof HelpRequestModel;
     }
 
-
+    public void subscribe(UserService observer) {
+        this.subject.subscribe(observer);
+    }
 }
