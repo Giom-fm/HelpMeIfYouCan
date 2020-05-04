@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3.5"
 
 networks:
   helpmeifyoucan:
@@ -34,6 +34,10 @@ services:
         BACKEND_URL: backend
         BACKEND_PORT: 8080
         GOOGLE_API_KEY: 
+    entrypoint:
+      - npm
+      - run
+      - dev
     networks:
       - helpmeifyoucan
     ports:
