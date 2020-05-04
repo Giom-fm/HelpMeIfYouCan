@@ -4,11 +4,9 @@ networks:
   helpmeifyoucan:
 
 services:
-
   backend:
     build: 
       context: .
-      dockerfile: 
     container_name: helpmeifyoucan-app
     environment: 
       - PROFILE=local
