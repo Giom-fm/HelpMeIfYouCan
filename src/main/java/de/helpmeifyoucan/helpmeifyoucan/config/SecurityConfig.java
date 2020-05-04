@@ -26,16 +26,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         private JwtAuthenticationProvider jwtAuthenticationProvider;
         private EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider;
-   
-
 
         @Autowired
         public SecurityConfig(JwtAuthenticationProvider jwtAuthenticationProvider,
                         EmailPasswordAuthenticationProvider emailPasswordAuthenticationProvider) {
                 this.jwtAuthenticationProvider = jwtAuthenticationProvider;
                 this.emailPasswordAuthenticationProvider = emailPasswordAuthenticationProvider;
-            
-           
+
         }
 
         @Override
@@ -43,8 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 http
                                 // Disbale Cors and CSRF
                                 .cors().and().csrf().disable()
-                                // Allow only signup
+                                // Allow public Endpoints
                                 .authorizeRequests().antMatchers(HttpMethod.POST, "/auth/signup").permitAll()
+                                .antMatchers(HttpMethod.GET, "/coordinates/public").permitAll()
                                 // Make any other Endpoint only reachable with JWT-Token
                                 .anyRequest().authenticated().and()
                                 // Login Filter
