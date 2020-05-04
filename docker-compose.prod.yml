@@ -4,25 +4,24 @@ networks:
   helpmeifyoucan:
 
 services:
-
   backend:
     build: .
     container_name: helpmeifyoucan-backend
-    environment: 
+    environment:
       - PROFILE=production
-    networks: 
+    networks:
       - helpmeifyoucan
-    depends_on: 
+    depends_on:
       - database
-  
+
   database:
     image: mongo
     container_name: helpmeifyoucan-db
     volumes:
       - ./volumes/mongo:/data/db
-    networks: 
+    networks:
       - helpmeifyoucan
-    ports: 
+    ports:
       - 27017:27017
 
   frontend:
@@ -33,14 +32,9 @@ services:
         BASE_PORT: 3030
         BACKEND_URL: backend
         BACKEND_PORT: 8080
-        GOOGLE_API_KEY: 
-    entrypoint:
-      - npm
-      - run
-      - dev
+        GOOGLE_API_KEY:
+    entrypoint: [npm, run, dev]
     networks:
       - helpmeifyoucan
     ports:
       - 3030:3030
-
-
