@@ -119,8 +119,14 @@ public abstract class AbstractHelpModelService<T extends AbstractHelpModel> exte
 
         var removeApplicationFromApplications = pull("applications", eq(applicationId));
 
-        this.updateExistingFields(eq(helpModel), combine(buildAcceptedApplicationUpdate(acceptedApplication),
-                removeApplicationFromApplications));
+        var setModelToInActive = set("status", PostStatusEnum.INACTIVE);
+
+
+        var acceptedModel = this.updateExistingFields(eq(helpModel),
+                combine(buildAcceptedApplicationUpdate(acceptedApplication),
+                        removeApplicationFromApplications, setModelToInActive));
+
+        this.coordinatesService.handleHelpModelCoordinateDelete(acceptedModel);
 
         return acceptedApplication;
     }

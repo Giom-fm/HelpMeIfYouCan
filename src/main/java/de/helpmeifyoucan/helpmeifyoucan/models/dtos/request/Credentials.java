@@ -16,7 +16,7 @@ public class Credentials {
     }
 
     public Credentials(String email, String password){
-        this.email = email;
+        this.email = email.toLowerCase();
         this.password = password;
     }
 
@@ -26,7 +26,7 @@ public class Credentials {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email.toLowerCase();
     }
 
     public String getPassword() {

@@ -1,6 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.DateSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
 import org.bson.types.ObjectId;
 
@@ -10,29 +11,23 @@ import java.util.Objects;
 
 public class HelpModelApplication extends AbstractEntity {
 
+    @JsonSerialize(converter = DateSerializer.class)
+    protected Date created;
     @NotNull
     private String message;
-
     private String name;
-
     private String lastName;
-
     @JsonSerialize(converter = ObjectIdMapping.class)
     private ObjectId user;
-
     private String telephoneNr;
-
     @JsonSerialize(converter = ObjectIdMapping.class)
     private ObjectId modelId;
-
     private String helpModelType;
-
     private boolean read;
 
-    protected Date created;
-
-
     public Date getCreated() {
+
+
         return created;
     }
 
@@ -123,7 +118,8 @@ public class HelpModelApplication extends AbstractEntity {
 
     public HelpModelApplication generateId() {
         this.setId(new ObjectId());
-        this.setCreated(new Date());
+        this.created = new Date();
+
         return this;
     }
 

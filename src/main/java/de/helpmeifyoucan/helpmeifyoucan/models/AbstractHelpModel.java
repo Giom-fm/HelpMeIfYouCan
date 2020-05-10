@@ -1,6 +1,7 @@
 package de.helpmeifyoucan.helpmeifyoucan.models;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.PostStatusEnum;
 import de.helpmeifyoucan.helpmeifyoucan.utils.listSerializers.ListApplicationSerializer;
 import de.helpmeifyoucan.helpmeifyoucan.utils.objectSerializers.ObjectIdMapping;
@@ -31,6 +32,7 @@ public abstract class AbstractHelpModel extends AbstractEntity {
 
     protected PostStatusEnum status;
 
+    @JsonSerialize(using = DateSerializer.class)
     protected Date datePublished;
 
 

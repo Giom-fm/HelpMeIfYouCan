@@ -41,7 +41,7 @@ public class AuthController {
         var hashedPassword = bCryptPasswordEncoder.encode(register.getPassword());
         var roles = new LinkedList<>(Collections.singletonList(Role.ROLE_USER));
         var user = new UserModel();
-        user.setEmail(register.getEmail()).setPassword(hashedPassword);
+        user.setEmail(register.getEmail().toLowerCase()).setPassword(hashedPassword);
         user.setName(register.getName()).setLastName(register.getLastName());
         user.setPhoneNr(register.getPhoneNr());
         user.setRoles(roles);
